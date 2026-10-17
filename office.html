@@ -179,6 +179,13 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .clog{display:flex;flex-direction:column;gap:10px}
 .rec.prg{text-decoration:none;color:inherit;border:1px solid color-mix(in srgb,var(--c) 28%,var(--line));border-top:4px solid var(--c);border-inline-start-width:1px;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 9%,var(--surface)),var(--surface) 70%)}
 .rec.prg .t b{color:var(--c)}
+.rec.prg .cov{display:flex;flex-direction:column;gap:8px;color:inherit;text-decoration:none}
+.rec.prg .acts{border-top:1px dashed color-mix(in srgb,var(--c) 30%,var(--line));padding-top:8px}
+.rec.prg .acts .btn:not(.ghost){border-color:color-mix(in srgb,var(--c) 40%,var(--line));color:var(--c)}
+.sug{display:flex;flex-wrap:wrap;gap:6px;grid-column:1/-1;margin-top:-4px}.sug>span{flex-basis:100%}
+.sug button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:.84rem;text-align:start;color:inherit}
+.sug button[aria-pressed=true]{background:color-mix(in srgb,var(--prg) 14%,var(--surface));border-color:var(--prg);color:var(--prg);font-weight:700}
+.sug button[aria-pressed=true]::before{content:'✓ '}
 .rec.prg .pic{width:34px;height:34px;border-radius:11px;background:var(--c);color:#fff;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:1.05rem;flex:none;box-shadow:0 3px 8px color-mix(in srgb,var(--c) 35%,transparent)}
 .rec.prg .pbar i{background:var(--c)}
 .chip.warn{background:color-mix(in srgb,#C77700 14%,var(--surface));color:#9A5B00;border-color:color-mix(in srgb,#C77700 35%,var(--line))}
@@ -1191,6 +1198,27 @@ const MY_PROGS = [
     results: 'معرفة الطالبات بقواعد الاستخدام الآمن للإنترنت\nوعي الطالبات بأهمية حماية معلوماتهن الشخصية وعدم التواصل مع الغرباء\nمعرفة الطالبات بطرق التصرف والإبلاغ عند التعرض لمحتوى أو تواصل مزعج\nوصول الرسالة التوعوية لأولياء الأمور عن الرقابة وتنظيم وقت الشاشة',
     recs: 'تكرار التوعية بالأمان الرقمي خلال العام\nتفعيل دور الأسرة في متابعة استخدام بناتهن للأجهزة\nالتعامل مع حالات التنمر الإلكتروني فوراً بالتنسيق مع الأسرة' }
 ];
+
+const SUG_RES = ['تفاعل الطالبات مع أنشطة البرنامج بشكل إيجابي', 'تحقق أهداف البرنامج بدرجة عالية', 'زيادة وعي الطالبات بموضوع البرنامج', 'مشاركة فاعلة من المعلمات في تنفيذ البرنامج', 'تفاعل أولياء الأمور مع الرسائل التوعوية', 'تحسن ملحوظ في سلوك الطالبات المرتبط بموضوع البرنامج', 'رصد الطالبات المحتاجات لمتابعة فردية والبدء في متابعتهن', 'رضا الطالبات والمعلمات عن البرنامج وأنشطته'];
+const SUG_REC = ['الاستمرار في تنفيذ البرنامج في الأعوام القادمة', 'تكرار الأنشطة التوعوية خلال العام الدراسي', 'زيادة إشراك أولياء الأمور في البرنامج', 'إشراك المعلمات في التخطيط والتنفيذ', 'متابعة الطالبات المحتاجات لدعم فردي', 'تخصيص وقت أطول لأنشطة البرنامج', 'تعزيز الطالبات المتميزات في البرنامج', 'توثيق البرنامج ونشره كتجربة ناجحة'];
+const SUG_X = {
+  'التهيئة الإرشادية للمستجدات': { r: ['انتظام الطالبات المستجدات في الحضور من الأسبوع الأول', 'شعور الأمهات بالاطمئنان على بناتهن'], c: ['تجهيز ركن ترحيبي دائم للمستجدات', 'عقد لقاء متابعة مع الأمهات بعد شهر من بداية الدراسة'] },
+  'التهيئة الإرشادية لجميع طالبات المدرسة': { r: ['انتظام الطالبات في الحضور الصباحي منذ بداية العام', 'وضوح قواعد السلوك والمواظبة لدى الطالبات'], c: ['تكرار التهيئة مع بداية كل فصل دراسي', 'متابعة الطالبات المتأخرات صباحاً من الأسبوع الأول'] },
+  'برنامج رفق': { r: ['انتشار عبارات اللطف والاحترام بين الطالبات', 'لجوء الطالبات للموجهة عند التعرض لموقف مزعج'], c: ['استمرار شجرة الرفق طوال العام', 'تكريم شهري للطالبات المتميزات في الرفق'] },
+  'المصالح الفضلى للطفل': { r: ['معرفة الطالبات بالأشخاص الموثوقين الذين يلجأن لهم', 'وعي المعلمات بآلية التعامل مع حالات الاشتباه بالإيذاء'], c: ['تعليق دائرة الأمان في الفصول', 'تدريب المعلمات على آلية الإبلاغ عن حالات الإيذاء'] },
+  'الصحة النفسية': { r: ['استفادة الطالبات من ركن الهدوء', 'قدرة الطالبات على استخدام تمارين التنفس عند القلق'], c: ['تدريب المعلمات على ملاحظة علامات الضغط النفسي لدى الطالبات', 'تخصيص لقاء شهري للتعبير عن المشاعر'] },
+  'الاستخدام الآمن للإنترنت': { r: ['قدرة الطالبات على التمييز بين المواقف الآمنة وغير الآمنة على الإنترنت', 'تفاعل الأسر مع نصائح تنظيم وقت الشاشة'], c: ['تعليق إشارة المرور الرقمية في الفصول ومعمل الحاسب', 'التنسيق مع معلمة المهارات الرقمية لدمج الأمان الرقمي في الدروس'] } };
+function progSug(p) {
+  const m = MY_PROGS.find(t => norm(t.title) === norm(p.title)) || {}; const x = SUG_X[(MY_PROGS.find(t => norm(t.title) === norm(p.title)) || {}).title] || {};
+  const u = a => [...new Set(a.filter(Boolean))];
+  return { r: u([...lines(m.results), ...(x.r || []), ...SUG_RES]), c: u([...lines(m.recs), ...(x.c || []), ...SUG_REC]) };
+}
+const psugHTML = (id, arr, cur) => `<div class="sug" data-sugfor="${id}"><span class="tiny muted">اضغطي على أي اقتراح يضاف، واضغطي مرة ثانية يتشال:</span>${arr.map(t => `<button type="button" data-sug="${esc(t)}" aria-pressed="${lines(cur).includes(t)}">${esc(t)}</button>`).join('')}</div>`;
+function sugBind(bg) {
+  bg.addEventListener('click', e => { const b = e.target.closest('[data-sug]'); if (!b) return; e.preventDefault();
+    const ta = bg.querySelector('#' + b.closest('[data-sugfor]').dataset.sugfor); const t = b.dataset.sug; let L = lines(ta.value);
+    if (L.includes(t)) L = L.filter(x => x !== t); else L.push(t); ta.value = L.join('\n'); b.setAttribute('aria-pressed', String(L.includes(t))); });
+}
 async function addMyProgs() {
   const have = new Set(list('program').map(p => norm(p.title)));
   const rows = MY_PROGS.filter(t => !have.has(norm(t.title))).map(t => ({ id: uid('prog'), kind: 'program', data: { ...t, steps: t.steps.map(([x, who]) => ({ t: x, who, date: '', done: true })), status: 'منفذ', lead: 'الموجهة الطلابية', partners: '', count: '', start: '', end: '', photos: [], caps: {} } }));
@@ -1282,10 +1310,11 @@ function vPrograms() {
 }
 function progCard(p) {
   const c = pcolor(p); const [sc, ss] = PSTAT[p.status] || PSTAT['مخطط']; const pct = progPct(p); const st = p.steps || [];
-  return `<a class="rec prg" href="#programs/${p.id}" style="--c:${c}"><div class="t"><span class="pic" aria-hidden="true">${esc(p.icon || String(p.title || '؟').replace(/^(برنامج|البرنامج)\s+/, '').replace(/^ال/, '').trim().charAt(0))}</span><b>${esc(p.title)}</b><span class="pill" style="--pc:${sc};--ps:${ss}">${esc(p.status || 'مخطط')}</span></div>
+  return `<div class="rec prg" style="--c:${c}"><a class="cov" href="#programs/${p.id}"><div class="t"><span class="pic" aria-hidden="true">${esc(p.icon || String(p.title || '؟').replace(/^(برنامج|البرنامج)\s+/, '').replace(/^ال/, '').trim().charAt(0))}</span><b>${esc(p.title)}</b><span class="pill" style="--pc:${sc};--ps:${ss}">${esc(p.status || 'مخطط')}</span></div>
     <div class="meta"><span class="chip c" style="--cs:color-mix(in srgb,${c} 13%,var(--surface))">${esc(p.domain || '')}</span>${p.svc ? `<span class="chip">${esc(p.svc)}</span>` : ''}${p.form && p.form !== 'برنامج' ? `<span class="chip">${esc(p.form)}</span>` : ''}</div>
     <div class="meta">${p.start ? `<span class="chip">${esc(hij(p.start))}</span>` : p.status === 'منفذ' ? '<span class="chip warn">📅 باقي التاريخ</span>' : p.term ? `<span class="chip">${esc(p.term)}</span>` : ''}${p.status === 'منفذ' && !(p.photos || []).length ? '<span class="chip warn">📷 باقي الشواهد</span>' : ''}${p.target ? `<span class="chip">${esc(p.target)}</span>` : ''}</div>
-    ${st.length ? `<div class="pbar" aria-label="تقدم الخطة ${pct}%"><i style="width:${pct}%"></i></div><span class="tiny muted">الخطة: ${ar(st.filter(x => x.done).length)} من ${ar(st.length)} خطوات${(p.photos || []).length ? ` · ${ar(p.photos.length)} شاهد` : ''}${p.count ? ` · ${ar(p.count)} مستفيدة` : ''}</span>` : ''}</a>`;
+    ${st.length ? `<div class="pbar" aria-label="تقدم الخطة ${pct}%"><i style="width:${pct}%"></i></div><span class="tiny muted">الخطة: ${ar(st.filter(x => x.done).length)} من ${ar(st.length)} خطوات${(p.photos || []).length ? ` · ${ar(p.photos.length)} شاهد` : ''}${p.count ? ` · ${ar(p.count)} مستفيدة` : ''}</span>` : ''}</a>
+    <div class="acts"><button class="btn sm" data-prep1="${p.id}">📄 تقرير صفحة واحدة</button><button class="btn sm" data-prep="${p.id}">📑 التقرير الكامل</button><a class="btn sm ghost" href="#programs/${p.id}">فتح ←</a></div></div>`;
 }
 function progFields(p) {
   const sel = (id, opts, v) => `<select id="${id}">${opts.map(o => `<option${o === v ? ' selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
@@ -1327,7 +1356,7 @@ function vProgramOne() {
   return `<a class="btn ghost" href="#programs" style="align-self:flex-start">→ كل البرامج</a>
     <div class="stu-head prg-head" style="--c:${c}"><div class="bigcount" style="--pc:${c};--ps:color-mix(in srgb,${c} 13%,var(--surface))"><div><b class="num">${ar(pct)}٪</b><small>الخطة</small></div></div>
       <div style="flex:1;min-width:220px"><h1 style="font-size:1.45rem;color:${c}">${esc(p.title)}</h1><div class="meta" style="margin-top:6px"><span class="pill" style="--pc:${sc};--ps:${ss}">${esc(p.status || 'مخطط')}</span><span class="chip c" style="--c:${c};--cs:color-mix(in srgb,${c} 13%,var(--surface))">${esc(p.domain || '')}</span>${p.svc ? `<span class="chip">${esc(p.svc)}</span>` : ''}</div></div>
-      <div class="toolbar"><button class="btn hint" data-act="pAI" title="اقتراحات" aria-label="اقتراحات">✦</button><button class="btn wa" data-act="pWA">📲 دعوة أولياء الأمور</button><button class="btn" data-act="pTpl" title="يصير من برامجك الجاهزة وتستخدمينه كل سنة">⭐ حفظ كبرنامج جاهز</button><button class="btn" data-act="pEdit">تعديل</button><button class="btn danger" data-del="${id}" data-back="#programs">حذف</button></div></div>
+      <div class="toolbar"><button class="btn hint" data-act="pAI" title="اقتراحات" aria-label="اقتراحات">✦</button><button class="btn primary" data-act="pRep1">📄 التقرير</button><button class="btn wa" data-act="pWA">📲 دعوة أولياء الأمور</button><button class="btn" data-act="pTpl" title="يصير من برامجك الجاهزة وتستخدمينه كل سنة">⭐ حفظ كبرنامج جاهز</button><button class="btn" data-act="pEdit">تعديل</button><button class="btn danger" data-del="${id}" data-back="#programs">حذف</button></div></div>
     <div class="pcolrow"><span class="tiny muted">لون البرنامج:</span>${PRG_PAL.map(k => `<button type="button" class="sw" data-pcol="${k}" style="--k:${k}" aria-label="لون" aria-pressed="${k === c}"></button>`).join('')}</div>
     ${p.status === 'منفذ' && (!p.start || !(p.photos || []).length) ? `<div class="todo" style="--c:${c}"><b>باقي عليك:</b>${!p.start ? '<button class="btn sm primary" data-act="pDone">📅 تاريخ التنفيذ وعدد المستفيدات</button>' : ''}${!(p.photos || []).length ? '<label class="btn sm primary" style="cursor:pointer">📷 صور الشواهد<input type="file" accept="image/*" multiple data-pph hidden></label>' : ''}</div>` : ''}
     <section class="panel prep" style="--c:${c}"><div class="head"><h3>التقارير</h3></div><div class="reps">
@@ -1361,16 +1390,17 @@ function progStep(i) {
 }
 function progDone() {
   const p = DB.docs[S.param].data;
-  openSheet('تسجيل التنفيذ والنتائج', `<div class="form"><label class="f"><span>عدد المستفيدات</span><input id="r_n" type="number" min="0" inputmode="numeric" value="${esc(p.count || '')}"></label><label class="f"><span>نسبة تحقق الأهداف ٪ (اختياري)</span><input id="r_a" type="number" min="0" max="100" inputmode="numeric" value="${esc(p.achieve || '')}"></label>
+  const bg = openSheet('تسجيل التنفيذ والنتائج', `<div class="form"><label class="f"><span>عدد المستفيدات</span><input id="r_n" type="number" min="0" inputmode="numeric" value="${esc(p.count || '')}"></label><label class="f"><span>نسبة تحقق الأهداف ٪ (اختياري)</span><input id="r_a" type="number" min="0" max="100" inputmode="numeric" value="${esc(p.achieve || '')}"></label>
     <div class="f"><span>تاريخ البداية</span>${hdInput('r_s', p.start)}</div><div class="f"><span>تاريخ النهاية</span>${hdInput('r_e', p.end || p.start)}</div>
-    <label class="f full"><span>النتائج والأثر (كل نتيجة في سطر)</span><textarea id="r_res" style="min-height:110px" placeholder="مثال: تفاعل ٩٠٪ من الطالبات مع الأنشطة&#10;انخفاض حالات التأخر الصباحي">${esc(p.results || '')}</textarea></label>
-    <label class="f full"><span>التوصيات (كل توصية في سطر)</span><textarea id="r_rec" style="min-height:90px">${esc(p.recs || '')}</textarea></label>
+    <label class="f full"><span>النتائج والأثر (كل نتيجة في سطر)</span><textarea id="r_res" style="min-height:110px" placeholder="اختاري من الاقتراحات تحت أو اكتبي">${esc(p.results || '')}</textarea></label>${psugHTML('r_res', progSug(p).r, p.results)}
+    <label class="f full"><span>التوصيات (كل توصية في سطر)</span><textarea id="r_rec" style="min-height:90px" placeholder="اختاري من الاقتراحات تحت أو اكتبي">${esc(p.recs || '')}</textarea></label>${psugHTML('r_rec', progSug(p).c, p.recs)}
     <label class="chk full" style="--sc:var(--good)"><input type="checkbox" id="r_done" checked><span>تم تنفيذ البرنامج (تتغير حالته إلى «منفذ»)</span></label></div>
     <div class="toolbar"><button class="btn primary" type="submit">حفظ</button></div>`,
     async f => { const id = S.param; const d = JSON.parse(JSON.stringify(DB.docs[id].data)); const n = f.querySelector('#r_n').value, a = f.querySelector('#r_a').value;
       d.count = n === '' ? '' : Math.max(0, +n); d.achieve = a === '' ? '' : Math.min(100, Math.max(0, +a)); d.start = readHD(f, 'r_s'); d.end = readHD(f, 'r_e'); if (d.end < d.start) d.end = d.start;
       d.results = f.querySelector('#r_res').value.trim(); d.recs = f.querySelector('#r_rec').value.trim(); if (f.querySelector('#r_done').checked) d.status = 'منفذ'; else if (d.status === 'منفذ') d.status = 'قيد التنفيذ';
       await saveDoc(id, 'program', d); toast('تم الحفظ'); }, `--c:var(--prg);--cs:var(--prg-soft)`);
+  sugBind(bg);
 }
 /* reports */
 function pInfoTable(p) {
@@ -2706,6 +2736,7 @@ document.addEventListener('click', async e => {
   if (d.stepdate) { e.preventDefault(); stepDate_(d.stepdate); return; }
   if (d.absrep) { const only = d.absrep === 'm'; const nm = DB.docs[S.param].data.studentName; closeSheet(); openReport(absReport(only), (only ? 'إجراءات-الموجهة-' : 'غياب-') + nm); return; }
   if (d.role) { e.preventDefault(); const k = d.role; absUpdate(x => { x.roles = x.roles || {}; const cur = roleOf(x, k); x.roles[k] = cur === 'm' ? 'a' : 'm'; }, ''); return; }
+  if (d.prep || d.prep1) { const id = d.prep || d.prep1; const p = { id, ...DB.docs[id].data }; if (d.prep) openReport(progReport(p), 'تقرير-' + p.title); else openReport(progReport1(p), 'تقرير-مختصر-' + p.title); return; }
   if (d.pcol) { progUpdate(x => { x.color = d.pcol; }); return; }
   if (d.daywa) { waDaily(d.daywa); return; }
   if (d.honwa) { waHonor([{ id: d.honwa, ...DB.docs[d.honwa].data }]); return; }

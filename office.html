@@ -177,25 +177,29 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .log .tag{font-style:normal;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--fam-soft);color:var(--fam);flex:none}
 .log .tag.in{background:var(--abs-soft);color:var(--abs)}
 .clog{display:flex;flex-direction:column;gap:10px}
-.rec.prg{text-decoration:none;color:inherit;border:1px solid color-mix(in srgb,var(--c) 28%,var(--line));border-top:4px solid var(--c);border-inline-start-width:1px;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 9%,var(--surface)),var(--surface) 70%)}
-.rec.prg .t b{color:var(--c)}
+.rec.prg{text-decoration:none;color:inherit;border:1px solid color-mix(in srgb,var(--c) 22%,var(--line));border-top:3px solid var(--c);border-inline-start-width:1px;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 6%,var(--surface)),var(--surface) 60%)}
+.rec.prg .t b{color:color-mix(in srgb,var(--c) 60%,#1b2422)}
+.rec.prg .chip.c,.prg-head .chip.c{color:color-mix(in srgb,var(--c) 55%,#1b2422)}
+.panel.prep .rep-btn b{color:color-mix(in srgb,var(--c) 60%,#1b2422)}
+.prg-head .btn.primary{background:color-mix(in srgb,var(--c) 75%,#1b2422);border-color:transparent}
 .rec.prg .cov{display:flex;flex-direction:column;gap:8px;color:inherit;text-decoration:none}
 .rec.prg .acts{border-top:1px dashed color-mix(in srgb,var(--c) 30%,var(--line));padding-top:8px}
-.rec.prg .acts .btn:not(.ghost){border-color:color-mix(in srgb,var(--c) 40%,var(--line));color:var(--c)}
+.rec.prg .acts .btn:not(.ghost){border-color:color-mix(in srgb,var(--c) 35%,var(--line));color:color-mix(in srgb,var(--c) 60%,#1b2422)}
 .sug{display:flex;flex-wrap:wrap;gap:6px;grid-column:1/-1;margin-top:-4px}.sug>span{flex-basis:100%}
 .sug button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:.84rem;text-align:start;color:inherit}
 .sug button[aria-pressed=true]{background:color-mix(in srgb,var(--prg) 14%,var(--surface));border-color:var(--prg);color:var(--prg);font-weight:700}
 .sug button[aria-pressed=true]::before{content:'✓ '}
-.rec.prg .pic{width:34px;height:34px;border-radius:11px;background:var(--c);color:#fff;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:1.05rem;flex:none;box-shadow:0 3px 8px color-mix(in srgb,var(--c) 35%,transparent)}
+.rec.prg .pic{width:34px;height:34px;border-radius:11px;background:color-mix(in srgb,var(--c) 18%,var(--surface));color:color-mix(in srgb,var(--c) 60%,#1b2422);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:1.05rem;flex:none}
 .rec.prg .pbar i{background:var(--c)}
+.picon{width:64px;height:64px;border-radius:20px;background:color-mix(in srgb,var(--c) 18%,var(--surface));color:color-mix(in srgb,var(--c) 60%,#1b2422);display:grid;place-items:center;font-size:1.9rem;font-family:var(--f-display);font-weight:800;flex:none}
 .chip.warn{background:color-mix(in srgb,#C77700 14%,var(--surface));color:#9A5B00;border-color:color-mix(in srgb,#C77700 35%,var(--line))}
 .myprg{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:14px 16px;border-radius:16px;border:1.5px dashed var(--prg);background:color-mix(in srgb,var(--prg) 7%,var(--surface))}
 .myprg>div{flex:1;min-width:220px;display:flex;flex-direction:column;gap:3px}.myprg span{font-size:.9rem;font-weight:600}.myprg small{color:var(--muted)}
 .pcolrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .pcolrow .sw{width:26px;height:26px;border-radius:50%;background:var(--k);border:3px solid var(--surface);box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0}
 .pcolrow .sw[aria-pressed=true]{box-shadow:0 0 0 2px var(--k)}
-.todo{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 14px;border-radius:14px;background:color-mix(in srgb,var(--c) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 35%,var(--line))}
-.todo .btn.primary{background:var(--c);border-color:var(--c)}
+.todo{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 14px;border-radius:14px;background:color-mix(in srgb,var(--c) 8%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 35%,var(--line))}
+.todo .btn.primary{background:var(--surface);border-color:color-mix(in srgb,var(--c) 50%,var(--line));color:color-mix(in srgb,var(--c) 60%,#1b2422)}
 .tscroll{overflow-x:auto}
 .amt{width:100%;border-collapse:collapse;font-size:.93rem}
 .amt th{font-size:.8rem;color:var(--muted);text-align:start;padding:6px 8px;border-bottom:1.5px solid var(--line);white-space:nowrap}
@@ -265,7 +269,7 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .tpl button{display:flex;flex-direction:column;gap:3px;text-align:start;border:1.5px solid var(--line);border-inline-start:4px solid var(--c,var(--muted));background:var(--surface);border-radius:12px;padding:10px 12px;min-height:64px;color:inherit;font:inherit;cursor:pointer}
 .tpl button:hover{border-color:var(--c,var(--prg))}.tpl b{font-size:.95rem}.tpl small{color:var(--muted);font-size:.78rem}
 .fsec{font-size:.95rem;color:var(--c);border-bottom:1px solid var(--line);padding-bottom:4px;margin-top:4px}
-.prg-head{border-inline-start:5px solid var(--c);background:linear-gradient(180deg,color-mix(in srgb,var(--c) 10%,var(--surface)),var(--surface))}
+.prg-head{border-inline-start:4px solid var(--c);background:linear-gradient(180deg,color-mix(in srgb,var(--c) 6%,var(--surface)),var(--surface))}
 .reps{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:8px}
 .rep-btn{display:flex;flex-direction:column;gap:2px;text-align:start;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:11px 14px;color:inherit;font:inherit;cursor:pointer}
 .rep-btn b{color:var(--c)}.rep-btn small{color:var(--muted);font-size:.8rem}.rep-btn:hover{border-color:var(--c);background:color-mix(in srgb,var(--c) 6%,var(--surface))}
@@ -291,7 +295,7 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .a4 .pg2 figure,.a4 .pg4 figure{margin:0;border:1px solid #c9d3d0;border-radius:8px;overflow:hidden;break-inside:avoid}
 .a4 .pg2 img{width:100%;height:215px;object-fit:cover;display:block}
 .a4 figcaption{font-size:11.5px;padding:4px 8px;text-align:center;color:#3c4a47;min-height:22px}
-.a4 .pg4{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.a4 .pg4.n3{grid-template-columns:repeat(3,1fr)}
+.a4 .pg4{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.a4 .pg4.n3,.a4 .pg4.n5,.a4 .pg4.n6{grid-template-columns:repeat(3,1fr)}.a4 .pg4.n5 img,.a4 .pg4.n6 img{height:150px}
 .a4 .pg4 img{width:100%;height:175px;object-fit:cover;display:block}.a4 .pg4.n1 img,.a4 .pg4.n2 img{height:230px}
 .a4.one{font-size:12px;gap:8px}.a4.one .box{padding:6px 10px}.a4 .one-kv{background:#f4f7f6;border-radius:8px;padding:6px 10px}
 .btn.hint{min-width:42px;padding:7px 10px;color:var(--muted);font-size:1rem}
@@ -440,8 +444,8 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .a4 th{background:#eaf2f0;color:#1F5E58;font-weight:600}
 .a4 tbody tr:nth-child(even) td{background:#fafcfb}
 .a4 .sigs{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:30px;padding-top:18px}
-.a4 .sigs div{display:flex;flex-direction:column;gap:22px;font-weight:700}
-.a4 .sigs span{border-bottom:1.5px solid #18211f;height:1px}
+.a4 .sigs div{display:flex;flex-direction:column;gap:8px;font-weight:700;text-align:center}
+.a4 .sigs span{display:none}
 .a4 .sigs i{font-style:normal;font-weight:500}
 .a4 .rt{font-size:18px;font-family:"Readex Pro",sans-serif}
 @media print{
@@ -1159,7 +1163,9 @@ const PSTAT = { 'مخطط': ['var(--z1)', 'var(--z1s)'], 'قيد التنفيذ'
 const pcol = d => PDOM_C[d] || 'var(--prg)';
 /* ═════════ برامج الموجهة المنفذة هذا العام (جاهزة بمحتواها) ═════════ */
 const PRG_PAL = ['#0A8197', '#C2416B', '#6A4BC4', '#2E7D4F', '#C9532A', '#1F6FB2', '#B07A12', '#8A49C6', '#0E7F7B', '#D24E7E'];
-function pcolor(p) { if (p.color) return p.color; const k = String(p.title || p.id || ''); let h = 0; for (const ch of k) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return PRG_PAL[h % PRG_PAL.length]; }
+const PRG_SOFT = ['#5E9EA8', '#C88597', '#9089C2', '#76A585', '#CF9877', '#7A9DC6', '#C2A363', '#A88BC6', '#68A6A0', '#D293AA'];
+const softC = k => { const i = PRG_PAL.indexOf(k); return i >= 0 ? PRG_SOFT[i] : k; };
+function pcolor(p) { if (p.color) return softC(p.color); const k = String(p.title || p.id || ''); let h = 0; for (const ch of k) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return PRG_SOFT[h % PRG_SOFT.length]; }
 const MY_PROGS = [
   { icon: '🌱', title: 'التهيئة الإرشادية للمستجدات', color: '#0A8197', domain: 'التربوي والتعليمي', svc: 'نمائي', form: 'برنامج', target: 'طالبات الصف الأول وأمهاتهن', term: 'الفصل الأول', place: 'المدرسة',
     goals: 'مساعدة الطالبات المستجدات على التكيف مع البيئة المدرسية\nتعريف الطالبات بالمدرسة ومرافقها ومنسوباتها\nتخفيف قلق الانفصال لدى الطالبات وأمهاتهن\nبناء شراكة مبكرة بين الأسرة والمدرسة',
@@ -1310,7 +1316,7 @@ function vPrograms() {
 }
 function progCard(p) {
   const c = pcolor(p); const [sc, ss] = PSTAT[p.status] || PSTAT['مخطط']; const pct = progPct(p); const st = p.steps || [];
-  return `<div class="rec prg" style="--c:${c}"><a class="cov" href="#programs/${p.id}"><div class="t"><span class="pic" aria-hidden="true">${esc(p.icon || String(p.title || '؟').replace(/^(برنامج|البرنامج)\s+/, '').replace(/^ال/, '').trim().charAt(0))}</span><b>${esc(p.title)}</b><span class="pill" style="--pc:${sc};--ps:${ss}">${esc(p.status || 'مخطط')}</span></div>
+  return `<div class="rec prg" style="--c:${c}"><a class="cov" href="#programs/${p.id}"><div class="t"><b>${esc(p.title)}</b><span class="pill" style="--pc:${sc};--ps:${ss}">${esc(p.status || 'مخطط')}</span></div>
     <div class="meta"><span class="chip c" style="--cs:color-mix(in srgb,${c} 13%,var(--surface))">${esc(p.domain || '')}</span>${p.svc ? `<span class="chip">${esc(p.svc)}</span>` : ''}${p.form && p.form !== 'برنامج' ? `<span class="chip">${esc(p.form)}</span>` : ''}</div>
     <div class="meta">${p.start ? `<span class="chip">${esc(hij(p.start))}</span>` : p.status === 'منفذ' ? '<span class="chip warn">📅 باقي التاريخ</span>' : p.term ? `<span class="chip">${esc(p.term)}</span>` : ''}${p.status === 'منفذ' && !(p.photos || []).length ? '<span class="chip warn">📷 باقي الشواهد</span>' : ''}${p.target ? `<span class="chip">${esc(p.target)}</span>` : ''}</div>
     ${st.length ? `<div class="pbar" aria-label="تقدم الخطة ${pct}%"><i style="width:${pct}%"></i></div><span class="tiny muted">الخطة: ${ar(st.filter(x => x.done).length)} من ${ar(st.length)} خطوات${(p.photos || []).length ? ` · ${ar(p.photos.length)} شاهد` : ''}${p.count ? ` · ${ar(p.count)} مستفيدة` : ''}</span>` : ''}</a>
@@ -1354,14 +1360,14 @@ function vProgramOne() {
   const p = doc.data; const c = pcolor(p); const [sc, ss] = PSTAT[p.status] || PSTAT['مخطط']; const st = p.steps || []; const pct = progPct(p); const g = lines(p.goals);
   const info = [['المجال', p.domain], ['نوع الخدمة', p.svc], ['الشكل', p.form], ['الفئة المستهدفة', p.target], ['الفصل', p.term], ['التاريخ', p.start ? (p.end && p.end !== p.start ? hij(p.start) + ' — ' + hij(p.end) : hij(p.start)) : ''], ['المكان', p.place], ['المنفذة', p.lead], ['المشاركات', p.partners], ['عدد المستفيدات', p.count ? ar(p.count) : '']].filter(x => x[1]);
   return `<a class="btn ghost" href="#programs" style="align-self:flex-start">→ كل البرامج</a>
-    <div class="stu-head prg-head" style="--c:${c}"><div class="bigcount" style="--pc:${c};--ps:color-mix(in srgb,${c} 13%,var(--surface))"><div><b class="num">${ar(pct)}٪</b><small>الخطة</small></div></div>
-      <div style="flex:1;min-width:220px"><h1 style="font-size:1.45rem;color:${c}">${esc(p.title)}</h1><div class="meta" style="margin-top:6px"><span class="pill" style="--pc:${sc};--ps:${ss}">${esc(p.status || 'مخطط')}</span><span class="chip c" style="--c:${c};--cs:color-mix(in srgb,${c} 13%,var(--surface))">${esc(p.domain || '')}</span>${p.svc ? `<span class="chip">${esc(p.svc)}</span>` : ''}</div></div>
+    <div class="stu-head prg-head" style="--c:${c}">
+      <div style="flex:1;min-width:220px"><h1 style="font-size:1.45rem;color:color-mix(in srgb,${c} 60%,#1b2422)">${esc(p.title)}</h1><div class="meta" style="margin-top:6px"><span class="pill" style="--pc:${sc};--ps:${ss}">${esc(p.status || 'مخطط')}</span><span class="chip c" style="--c:${c};--cs:color-mix(in srgb,${c} 13%,var(--surface))">${esc(p.domain || '')}</span>${p.svc ? `<span class="chip">${esc(p.svc)}</span>` : ''}</div></div>
       <div class="toolbar"><button class="btn hint" data-act="pAI" title="اقتراحات" aria-label="اقتراحات">✦</button><button class="btn primary" data-act="pRep1">📄 التقرير</button><button class="btn wa" data-act="pWA">📲 دعوة أولياء الأمور</button><button class="btn" data-act="pTpl" title="يصير من برامجك الجاهزة وتستخدمينه كل سنة">⭐ حفظ كبرنامج جاهز</button><button class="btn" data-act="pEdit">تعديل</button><button class="btn danger" data-del="${id}" data-back="#programs">حذف</button></div></div>
-    <div class="pcolrow"><span class="tiny muted">لون البرنامج:</span>${PRG_PAL.map(k => `<button type="button" class="sw" data-pcol="${k}" style="--k:${k}" aria-label="لون" aria-pressed="${k === c}"></button>`).join('')}</div>
+    <div class="pcolrow"><span class="tiny muted">لون البرنامج:</span>${PRG_PAL.map(k => `<button type="button" class="sw" data-pcol="${k}" style="--k:${softC(k)}" aria-label="لون" aria-pressed="${softC(k) === c}"></button>`).join('')}</div>
     ${p.status === 'منفذ' && (!p.start || !(p.photos || []).length) ? `<div class="todo" style="--c:${c}"><b>باقي عليك:</b>${!p.start ? '<button class="btn sm primary" data-act="pDone">📅 تاريخ التنفيذ وعدد المستفيدات</button>' : ''}${!(p.photos || []).length ? '<label class="btn sm primary" style="cursor:pointer">📷 صور الشواهد<input type="file" accept="image/*" multiple data-pph hidden></label>' : ''}</div>` : ''}
     <section class="panel prep" style="--c:${c}"><div class="head"><h3>التقارير</h3></div><div class="reps">
       <button class="rep-btn" data-act="pRep"><b>تقرير التنفيذ</b><small>تقرير كامل مع صفحة الشواهد</small></button>
-      <button class="rep-btn" data-act="pRep1"><b>تقرير صفحة واحدة</b><small>ملخص مع ٤ شواهد</small></button>
+      <button class="rep-btn" data-act="pRep1"><b>تقرير صفحة واحدة</b><small>ملخص مع ٦ شواهد</small></button>
       <button class="rep-btn" data-act="pRepPlan"><b>خطة البرنامج</b><small>قبل التنفيذ: الأهداف والخطوات</small></button></div></section>
     <section class="panel"><div class="head"><h3>بيانات البرنامج</h3></div><dl class="pinfo">${info.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></section>
     <section class="panel"><div class="head"><h3>الأهداف</h3><span class="sp"></span><button class="btn sm ghost" data-act="pEdit">تعديل</button></div>${g.length ? `<ol class="goals">${g.map(x => `<li>${esc(x)}</li>`).join('')}</ol>` : '<p class="small muted">لم تُكتب الأهداف بعد.</p>'}</section>
@@ -1370,7 +1376,7 @@ function vProgramOne() {
         <span class="sbtn"><button class="btn sm ghost" data-pmv="${i}:-1" aria-label="لأعلى" ${i ? '' : 'disabled'}>↑</button><button class="btn sm ghost" data-pstep="${i}" aria-label="تعديل">✎</button><button class="btn sm ghost" data-pdel="${i}" aria-label="حذف">✕</button></span></li>`).join('')}</ol>` : '<p class="small muted">أضيفي خطوات التنفيذ: الأنشطة والفعاليات ومواعيدها والمسؤولة عنها.</p>'}</section>
     ${ideasHTML(id)}
     <section class="panel"><div class="head"><h3>الشواهد</h3><span class="tiny muted">${ar((p.photos || []).length)} صورة</span><span class="sp"></span><label class="btn primary sm" style="cursor:pointer">＋ صور<input type="file" accept="image/*" multiple data-pph hidden></label></div>
-      <p class="tiny muted" id="pphMsg">صور البرنامج كلها هنا. أول ٤ صور تظهر في تقرير الصفحة الواحدة، وتقدرين ترتيبها بالسهم.</p>
+      <p class="tiny muted" id="pphMsg">صور البرنامج كلها هنا. أول ٦ صور تظهر في تقرير الصفحة الواحدة، وتقدرين ترتيبها بالسهم.</p>
       ${(p.photos || []).length ? `<div class="pgrid">${p.photos.map((ph, i) => `<figure><img alt="" data-img="${esc(ph)}"><span class="pacts"><button class="btn sm ghost" data-phmv="${i}" aria-label="تقديم" ${i ? '' : 'disabled'}>→</button><button class="btn sm ghost" data-phdel="${esc(ph)}" aria-label="حذف الصورة">✕</button></span></figure>`).join('')}</div>`
         : `<label class="addph wide">＋ أضيفي صور الشواهد<input type="file" accept="image/*" multiple data-pph></label>`}</section>
     <section class="panel"><div class="head"><h3>لقاءات التوجيه الجمعي</h3><span class="tiny muted">${ar(progGroups(id).length)}</span><span class="sp"></span><button class="btn sm" data-act="gAddP">＋ لقاء ضمن البرنامج</button></div>
@@ -1420,7 +1426,7 @@ function progReport(p, full) {
   return page1;
 }
 function progReport1(p) {
-  const st = p.steps || []; const ph = (p.photos || []).concat(...(p.id ? progGroups(p.id) : []).map(g => g.photos || [])).slice(0, 4);
+  const st = p.steps || []; const ph = (p.photos || []).concat(...(p.id ? progGroups(p.id) : []).map(g => g.photos || [])).slice(0, 6);
   return `<div class="a4 prep-a4 one">${repHead('تقرير برنامج', p.end || p.start)}<div class="pband"><small>${esc([p.form, p.domain, p.svc].filter(Boolean).join(' · '))}</small><b>${esc(p.title)}</b></div>
     <div class="kv one-kv">${[['الفئة المستهدفة', p.target], ['عدد المستفيدات', p.count ? ar(p.count) : ''], ['التاريخ', p.start ? (p.end && p.end !== p.start ? hij(p.start) + ' — ' + hij(p.end) : hij(p.start)) : ''], ['المكان', p.place], ['المنفذة', p.lead]].filter(x => x[1]).map(([k, v]) => `<span><b>${k}:</b> ${esc(v)}</span>`).join('')}</div>
     <div class="boxes"><div class="box"><h4>الأهداف</h4>${pList(p.goals)}</div><div class="box"><h4>آلية التنفيذ</h4>${st.length ? `<ol>${st.map(s => `<li>${esc(s.t)}${stepDate(s) ? ` <span style="color:#56635f">(${esc(stepDate(s))})</span>` : ''}</li>`).join('')}</ol>` : '<p>—</p>'}</div>

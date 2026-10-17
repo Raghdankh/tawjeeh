@@ -177,29 +177,41 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .log .tag{font-style:normal;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--fam-soft);color:var(--fam);flex:none}
 .log .tag.in{background:var(--abs-soft);color:var(--abs)}
 .clog{display:flex;flex-direction:column;gap:10px}
-.rec.prg{text-decoration:none;color:inherit;border:1px solid color-mix(in srgb,var(--c) 22%,var(--line));border-top:3px solid var(--c);border-inline-start-width:1px;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 6%,var(--surface)),var(--surface) 60%)}
-.rec.prg .t b{color:color-mix(in srgb,var(--c) 60%,#1b2422)}
-.rec.prg .chip.c,.prg-head .chip.c{color:color-mix(in srgb,var(--c) 55%,#1b2422)}
-.panel.prep .rep-btn b{color:color-mix(in srgb,var(--c) 60%,#1b2422)}
-.prg-head .btn.primary{background:color-mix(in srgb,var(--c) 75%,#1b2422);border-color:transparent}
-.rec.prg .cov{display:flex;flex-direction:column;gap:8px;color:inherit;text-decoration:none}
-.rec.prg .acts{border-top:1px dashed color-mix(in srgb,var(--c) 30%,var(--line));padding-top:8px}
-.rec.prg .acts .btn:not(.ghost){border-color:color-mix(in srgb,var(--c) 35%,var(--line));color:color-mix(in srgb,var(--c) 60%,#1b2422)}
 .sug{display:flex;flex-wrap:wrap;gap:6px;grid-column:1/-1;margin-top:-4px}.sug>span{flex-basis:100%}
 .sug button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:.84rem;text-align:start;color:inherit}
 .sug button[aria-pressed=true]{background:color-mix(in srgb,var(--prg) 14%,var(--surface));border-color:var(--prg);color:var(--prg);font-weight:700}
 .sug button[aria-pressed=true]::before{content:'✓ '}
-.rec.prg .pic{width:34px;height:34px;border-radius:11px;background:color-mix(in srgb,var(--c) 18%,var(--surface));color:color-mix(in srgb,var(--c) 60%,#1b2422);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:1.05rem;flex:none}
-.rec.prg .pbar i{background:var(--c)}
 .picon{width:64px;height:64px;border-radius:20px;background:color-mix(in srgb,var(--c) 18%,var(--surface));color:color-mix(in srgb,var(--c) 60%,#1b2422);display:grid;place-items:center;font-size:1.9rem;font-family:var(--f-display);font-weight:800;flex:none}
-.chip.warn{background:color-mix(in srgb,#C77700 14%,var(--surface));color:#9A5B00;border-color:color-mix(in srgb,#C77700 35%,var(--line))}
 .myprg{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:14px 16px;border-radius:16px;border:1.5px dashed var(--prg);background:color-mix(in srgb,var(--prg) 7%,var(--surface))}
 .myprg>div{flex:1;min-width:220px;display:flex;flex-direction:column;gap:3px}.myprg span{font-size:.9rem;font-weight:600}.myprg small{color:var(--muted)}
+.pcard{--ct:color-mix(in srgb,var(--c) 82%,#101816);position:relative;background:var(--surface);border:1px solid var(--line);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 1px 2px rgba(16,24,22,.04),0 4px 14px -6px rgba(16,24,22,.10);transition:box-shadow .2s,transform .2s,border-color .2s}
+.pcard::before{content:'';position:absolute;inset-block:0;inset-inline-start:0;width:4px;background:var(--c)}
+.pcard:hover{box-shadow:0 2px 4px rgba(16,24,22,.05),0 12px 28px -10px color-mix(in srgb,var(--c) 45%,transparent);transform:translateY(-2px);border-color:color-mix(in srgb,var(--c) 35%,var(--line))}
+.pc-main{display:flex;flex-direction:column;gap:8px;padding:16px 20px 14px;color:inherit;text-decoration:none;flex:1}
+.pc-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pc-dom{font-size:.76rem;font-weight:800;letter-spacing:.2px;color:var(--ct);display:inline-flex;align-items:center;gap:6px}
+.pc-dom::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--c);box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 18%,transparent)}
+.pc-t{font-family:var(--f-display);font-size:1.12rem;font-weight:800;line-height:1.45;color:var(--ink,#16201e);margin:0}
+.pc-sub{margin:0;font-size:.84rem;color:var(--muted);font-weight:600}.pc-sub i{font-style:normal;margin-inline:7px;opacity:.5}
+.pc-tg{margin:0;font-size:.82rem;color:var(--muted)}
+.pc-prog{display:flex;align-items:center;gap:10px;margin-top:4px}.pc-prog span{font-size:.76rem;color:var(--muted);font-weight:600;white-space:nowrap}
+.pc-bar{flex:1;height:5px;border-radius:9px;background:color-mix(in srgb,var(--c) 12%,var(--sunk));overflow:hidden}.pc-bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--c),color-mix(in srgb,var(--c) 70%,#fff))}
+.pc-miss{margin:0;font-size:.8rem;font-weight:700;color:#A0620A;display:flex;align-items:center;gap:7px}.pc-miss::before{content:'';width:7px;height:7px;border-radius:50%;background:#D98B1A}
+.pc-acts{display:flex;align-items:center;gap:6px;padding:10px 14px 12px 20px;border-top:1px solid var(--line);background:color-mix(in srgb,var(--c) 3%,var(--surface))}
+.pc-btn{border:1px solid color-mix(in srgb,var(--c) 28%,var(--line));background:var(--surface);color:var(--ct);border-radius:9px;padding:6px 12px;font-size:.8rem;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s}
+.pc-btn:hover{background:color-mix(in srgb,var(--c) 9%,var(--surface));border-color:var(--c)}
+.pc-open{margin-inline-start:auto;font-size:.82rem;font-weight:800;color:var(--ct);text-decoration:none;padding:6px 4px;display:inline-flex;align-items:center;gap:6px}.pc-open::after{content:'←';font-weight:700;transition:transform .15s}.pcard:hover .pc-open::after{transform:translateX(-3px)}
+.prg-head{border-inline-start:4px solid var(--c);background:var(--surface)}
+.prg-head h1{color:var(--ink,#16201e)!important}
+.prg-head .chip.c{color:color-mix(in srgb,var(--c) 82%,#101816)}
+.prg-head .btn.primary{background:color-mix(in srgb,var(--c) 88%,#101816);border-color:transparent}
+.panel.prep .rep-btn b{color:color-mix(in srgb,var(--c) 82%,#101816)}
+.myprg{border-style:solid!important}
 .pcolrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .pcolrow .sw{width:26px;height:26px;border-radius:50%;background:var(--k);border:3px solid var(--surface);box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0}
 .pcolrow .sw[aria-pressed=true]{box-shadow:0 0 0 2px var(--k)}
 .todo{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 14px;border-radius:14px;background:color-mix(in srgb,var(--c) 8%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 35%,var(--line))}
-.todo .btn.primary{background:var(--surface);border-color:color-mix(in srgb,var(--c) 50%,var(--line));color:color-mix(in srgb,var(--c) 60%,#1b2422)}
+.todo .btn.primary{background:color-mix(in srgb,var(--c) 88%,#101816);border-color:transparent;color:#fff}
 .tscroll{overflow-x:auto}
 .amt{width:100%;border-collapse:collapse;font-size:.93rem}
 .amt th{font-size:.8rem;color:var(--muted);text-align:start;padding:6px 8px;border-bottom:1.5px solid var(--line);white-space:nowrap}
@@ -263,13 +275,11 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .addcl{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}.addcl select{width:auto!important}.addcl select,.addcl input{border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:6px 10px;min-height:38px;font:inherit;color:inherit}.addcl input{width:90px}
 .glist{display:flex;flex-direction:column;gap:6px}.glist div{display:flex;gap:10px;align-items:center;flex-wrap:wrap;border:1px solid var(--line);border-radius:12px;padding:7px 12px}.glist div .tiny{flex:1}
 .tiles.t6{grid-template-columns:repeat(3,1fr)}@media(min-width:1000px){.tiles.t6{grid-template-columns:repeat(6,1fr)}}
-.rec.prg:hover{border-color:var(--c)}
 .pbar{height:7px;background:var(--sunk);border-radius:99px;overflow:hidden}.pbar i{display:block;height:100%;background:var(--c);border-radius:99px}
 .tpl{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
 .tpl button{display:flex;flex-direction:column;gap:3px;text-align:start;border:1.5px solid var(--line);border-inline-start:4px solid var(--c,var(--muted));background:var(--surface);border-radius:12px;padding:10px 12px;min-height:64px;color:inherit;font:inherit;cursor:pointer}
 .tpl button:hover{border-color:var(--c,var(--prg))}.tpl b{font-size:.95rem}.tpl small{color:var(--muted);font-size:.78rem}
 .fsec{font-size:.95rem;color:var(--c);border-bottom:1px solid var(--line);padding-bottom:4px;margin-top:4px}
-.prg-head{border-inline-start:4px solid var(--c);background:linear-gradient(180deg,color-mix(in srgb,var(--c) 6%,var(--surface)),var(--surface))}
 .reps{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:8px}
 .rep-btn{display:flex;flex-direction:column;gap:2px;text-align:start;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:11px 14px;color:inherit;font:inherit;cursor:pointer}
 .rep-btn b{color:var(--c)}.rep-btn small{color:var(--muted);font-size:.8rem}.rep-btn:hover{border-color:var(--c);background:color-mix(in srgb,var(--c) 6%,var(--surface))}
@@ -371,6 +381,7 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .rep-pages{width:max-content;margin:0 auto}
 .a4.fitted{height:297mm;overflow:hidden}
 .fitin{display:flex;flex-direction:column;gap:12px;flex:none;transform-origin:top right}.a4.one .fitin{gap:8px}
+.a4 .thumbs{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.a4 .thumbs figure{margin:0;border:1px solid #c9d3d0;border-radius:6px;overflow:hidden;aspect-ratio:4/3}.a4 .thumbs img{width:100%;height:100%;object-fit:cover;display:block}
 .a4 .evid h4{font-family:"Readex Pro",sans-serif;font-weight:600;color:#1F5E58;font-size:14.5px;margin-bottom:6px;display:flex;align-items:center;gap:8px}.a4 .evid h4::before{content:"";width:4px;height:16px;border-radius:3px;background:#1F5E58}
 .a4 .eg{display:grid;gap:8px;grid-template-columns:repeat(3,1fr)}.a4 .eg.e1{grid-template-columns:1fr}.a4 .eg.e2,.a4 .eg.e4{grid-template-columns:1fr 1fr}
 .a4 .eg figure{margin:0;border:1px solid #c9d3d0;border-radius:8px;overflow:hidden}.a4 .eg img{width:100%;height:118px;object-fit:cover;display:block}
@@ -529,11 +540,13 @@ function demoSeed() {
 function demoLoad() { try { const d = JSON.parse(localStorage.getItem(DEMO_KEY) || 'null'); if (d) return d; } catch (e) {} const d = demoSeed(); demoSave(d); return d; }
 function demoSave(d) { try { localStorage.setItem(DEMO_KEY, JSON.stringify(d)); } catch (e) {} }
 async function q(p) { const r = await p; if (r.error) throw r.error; return r.data; }
+const DOM_MIG = {'التربوي والتعليمي': 'تربوي وتعليمي', 'السلوكي': 'سلوكي', 'النفسي': 'نفسي', 'الاجتماعي والأسري': 'اجتماعي وأسري', 'الوقائي والصحي': 'وقائي وصحي', 'القيمي والوطني': 'قيم ومواطنة', 'قيمي ووطني': 'قيم ومواطنة', 'المهارات الحياتية': 'مهارات حياتية'};
+function migDom() { Object.values(DB.docs || {}).forEach(v => { const d = v && v.data; if (d && DOM_MIG[d.domain]) d.domain = DOM_MIG[d.domain]; }); }
 async function loadAll() {
-  if (DB.demo) { const d = demoLoad(); DB.docs = d.docs; DB.imgs = d.imgs || {}; return; }
+  if (DB.demo) { const d = demoLoad(); DB.docs = d.docs; DB.imgs = d.imgs || {}; migDom(); return; }
   const out = {}; let from = 0;
   for (;;) { const rows = await q(DB.sb.from('platform_docs').select('id,kind,data').order('id').range(from, from + 999)); rows.forEach(r => { out[r.id] = { kind: r.kind, data: r.data }; }); if (rows.length < 1000) break; from += 1000; }
-  DB.docs = out;
+  DB.docs = out; migDom();
 }
 async function saveDoc(id, kind, data) {
   if (DB.demo) { const d = demoLoad(); d.docs[id] = { kind, data }; demoSave(d); DB.docs[id] = { kind, data }; return; }
@@ -1154,8 +1167,8 @@ function dayLogReport(rows, title) {
 }
 
 /* ═════════ view: guidance programs ═════════ */
-const PDOM = ['التربوي والتعليمي', 'السلوكي', 'النفسي', 'الاجتماعي والأسري', 'الوقائي والصحي', 'القيمي والوطني', 'المهارات الحياتية'];
-const PDOM_C = { 'التربوي والتعليمي': '#1F6FB2', 'السلوكي': '#C77700', 'النفسي': '#6A4BC4', 'الاجتماعي والأسري': '#C2416B', 'الوقائي والصحي': '#2E7D4F', 'القيمي والوطني': '#0A8197', 'المهارات الحياتية': '#8F6410' };
+const PDOM = ['تربوي وتعليمي', 'سلوكي', 'نفسي', 'اجتماعي وأسري', 'وقائي وصحي', 'قيم ومواطنة', 'مهارات حياتية'];
+const PDOM_C = { 'تربوي وتعليمي': '#1F6FB2', 'سلوكي': '#C77700', 'نفسي': '#6A4BC4', 'اجتماعي وأسري': '#C2416B', 'وقائي وصحي': '#2E7D4F', 'قيم ومواطنة': '#0A8197', 'مهارات حياتية': '#8F6410' };
 const PSVC = ['نمائي', 'وقائي', 'علاجي'];
 const PFORM = ['برنامج', 'حملة توعوية', 'فعالية', 'يوم عالمي', 'لقاء أو محاضرة', 'مسابقة', 'ورشة عمل'];
 const PTERM = ['الفصل الأول', 'الفصل الثاني', 'الفصل الثالث'];
@@ -1163,41 +1176,41 @@ const PSTAT = { 'مخطط': ['var(--z1)', 'var(--z1s)'], 'قيد التنفيذ'
 const pcol = d => PDOM_C[d] || 'var(--prg)';
 /* ═════════ برامج الموجهة المنفذة هذا العام (جاهزة بمحتواها) ═════════ */
 const PRG_PAL = ['#0A8197', '#C2416B', '#6A4BC4', '#2E7D4F', '#C9532A', '#1F6FB2', '#B07A12', '#8A49C6', '#0E7F7B', '#D24E7E'];
-const PRG_SOFT = ['#5E9EA8', '#C88597', '#9089C2', '#76A585', '#CF9877', '#7A9DC6', '#C2A363', '#A88BC6', '#68A6A0', '#D293AA'];
+const PRG_SOFT = ['#1F7A87', '#B04A6B', '#5A50B0', '#2F7A57', '#B9612F', '#2D68A8', '#9C7A1F', '#7A52B0', '#18807A', '#B9507C'];
 const softC = k => { const i = PRG_PAL.indexOf(k); return i >= 0 ? PRG_SOFT[i] : k; };
 function pcolor(p) { if (p.color) return softC(p.color); const k = String(p.title || p.id || ''); let h = 0; for (const ch of k) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return PRG_SOFT[h % PRG_SOFT.length]; }
 const MY_PROGS = [
-  { icon: '🌱', title: 'التهيئة الإرشادية للمستجدات', color: '#0A8197', domain: 'التربوي والتعليمي', svc: 'نمائي', form: 'برنامج', target: 'طالبات الصف الأول وأمهاتهن', term: 'الفصل الأول', place: 'المدرسة',
+  { icon: '🌱', title: 'التهيئة الإرشادية للمستجدات', color: '#0A8197', domain: 'تربوي وتعليمي', svc: 'نمائي', form: 'برنامج', target: 'طالبات الصف الأول وأمهاتهن', term: 'الفصل الأول', place: 'المدرسة',
     goals: 'مساعدة الطالبات المستجدات على التكيف مع البيئة المدرسية\nتعريف الطالبات بالمدرسة ومرافقها ومنسوباتها\nتخفيف قلق الانفصال لدى الطالبات وأمهاتهن\nبناء شراكة مبكرة بين الأسرة والمدرسة',
     steps: [['استقبال الطالبات المستجدات وأمهاتهن بأجواء ترحيبية وهدايا رمزية', 'الموجهة الطلابية'], ['جولة تعريفية بمرافق المدرسة ومنسوباتها', 'الموجهة الطلابية'], ['لقاء تعريفي للأمهات بأنظمة المدرسة وقواعد السلوك والمواظبة وخدمات التوجيه الطلابي', 'الموجهة الطلابية'], ['أنشطة قصصية وترفيهية خلال الأسبوع الأول لتخفيف قلق الانفصال', 'معلمات الصف الأول'], ['التدرج في بقاء الأمهات مع الطالبات خلال الأيام الأولى', 'الموجهة الطلابية'], ['رصد الطالبات اللاتي يواجهن صعوبة في التكيف ومتابعتهن فردياً', 'الموجهة الطلابية']],
     tools: 'هدايا ترحيبية، بطاقات أسماء، عرض تقديمي للأمهات، قصص مصورة، ركن ألعاب', evalm: 'ملاحظة تكيف الطالبات خلال الأسبوعين الأولين، استبانة رضا الأمهات، متابعة حالات رفض المدرسة',
     results: 'تكيّف أغلب الطالبات المستجدات مع المدرسة خلال الأسبوع الأول\nانخفاض حالات البكاء ورفض الدخول للفصل\nتفاعل إيجابي من الأمهات مع اللقاء التعريفي\nرصد الطالبات المحتاجات لمتابعة فردية والبدء في متابعتهن',
     recs: 'الاستمرار في تنفيذ البرنامج سنوياً قبل بداية الدراسة\nإشراك معلمات الصف الأول في التخطيط للبرنامج\nمتابعة الطالبات المتأخرات في التكيف حتى نهاية الفصل' },
-  { icon: '🏫', title: 'التهيئة الإرشادية لجميع طالبات المدرسة', color: '#1F6FB2', domain: 'التربوي والتعليمي', svc: 'نمائي', form: 'برنامج', target: 'جميع طالبات المدرسة', term: 'الفصل الأول', place: 'المدرسة',
+  { icon: '🏫', title: 'التهيئة الإرشادية لجميع طالبات المدرسة', color: '#1F6FB2', domain: 'تربوي وتعليمي', svc: 'نمائي', form: 'برنامج', target: 'جميع طالبات المدرسة', term: 'الفصل الأول', place: 'المدرسة',
     goals: 'تهيئة الطالبات نفسياً وتربوياً لبداية العام الدراسي\nتعريف الطالبات بقواعد السلوك والمواظبة\nتعريف الطالبات بخدمات التوجيه الطلابي وكيفية طلب المساعدة\nتعزيز الدافعية للتعلم والانضباط منذ بداية العام',
     steps: [['استقبال الطالبات في الأسبوع الأول بأجواء ترحيبية', 'الموجهة الطلابية'], ['إذاعة مدرسية عن بداية العام وأهمية الانضباط والمواظبة', 'الموجهة الطلابية'], ['تعريف الطالبات بقواعد السلوك والمواظبة في الفصول', 'معلمات الفصول'], ['التعريف بخدمات التوجيه الطلابي ومكان الموجهة وطريقة طلب المساعدة', 'الموجهة الطلابية'], ['نشرة توعوية لأولياء الأمور عن بداية العام والتهيئة النفسية للطالبات', 'الموجهة الطلابية'], ['حصر الطالبات المحتاجات لرعاية خاصة (صحية، اجتماعية، تحصيلية)', 'الموجهة الطلابية']],
     tools: 'إذاعة مدرسية، مطويات، عرض تقديمي، لوحات ترحيبية', evalm: 'ملاحظة انضباط الطالبات في الأسابيع الأولى، نسبة الحضور، تفاعل الطالبات مع الأنشطة',
     results: 'معرفة الطالبات بقواعد السلوك والمواظبة منذ بداية العام\nتعرّف الطالبات على خدمات التوجيه الطلابي وطريقة طلبها\nحصر الطالبات المحتاجات لرعاية خاصة والبدء في متابعتهن',
     recs: 'الاستمرار في البرنامج مع بداية كل فصل دراسي\nتعليق قواعد السلوك والمواظبة في الفصول\nتفعيل الشراكة مع أولياء الأمور منذ بداية العام' },
-  { icon: '🤝', title: 'برنامج رفق', color: '#2E7D4F', domain: 'السلوكي', svc: 'وقائي', form: 'برنامج', target: 'جميع الطالبات والمعلمات وأولياء الأمور', term: 'الفصل الأول', place: 'المدرسة',
+  { icon: '🤝', title: 'برنامج رفق', color: '#2E7D4F', domain: 'سلوكي', svc: 'وقائي', form: 'برنامج', target: 'جميع الطالبات والمعلمات وأولياء الأمور', term: 'الفصل الأول', place: 'المدرسة',
     goals: 'نشر ثقافة الرفق والتسامح ونبذ العنف والتنمر في البيئة المدرسية\nتعريف الطالبات بأشكال العنف والتنمر وطرق التصرف الصحيح عند التعرض لها\nتنمية مهارات التواصل وحل الخلافات بهدوء\nتعزيز دور الأسرة في التربية بالرفق',
     steps: [['إذاعة مدرسية عن الرفق وفضله', 'الموجهة الطلابية'], ['لقاءات توجيه جمعي في الفصول عن التعامل بلطف واحترام', 'الموجهة الطلابية'], ['نشاط «شجرة الرفق»: كل موقف لطيف تكتبه الطالبات على ورقة وتُعلّق', 'رائدة النشاط'], ['توعية الطالبات بطرق التصرف عند التعرض للعنف أو التنمر وطلب المساعدة', 'الموجهة الطلابية'], ['نشرة لأولياء الأمور عن التربية بالرفق والحوار', 'الموجهة الطلابية'], ['رصد حالات العنف والتنمر ومعالجتها فردياً', 'الموجهة الطلابية'], ['تكريم الطالبات المتميزات في الرفق والتعامل الحسن', 'الموجهة الطلابية']],
     tools: 'إذاعة مدرسية، شجرة الرفق، بطاقات مواقف، مطويات، شهادات تكريم', evalm: 'ملاحظة سلوك الطالبات، عدد حالات العنف والتنمر المرصودة قبل البرنامج وبعده، تفاعل الطالبات مع الأنشطة',
     results: 'زيادة وعي الطالبات بأهمية الرفق ونبذ العنف والتنمر\nانخفاض الخلافات والمشاحنات بين الطالبات\nمعرفة الطالبات بطرق طلب المساعدة عند التعرض للأذى\nتفاعل إيجابي من الطالبات مع شجرة الرفق',
     recs: 'الاستمرار في تعزيز ثقافة الرفق طوال العام\nمتابعة الحالات المرصودة وتقديم الدعم لها\nإشراك المعلمات في رصد المواقف الإيجابية وتعزيزها' },
-  { icon: '🛡️', title: 'المصالح الفضلى للطفل', color: '#C2416B', domain: 'الاجتماعي والأسري', svc: 'وقائي', form: 'برنامج', target: 'الطالبات والمعلمات وأولياء الأمور', term: 'الفصل الأول', place: 'المدرسة',
+  { icon: '🛡️', title: 'المصالح الفضلى للطفل', color: '#C2416B', domain: 'اجتماعي وأسري', svc: 'وقائي', form: 'برنامج', target: 'الطالبات والمعلمات وأولياء الأمور', term: 'الفصل الأول', place: 'المدرسة',
     goals: 'التعريف بمبدأ المصلحة الفضلى للطفل وحقوقه وفق نظام حماية الطفل\nترسيخ مراعاة مصلحة الطالبة في القرارات والتعاملات المدرسية\nتوعية الطالبات بحقوقهن وواجباتهن وكيفية طلب المساعدة\nتوعية المعلمات وأولياء الأمور بدورهم في حماية الطفل',
     steps: [['لقاء توعوي للمعلمات عن مبدأ المصلحة الفضلى للطفل ونظام حماية الطفل', 'الموجهة الطلابية'], ['إذاعة مدرسية عن حقوق الطفل', 'الموجهة الطلابية'], ['توجيه جمعي في الفصول بقصة مصورة عن حقوق الطفل وواجباته', 'الموجهة الطلابية'], ['نشاط «دائرة الأمان»: ترسم الطالبة يدها وتكتب أسماء الأشخاص الموثوقين', 'الموجهة الطلابية'], ['نشرة توعوية لأولياء الأمور عن حماية الطفل ومصلحته', 'الموجهة الطلابية'], ['التعريف بآلية الإبلاغ والتعامل مع حالات الاشتباه بالإيذاء أو الإهمال', 'الموجهة الطلابية']],
     tools: 'عرض تقديمي، قصص مصورة، بطاقات نشاط، مطويات', evalm: 'أسئلة تقويمية للطالبات، ملاحظة التفاعل، استبانة للمعلمات',
     results: 'معرفة المعلمات بمبدأ المصلحة الفضلى للطفل ونظام حماية الطفل\nوعي الطالبات بحقوقهن والأشخاص الموثوقين الذين يلجأن لهم\nوصول الرسالة التوعوية لأولياء الأمور',
     recs: 'مراعاة المصلحة الفضلى للطالبة في كل القرارات المدرسية\nتفعيل آلية الإبلاغ عن حالات الاشتباه بالإيذاء\nتكرار التوعية بحقوق الطفل خلال العام' },
-  { icon: '💜', title: 'الصحة النفسية', color: '#6A4BC4', domain: 'النفسي', svc: 'وقائي', form: 'برنامج', target: 'جميع الطالبات وأولياء الأمور', term: 'الفصل الأول', place: 'المدرسة',
+  { icon: '💜', title: 'الصحة النفسية', color: '#6A4BC4', domain: 'نفسي', svc: 'وقائي', form: 'برنامج', target: 'جميع الطالبات وأولياء الأمور', term: 'الفصل الأول', place: 'المدرسة',
     goals: 'تعزيز وعي الطالبات بالصحة النفسية وأهميتها\nتدريب الطالبات على التعبير عن مشاعرهن بطريقة صحية\nإكساب الطالبات مهارات بسيطة للتعامل مع القلق والضغوط\nتوعية الأسرة بعلامات حاجة الطفلة للدعم النفسي',
     steps: [['إذاعة مدرسية بمناسبة اليوم العالمي للصحة النفسية', 'الموجهة الطلابية'], ['لقاءات توجيه جمعي «ميزان المشاعر» للتعبير عن المشاعر', 'الموجهة الطلابية'], ['تدريب الطالبات على تمارين التنفس والاسترخاء ونشاط «زجاجة الهدوء»', 'الموجهة الطلابية'], ['تجهيز ركن الهدوء لتلجأ له الطالبة عند الحاجة', 'الموجهة الطلابية'], ['نشرة لأولياء الأمور عن الصحة النفسية للأطفال وعلامات الحاجة للدعم', 'الموجهة الطلابية'], ['رصد الطالبات المحتاجات لدعم نفسي ومتابعتهن فردياً', 'الموجهة الطلابية']],
     tools: 'إذاعة مدرسية، بطاقات المشاعر، زجاجات الهدوء، مطويات، ركن الهدوء', evalm: 'ملاحظة تفاعل الطالبات، بطاقة المشاعر قبل البرنامج وبعده، عدد الطالبات المستفيدات من ركن الهدوء',
     results: 'قدرة الطالبات على تسمية مشاعرهن والتعبير عنها\nتعلّم الطالبات طرقاً بسيطة للتهدئة عند القلق أو الغضب\nزيادة وعي أولياء الأمور بالصحة النفسية لبناتهم\nرصد الطالبات المحتاجات لدعم ومتابعتهن',
     recs: 'الاستمرار في تفعيل ركن الهدوء طوال العام\nتكرار لقاءات التعبير عن المشاعر في الفصول\nالتواصل مع أسر الطالبات المحتاجات لدعم نفسي' },
-  { icon: '🔐', title: 'الاستخدام الآمن للإنترنت', color: '#C9532A', domain: 'الوقائي والصحي', svc: 'وقائي', form: 'برنامج', target: 'جميع الطالبات وأولياء الأمور', term: 'الفصل الأول', place: 'المدرسة',
+  { icon: '🔐', title: 'الاستخدام الآمن للإنترنت', color: '#C9532A', domain: 'وقائي وصحي', svc: 'وقائي', form: 'برنامج', target: 'جميع الطالبات وأولياء الأمور', term: 'الفصل الأول', place: 'المدرسة',
     goals: 'توعية الطالبات بفوائد الإنترنت ومخاطره\nتعريف الطالبات بقواعد الاستخدام الآمن وحماية المعلومات الشخصية\nتدريب الطالبات على التصرف الصحيح عند التعرض لمحتوى أو تواصل مزعج وإبلاغ شخص موثوق\nتوعية الأسرة بدورها في الرقابة وتنظيم وقت استخدام الأجهزة',
     steps: [['إذاعة مدرسية عن الاستخدام الآمن للإنترنت', 'الموجهة الطلابية'], ['لقاءات توجيه جمعي في الفصول عن قواعد الأمان الرقمي', 'الموجهة الطلابية'], ['نشاط «إشارة المرور الرقمية»: الأخضر آمن، الأصفر أستشير، الأحمر أتوقف وأبلغ', 'الموجهة الطلابية'], ['توعية الطالبات بعدم مشاركة المعلومات الشخصية والصور والتعامل مع الغرباء', 'الموجهة الطلابية'], ['تعريف الطالبات بالتنمر الإلكتروني وطريقة التصرف والإبلاغ عنه', 'الموجهة الطلابية'], ['نشرة لأولياء الأمور عن الرقابة الأبوية وتنظيم وقت الشاشة', 'الموجهة الطلابية']],
     tools: 'إذاعة مدرسية، عرض تقديمي، بطاقات إشارة المرور الرقمية، مطويات', evalm: 'أسئلة تقويمية للطالبات، ملاحظة التفاعل، مواقف تمثيلية قصيرة',
@@ -1234,55 +1247,55 @@ async function addMyProgs() {
 
 const lines = t => String(t || '').split(/\n+/).map(x => x.replace(/^[\s\-•*–\d.)(]+/, '').trim()).filter(Boolean);
 const P_TPL = [
-  { title: 'التهيئة الإرشادية للمستجدات', domain: 'التربوي والتعليمي', svc: 'نمائي', form: 'برنامج', target: 'طالبات الصف الأول وأمهاتهن', term: 'الفصل الأول',
+  { title: 'التهيئة الإرشادية للمستجدات', domain: 'تربوي وتعليمي', svc: 'نمائي', form: 'برنامج', target: 'طالبات الصف الأول وأمهاتهن', term: 'الفصل الأول',
     goals: 'مساعدة الطالبات المستجدات على التكيف مع البيئة المدرسية\nتعريف الطالبات بالمدرسة ومرافقها ومنسوباتها\nتخفيف قلق الانفصال لدى الطالبات وأمهاتهن\nبناء شراكة مبكرة بين الأسرة والمدرسة',
     steps: ['استقبال الطالبات وأمهاتهن بأجواء ترحيبية', 'جولة تعريفية بمرافق المدرسة', 'لقاء تعريفي للأمهات بأنظمة المدرسة وقواعد السلوك والمواظبة', 'أنشطة قصصية وترفيهية خلال الأسبوع الأول', 'رصد الطالبات اللاتي يواجهن صعوبة في التكيف ومتابعتهن فردياً'],
     tools: 'هدايا ترحيبية، بطاقات أسماء، عرض تقديمي للأمهات، قصص مصورة', evalm: 'ملاحظة تكيف الطالبات خلال الأسبوعين الأولين، استبانة رضا الأمهات، عدد حالات رفض المدرسة' },
-  { title: 'تعزيز الانضباط والمواظبة', domain: 'السلوكي', svc: 'وقائي', form: 'برنامج', target: 'جميع الطالبات وأولياء الأمور', term: 'الفصل الأول',
+  { title: 'تعزيز الانضباط والمواظبة', domain: 'سلوكي', svc: 'وقائي', form: 'برنامج', target: 'جميع الطالبات وأولياء الأمور', term: 'الفصل الأول',
     goals: 'رفع نسبة الحضور والانضباط المدرسي\nتوعية الطالبات وأولياء الأمور بقواعد السلوك والمواظبة\nتحفيز الطالبات المنضبطات وتكريمهن\nخفض حالات الغياب والتأخر الصباحي',
     steps: ['نشر قواعد السلوك والمواظبة للطالبات وأولياء الأمور', 'إذاعة مدرسية عن أهمية الانضباط والحضور', 'لوحة شرف شهرية للمواظبات والمتميزات سلوكياً', 'متابعة حالات الغياب والتأخر وفق الإجراءات المعتمدة', 'تكريم المواظبات نهاية كل شهر'],
     tools: 'لوحة الشرف، شهادات شكر، رسائل نصية لأولياء الأمور، مطويات', evalm: 'مقارنة نسب الغياب والتأخر قبل البرنامج وبعده، عدد المكرّمات شهرياً' },
-  { title: 'معاً ضد التنمر', domain: 'السلوكي', svc: 'وقائي', form: 'حملة توعوية', target: 'جميع الطالبات', term: 'الفصل الأول',
+  { title: 'معاً ضد التنمر', domain: 'سلوكي', svc: 'وقائي', form: 'حملة توعوية', target: 'جميع الطالبات', term: 'الفصل الأول',
     goals: 'تعريف الطالبات بمفهوم التنمر وأشكاله\nتنمية مهارات التصرف الصحيح عند التعرض للتنمر أو مشاهدته\nتعزيز قيم الاحترام وتقبّل الآخر\nاكتشاف حالات التنمر مبكراً والتعامل معها',
     steps: ['إذاعة مدرسية وفقرات توعوية عن التنمر', 'قصة أو مسرحية قصيرة تمثّل موقف تنمر وطريقة التصرف', 'أنشطة صفية بأسلوب لعب الأدوار', 'صندوق «أخبريني» لاستقبال البلاغات بسرية', 'متابعة الحالات المرصودة فردياً والتواصل مع الأسر'],
     tools: 'قصص، بطاقات مواقف، صندوق سري، مطويات للأمهات', evalm: 'استبانة قبلية وبعدية للطالبات، عدد البلاغات وطريقة معالجتها' },
-  { title: 'رعاية المتأخرات دراسياً', domain: 'التربوي والتعليمي', svc: 'علاجي', form: 'برنامج', target: 'الطالبات المتأخرات دراسياً', term: 'الفصل الأول',
+  { title: 'رعاية المتأخرات دراسياً', domain: 'تربوي وتعليمي', svc: 'علاجي', form: 'برنامج', target: 'الطالبات المتأخرات دراسياً', term: 'الفصل الأول',
     goals: 'حصر المتأخرات دراسياً وتشخيص أسباب التأخر\nوضع خطط علاجية بالتعاون مع معلمات المواد\nإشراك الأسرة في المتابعة المنزلية\nتحسين المستوى الدراسي للمتأخرات',
     steps: ['حصر المتأخرات من نتائج التقويم وترشيحات المعلمات', 'دراسة حالة للمحتاجات وتحديد أسباب التأخر', 'خطط علاجية وحصص تقوية بالتعاون مع معلمات المواد', 'لقاء بأولياء الأمور لخطة متابعة منزلية', 'قياس التحسن بمقارنة الدرجات قبل التدخل وبعده'],
     tools: 'كشف الحصر، الخطط العلاجية، أوراق عمل، برنامج الأخت المساعدة', evalm: 'مقارنة الدرجات قبل التدخل وبعده، تقارير معلمات المواد' },
-  { title: 'رعاية الموهوبات والمتفوقات', domain: 'التربوي والتعليمي', svc: 'نمائي', form: 'برنامج', target: 'الموهوبات والمتفوقات', term: 'الفصل الثاني',
+  { title: 'رعاية الموهوبات والمتفوقات', domain: 'تربوي وتعليمي', svc: 'نمائي', form: 'برنامج', target: 'الموهوبات والمتفوقات', term: 'الفصل الثاني',
     goals: 'اكتشاف الموهوبات والمتفوقات وحصرهن\nتنمية مواهب الطالبات وقدراتهن\nتحفيز المتفوقات وتكريمهن\nإبراز إنجازات الطالبات أمام المجتمع المدرسي',
     steps: ['حصر المتفوقات والموهوبات بترشيح المعلمات والنتائج', 'تصنيف المواهب وتوزيع الطالبات على الأنشطة المناسبة', 'مشاركة الطالبات في المسابقات والأندية', 'معرض لإنتاج الطالبات', 'حفل تكريم للمتفوقات والموهوبات'],
     tools: 'كشف الحصر، شهادات وجوائز، ركن المعرض', evalm: 'عدد المشاركات والإنجازات، رضا الطالبات وأولياء الأمور' },
-  { title: 'الأمان الرقمي', domain: 'الوقائي والصحي', svc: 'وقائي', form: 'حملة توعوية', target: 'الطالبات وأولياء الأمور', term: 'الفصل الثاني',
+  { title: 'الأمان الرقمي', domain: 'وقائي وصحي', svc: 'وقائي', form: 'حملة توعوية', target: 'الطالبات وأولياء الأمور', term: 'الفصل الثاني',
     goals: 'توعية الطالبات بالاستخدام الآمن للأجهزة والإنترنت\nتعريف الطالبات بعدم مشاركة المعلومات الشخصية مع الغرباء\nتوعية الأسر بأدوات الرقابة الأبوية وتنظيم وقت الشاشة\nتعزيز التوازن بين الأجهزة والأنشطة الأخرى',
     steps: ['فقرات إذاعية عن قواعد الأمان الرقمي', 'نشاط صفي «أنا أعرف متى أقول لا» بمواقف رقمية', 'رسائل ومطويات توعوية لأولياء الأمور', 'لقاء توعوي للأمهات عن الرقابة الأبوية', 'مسابقة رسم أو شعار عن الأمان الرقمي'],
     tools: 'عرض تقديمي، بطاقات مواقف، مطويات، رسائل نصية', evalm: 'استبانة قصيرة للطالبات قبل وبعد، عدد الأمهات الحاضرات' },
-  { title: 'مشاعري أعبّر عنها', domain: 'النفسي', svc: 'نمائي', form: 'برنامج', target: 'طالبات الصفوف الأولية', term: 'الفصل الثاني',
+  { title: 'مشاعري أعبّر عنها', domain: 'نفسي', svc: 'نمائي', form: 'برنامج', target: 'طالبات الصفوف الأولية', term: 'الفصل الثاني',
     goals: 'تعريف الطالبات بالمشاعر المختلفة وتسميتها\nتنمية قدرة الطالبات على التعبير عن مشاعرهن بطريقة مناسبة\nتعليم الطالبات طرقاً بسيطة لتهدئة النفس\nتشجيع الطالبات على طلب المساعدة من الكبار الموثوقين',
     steps: ['قصة عن المشاعر مع نقاش', 'نشاط «وجوه المشاعر» بالرسم والبطاقات', 'تدريب على تمارين تنفس وتهدئة بسيطة', 'ركن المشاعر في الفصل', 'متابعة فردية للطالبات اللاتي يحتجن دعماً'],
     tools: 'قصص، بطاقات وجوه المشاعر، أوراق رسم، ركن المشاعر', evalm: 'ملاحظة المعلمات، أعمال الطالبات، استبانة مصورة مبسطة' },
-  { title: 'سلامتي مسؤوليتي', domain: 'الوقائي والصحي', svc: 'وقائي', form: 'برنامج', target: 'جميع الطالبات', term: 'الفصل الثاني',
+  { title: 'سلامتي مسؤوليتي', domain: 'وقائي وصحي', svc: 'وقائي', form: 'برنامج', target: 'جميع الطالبات', term: 'الفصل الثاني',
     goals: 'تعريف الطالبات بمهارات السلامة الشخصية\nتدريب الطالبات على رفض المواقف غير الآمنة وإخبار شخص موثوق\nتحديد الكبار الموثوقين لكل طالبة في البيت والمدرسة\nتوعية الأسر بدورها في حماية أطفالها',
     steps: ['قصة مصورة مناسبة للعمر عن السلامة الشخصية', 'نشاط «دائرة الأمان» لتحديد الكبار الموثوقين', 'تدريب بلعب الأدوار على قول «لا» والإخبار', 'رسالة توعوية للأسر', 'متابعة أي حالة تُكتشف وفق الإجراءات النظامية'],
     tools: 'قصص مصورة، بطاقات، مطويات للأسر', evalm: 'ملاحظة استجابة الطالبات، أسئلة مصورة بسيطة بعد البرنامج' },
-  { title: 'التهيئة للاختبارات', domain: 'التربوي والتعليمي', svc: 'نمائي', form: 'برنامج', target: 'جميع الطالبات وأولياء الأمور', term: 'الفصل الثالث',
+  { title: 'التهيئة للاختبارات', domain: 'تربوي وتعليمي', svc: 'نمائي', form: 'برنامج', target: 'جميع الطالبات وأولياء الأمور', term: 'الفصل الثالث',
     goals: 'تعريف الطالبات بمهارات المذاكرة وتنظيم الوقت\nخفض قلق الاختبارات لدى الطالبات\nتوعية الأسر بدورها في تهيئة بناتهن للاختبارات\nتحسين التحصيل الدراسي',
     steps: ['إذاعة عن الاستعداد للاختبارات', 'ورشة صفية عن مهارات المذاكرة وتنظيم الوقت', 'جدول مذاكرة منزلي يُرسل للأسر', 'نشاط لتخفيف القلق (تنفس، عبارات إيجابية)', 'متابعة الطالبات القلقات فردياً'],
     tools: 'جدول مذاكرة، مطويات، بطاقات عبارات إيجابية', evalm: 'استبانة رضا، مقارنة النتائج، عدد حالات القلق المتابعة' },
-  { title: 'شركاء في التربية', domain: 'الاجتماعي والأسري', svc: 'نمائي', form: 'برنامج', target: 'أولياء الأمور', term: 'الفصل الأول',
+  { title: 'شركاء في التربية', domain: 'اجتماعي وأسري', svc: 'نمائي', form: 'برنامج', target: 'أولياء الأمور', term: 'الفصل الأول',
     goals: 'تعزيز الشراكة والتواصل بين الأسرة والمدرسة\nتعريف الأسر بخدمات التوجيه الطلابي\nإشراك الأسر في الأنشطة والمبادرات المدرسية\nرفع رضا الأسر عن المدرسة',
     steps: ['مجلس أمهات تعريفي بخطة التوجيه الطلابي', 'قنوات تواصل منتظمة (رسائل، نشرات)', 'إشراك الأمهات في فعالية أو مبادرة', 'استبانة رضا لأولياء الأمور', 'تكريم الأمهات المتعاونات'],
     tools: 'عرض تقديمي، رسائل، شهادات شكر، استبانة', evalm: 'عدد الحاضرات والمشاركات، نسبة الرضا في الاستبانة' },
-  { title: 'جواز سفر الانضباط', domain: 'السلوكي', svc: 'وقائي', form: 'برنامج', target: 'جميع الطالبات', term: 'الفصل الأول',
+  { title: 'جواز سفر الانضباط', domain: 'سلوكي', svc: 'وقائي', form: 'برنامج', target: 'جميع الطالبات', term: 'الفصل الأول',
     goals: 'تحفيز الطالبات على الحضور المبكر والانتظام بأسلوب ممتع\nتعزيز السلوك الإيجابي اليومي\nإشراك الفصول في تنافس إيجابي\nخفض حالات التأخر والغياب',
     steps: ['توزيع «جواز سفر الانضباط» على كل طالبة في إذاعة الافتتاح', 'ختم يومي للحاضرات قبل الطابور، وختم إضافي للسلوك المتميز', 'قطار الانضباط: عربة لكل فصل تتقدم مع الحضور الكامل', 'تكريم أسبوعي للفصل الأعلى انتظاماً بالكأس المتنقل', 'حفل ختامي لمكتملات الأختام وصورهن في ركن التصوير'],
     tools: 'جوازات مطبوعة، أختام وملصقات، لوحة القطار، كأس متنقل، ركن تصوير', evalm: 'مقارنة نسب الحضور والتأخر قبل البرنامج وبعده، عدد مكتملات الجواز' },
-  { title: 'سفيرات اللطف', domain: 'القيمي والوطني', svc: 'نمائي', form: 'برنامج', target: 'جميع الطالبات', term: 'الفصل الثاني',
+  { title: 'سفيرات اللطف', domain: 'قيم ومواطنة', svc: 'نمائي', form: 'برنامج', target: 'جميع الطالبات', term: 'الفصل الثاني',
     goals: 'نشر قيم اللطف والاحترام بين الطالبات\nالحد من المشاحنات والتنمر\nتنمية روح المبادرة والقيادة\nتعزيز بيئة مدرسية آمنة ومحبة',
     steps: ['اختيار سفيرتين من كل فصل وتسليمهن شارة «سفيرة اللطف»', 'شجرة اللطف في الممر: ورقة لكل موقف لطيف', 'تحدي الأسبوع: بطاقة لطف يومية تطبقها الطالبات', 'سوار الصداقة: كل طالبة تهدي زميلة سواراً وبطاقة', 'تكريم السفيرات والفصل الأكثر أوراقاً على الشجرة'],
     tools: 'شارات، أوراق ملونة، بطاقات تحدي، خيوط وخرز للأساور', evalm: 'عدد مواقف اللطف المرصودة، ملاحظة المعلمات، استبانة مصورة للطالبات' },
-  { title: 'محطات القيم التفاعلية', domain: 'القيمي والوطني', svc: 'نمائي', form: 'فعالية', target: 'جميع الطالبات', term: 'الفصل الثاني',
+  { title: 'محطات القيم التفاعلية', domain: 'قيم ومواطنة', svc: 'نمائي', form: 'فعالية', target: 'جميع الطالبات', term: 'الفصل الثاني',
     goals: 'تعريف الطالبات بالقيم بأسلوب تفاعلي ممتع\nتطبيق القيم في مواقف عملية\nتنمية العمل الجماعي',
     steps: ['تجهيز ٥ محطات في الساحة (الصدق، الاحترام، التعاون، النظافة، الأمانة)', 'بطاقة أختام لكل فصل يتنقل بها بين المحطات', 'في كل محطة نشاط قصير: لعبة أو موقف تمثيلي أو سؤال', 'ركن تصوير بإطار الفعالية', 'تكريم الفصول المكتملة الأختام'],
     tools: 'لوحات المحطات، بطاقات أختام، أدوات الألعاب، إطار تصوير', evalm: 'عدد الفصول المكتملة، ملاحظة المشرفات على المحطات، صور الشواهد' }
@@ -1315,12 +1328,17 @@ function vPrograms() {
       : `<div class="empty"><b>ابدئي بأول برنامج</b><span>اختاري من البرامج الجاهزة وعدّليها، أو اكتبي برنامجك من البداية.</span><button class="btn primary" data-act="pAdd">＋ برنامج</button></div>`}`;
 }
 function progCard(p) {
-  const c = pcolor(p); const [sc, ss] = PSTAT[p.status] || PSTAT['مخطط']; const pct = progPct(p); const st = p.steps || [];
-  return `<div class="rec prg" style="--c:${c}"><a class="cov" href="#programs/${p.id}"><div class="t"><b>${esc(p.title)}</b><span class="pill" style="--pc:${sc};--ps:${ss}">${esc(p.status || 'مخطط')}</span></div>
-    <div class="meta"><span class="chip c" style="--cs:color-mix(in srgb,${c} 13%,var(--surface))">${esc(p.domain || '')}</span>${p.svc ? `<span class="chip">${esc(p.svc)}</span>` : ''}${p.form && p.form !== 'برنامج' ? `<span class="chip">${esc(p.form)}</span>` : ''}</div>
-    <div class="meta">${p.start ? `<span class="chip">${esc(hij(p.start))}</span>` : p.status === 'منفذ' ? '<span class="chip warn">📅 باقي التاريخ</span>' : p.term ? `<span class="chip">${esc(p.term)}</span>` : ''}${p.status === 'منفذ' && !(p.photos || []).length ? '<span class="chip warn">📷 باقي الشواهد</span>' : ''}${p.target ? `<span class="chip">${esc(p.target)}</span>` : ''}</div>
-    ${st.length ? `<div class="pbar" aria-label="تقدم الخطة ${pct}%"><i style="width:${pct}%"></i></div><span class="tiny muted">الخطة: ${ar(st.filter(x => x.done).length)} من ${ar(st.length)} خطوات${(p.photos || []).length ? ` · ${ar(p.photos.length)} شاهد` : ''}${p.count ? ` · ${ar(p.count)} مستفيدة` : ''}</span>` : ''}</a>
-    <div class="acts"><button class="btn sm" data-prep1="${p.id}">📄 تقرير صفحة واحدة</button><button class="btn sm" data-prep="${p.id}">📑 التقرير الكامل</button><a class="btn sm ghost" href="#programs/${p.id}">فتح ←</a></div></div>`;
+  const c = pcolor(p); const [sc, ss] = PSTAT[p.status] || PSTAT['مخطط']; const pct = progPct(p); const st = p.steps || []; const ph = (p.photos || []).length;
+  const miss = p.status === 'منفذ' ? [!p.start && 'التاريخ', !ph && 'الشواهد'].filter(Boolean) : [];
+  const sub = [p.svc, p.form && p.form !== 'برنامج' ? p.form : '', p.start ? hij(p.start) : p.term].filter(Boolean);
+  return `<article class="pcard" style="--c:${c}"><a class="pc-main" href="#programs/${p.id}">
+      <div class="pc-top"><span class="pc-dom">${esc(p.domain || '')}</span><span class="pill" style="--pc:${sc};--ps:${ss}">${esc(p.status || 'مخطط')}</span></div>
+      <h3 class="pc-t">${esc(p.title)}</h3>
+      <p class="pc-sub">${sub.map(esc).join('<i>•</i>')}</p>
+      ${p.target ? `<p class="pc-tg">${esc(p.target)}</p>` : ''}
+      ${st.length ? `<div class="pc-prog"><div class="pc-bar"><i style="width:${pct}%"></i></div><span>${ar(st.filter(x => x.done).length)}/${ar(st.length)} خطوات${ph ? ` · ${ar(ph)} شاهد` : ''}${p.count ? ` · ${ar(p.count)} مستفيدة` : ''}</span></div>` : ''}
+      ${miss.length ? `<p class="pc-miss">ناقص: ${miss.join(' و')}</p>` : ''}</a>
+    <div class="pc-acts"><button class="pc-btn" data-prep="${p.id}">التقرير</button><a class="pc-open" href="#programs/${p.id}" aria-label="فتح البرنامج">فتح</a></div></article>`;
 }
 function progFields(p) {
   const sel = (id, opts, v) => `<select id="${id}">${opts.map(o => `<option${o === v ? ' selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
@@ -1362,12 +1380,11 @@ function vProgramOne() {
   return `<a class="btn ghost" href="#programs" style="align-self:flex-start">→ كل البرامج</a>
     <div class="stu-head prg-head" style="--c:${c}">
       <div style="flex:1;min-width:220px"><h1 style="font-size:1.45rem;color:color-mix(in srgb,${c} 60%,#1b2422)">${esc(p.title)}</h1><div class="meta" style="margin-top:6px"><span class="pill" style="--pc:${sc};--ps:${ss}">${esc(p.status || 'مخطط')}</span><span class="chip c" style="--c:${c};--cs:color-mix(in srgb,${c} 13%,var(--surface))">${esc(p.domain || '')}</span>${p.svc ? `<span class="chip">${esc(p.svc)}</span>` : ''}</div></div>
-      <div class="toolbar"><button class="btn hint" data-act="pAI" title="اقتراحات" aria-label="اقتراحات">✦</button><button class="btn primary" data-act="pRep1">📄 التقرير</button><button class="btn wa" data-act="pWA">📲 دعوة أولياء الأمور</button><button class="btn" data-act="pTpl" title="يصير من برامجك الجاهزة وتستخدمينه كل سنة">⭐ حفظ كبرنامج جاهز</button><button class="btn" data-act="pEdit">تعديل</button><button class="btn danger" data-del="${id}" data-back="#programs">حذف</button></div></div>
+      <div class="toolbar"><button class="btn hint" data-act="pAI" title="اقتراحات" aria-label="اقتراحات">✦</button><button class="btn primary" data-act="pRep">التقرير</button><button class="btn wa" data-act="pWA">دعوة أولياء الأمور</button><button class="btn" data-act="pTpl" title="يصير من برامجك الجاهزة وتستخدمينه كل سنة">حفظ كبرنامج جاهز</button><button class="btn" data-act="pEdit">تعديل</button><button class="btn danger" data-del="${id}" data-back="#programs">حذف</button></div></div>
     <div class="pcolrow"><span class="tiny muted">لون البرنامج:</span>${PRG_PAL.map(k => `<button type="button" class="sw" data-pcol="${k}" style="--k:${softC(k)}" aria-label="لون" aria-pressed="${softC(k) === c}"></button>`).join('')}</div>
-    ${p.status === 'منفذ' && (!p.start || !(p.photos || []).length) ? `<div class="todo" style="--c:${c}"><b>باقي عليك:</b>${!p.start ? '<button class="btn sm primary" data-act="pDone">📅 تاريخ التنفيذ وعدد المستفيدات</button>' : ''}${!(p.photos || []).length ? '<label class="btn sm primary" style="cursor:pointer">📷 صور الشواهد<input type="file" accept="image/*" multiple data-pph hidden></label>' : ''}</div>` : ''}
+    ${p.status === 'منفذ' && (!p.start || !(p.photos || []).length) ? `<div class="todo" style="--c:${c}"><b>لإكمال البرنامج:</b>${!p.start ? '<button class="btn sm primary" data-act="pDone">تاريخ التنفيذ وعدد المستفيدات</button>' : ''}${!(p.photos || []).length ? '<label class="btn sm primary" style="cursor:pointer">رفع صور الشواهد<input type="file" accept="image/*" multiple data-pph hidden></label>' : ''}</div>` : ''}
     <section class="panel prep" style="--c:${c}"><div class="head"><h3>التقارير</h3></div><div class="reps">
-      <button class="rep-btn" data-act="pRep"><b>تقرير التنفيذ</b><small>تقرير كامل مع صفحة الشواهد</small></button>
-      <button class="rep-btn" data-act="pRep1"><b>تقرير صفحة واحدة</b><small>ملخص مع ٦ شواهد</small></button>
+      <button class="rep-btn" data-act="pRep"><b>تقرير التنفيذ</b><small>تقرير كامل مع صور الشواهد</small></button>
       <button class="rep-btn" data-act="pRepPlan"><b>خطة البرنامج</b><small>قبل التنفيذ: الأهداف والخطوات</small></button></div></section>
     <section class="panel"><div class="head"><h3>بيانات البرنامج</h3></div><dl class="pinfo">${info.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></section>
     <section class="panel"><div class="head"><h3>الأهداف</h3><span class="sp"></span><button class="btn sm ghost" data-act="pEdit">تعديل</button></div>${g.length ? `<ol class="goals">${g.map(x => `<li>${esc(x)}</li>`).join('')}</ol>` : '<p class="small muted">لم تُكتب الأهداف بعد.</p>'}</section>
@@ -1376,7 +1393,7 @@ function vProgramOne() {
         <span class="sbtn"><button class="btn sm ghost" data-pmv="${i}:-1" aria-label="لأعلى" ${i ? '' : 'disabled'}>↑</button><button class="btn sm ghost" data-pstep="${i}" aria-label="تعديل">✎</button><button class="btn sm ghost" data-pdel="${i}" aria-label="حذف">✕</button></span></li>`).join('')}</ol>` : '<p class="small muted">أضيفي خطوات التنفيذ: الأنشطة والفعاليات ومواعيدها والمسؤولة عنها.</p>'}</section>
     ${ideasHTML(id)}
     <section class="panel"><div class="head"><h3>الشواهد</h3><span class="tiny muted">${ar((p.photos || []).length)} صورة</span><span class="sp"></span><label class="btn primary sm" style="cursor:pointer">＋ صور<input type="file" accept="image/*" multiple data-pph hidden></label></div>
-      <p class="tiny muted" id="pphMsg">صور البرنامج كلها هنا. أول ٦ صور تظهر في تقرير الصفحة الواحدة، وتقدرين ترتيبها بالسهم.</p>
+      <p class="tiny muted" id="pphMsg">صور البرنامج كلها هنا. أول ١٢ صورة تظهر في التقرير، وتقدرين ترتيبها بالسهم.</p>
       ${(p.photos || []).length ? `<div class="pgrid">${p.photos.map((ph, i) => `<figure><img alt="" data-img="${esc(ph)}"><span class="pacts"><button class="btn sm ghost" data-phmv="${i}" aria-label="تقديم" ${i ? '' : 'disabled'}>→</button><button class="btn sm ghost" data-phdel="${esc(ph)}" aria-label="حذف الصورة">✕</button></span></figure>`).join('')}</div>`
         : `<label class="addph wide">＋ أضيفي صور الشواهد<input type="file" accept="image/*" multiple data-pph></label>`}</section>
     <section class="panel"><div class="head"><h3>لقاءات التوجيه الجمعي</h3><span class="tiny muted">${ar(progGroups(id).length)}</span><span class="sp"></span><button class="btn sm" data-act="gAddP">＋ لقاء ضمن البرنامج</button></div>
@@ -1419,10 +1436,10 @@ function progReport(p, full) {
   const st = p.steps || []; const gs = p.id ? progGroups(p.id) : []; const photos = (p.photos || []).concat(...gs.map(g => g.photos || []));
   const page1 = `<div class="a4 prep-a4">${repHead('تقرير تنفيذ برنامج', p.end || p.start)}<div class="pband"><small>${esc([p.form, p.domain].filter(Boolean).join(' · '))}</small><b>${esc(p.title)}</b></div>${pInfoTable(p)}
     <div class="boxes"><div class="box${p.tools || p.evalm ? '' : ' full'}"><h4>الأهداف</h4>${pList(p.goals)}</div>${p.tools || p.evalm ? `<div class="box">${p.tools ? `<h4>الوسائل والأدوات</h4><p>${esc(p.tools)}</p>` : ''}${p.evalm ? `<h4${p.tools ? ' style="margin-top:6px"' : ''}>أساليب التقويم</h4><p>${esc(p.evalm)}</p>` : ''}</div>` : ''}
-    <div class="box full"><h4>آلية التنفيذ</h4>${st.length ? `<table><thead><tr><th style="width:28px">م</th><th>النشاط / الإجراء</th><th style="width:120px">التاريخ</th><th style="width:120px">المسؤولة</th><th style="width:44px">التنفيذ</th></tr></thead><tbody>${st.map((s, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(s.t)}</td><td>${esc(stepDate(s) || (s.doneAt ? hij(s.doneAt) : ''))}</td><td>${esc(s.who || '')}</td><td style="text-align:center">${s.done ? '✔' : ''}</td></tr>`).join('')}</tbody></table>` : '<p>—</p>'}</div>
+    <div class="box full"><h4>آلية التنفيذ</h4>${st.length ? `<table><thead><tr><th style="width:28px">م</th><th>النشاط / الإجراء</th><th style="width:130px">المسؤولة</th><th style="width:44px">التنفيذ</th></tr></thead><tbody>${st.map((s, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(s.t)}</td><td>${esc(s.who || '')}</td><td style="text-align:center">${s.done ? '✔' : ''}</td></tr>`).join('')}</tbody></table>` : '<p>—</p>'}</div>
     ${gs.length ? `<div class="box full"><h4>لقاءات التوجيه الجمعي (${ar(gs.length)})</h4><table><thead><tr><th style="width:28px">م</th><th>الموضوع</th><th style="width:120px">التاريخ</th><th>الفصل</th><th style="width:70px">الحاضرات</th></tr></thead><tbody>${gs.map((g, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(g.topic)}</td><td>${esc(hij(g.date))}</td><td>${esc((g.classes || []).join('، '))}</td><td>${g.count ? ar(g.count) : '—'}</td></tr>`).join('')}</tbody></table></div>` : ''}
     <div class="box"><h4>النتائج والأثر${p.achieve ? ` <span style="font-weight:500">(تحقق الأهداف ${ar(p.achieve)}٪)</span>` : ''}</h4>${pList(p.results, 'ul')}</div>
-    <div class="box"><h4>التوصيات</h4>${pList(p.recs, 'ul')}</div></div>${evidHTML(photos)}${repSigs()}</div>`;
+    <div class="box"><h4>التوصيات</h4>${pList(p.recs, 'ul')}</div></div>${photos.length ? `<div class="evid"><h4>الشواهد</h4><div class="thumbs">${photos.slice(0, 12).map(x => `<figure><img data-img="${esc(x)}" alt=""></figure>`).join('')}</div></div>` : ''}${repSigs()}</div>`;
   return page1;
 }
 function progReport1(p) {
@@ -1819,7 +1836,7 @@ async function amPlanSug(id, idx) {
   const r = DB.docs[id].data; const s = amSuggest(id); const st = todayH(); const pid = uid('prog');
   const chosen = s.items.filter((_, i) => !idx || idx.includes(i)); if (!chosen.length) { toast('اختاري مقترحاً واحداً على الأقل'); return; }
   const who = g => g === 'الغياب الصحي' ? 'الموجهة الطلابية والمرشدة الصحية' : g === 'الصفوف الأعلى ارتفاعاً' ? 'الموجهة الطلابية ومعلمات الصف' : 'الموجهة الطلابية';
-  await saveDoc(pid, 'program', { title: 'خطة علاجية للغياب — ' + amLabel(r), domain: 'السلوكي', svc: 'علاجي', form: 'برنامج', status: 'مخطط', target: 'جميع الطالبات وأولياء الأمور', term: PTERM[0], start: st, end: st, place: 'المدرسة', lead: 'الموجهة الطلابية', partners: '',
+  await saveDoc(pid, 'program', { title: 'خطة علاجية للغياب — ' + amLabel(r), domain: 'سلوكي', svc: 'علاجي', form: 'برنامج', status: 'مخطط', target: 'جميع الطالبات وأولياء الأمور', term: PTERM[0], start: st, end: st, place: 'المدرسة', lead: 'الموجهة الطلابية', partners: '',
     goals: `خفض نسبة الغياب إلى ${pct(s.target)} أو أقل في الشهر القادم\nمعالجة أسباب الغياب الأكثر تكراراً\nتعزيز وعي الأسر بأهمية الانتظام\nمتابعة كثيرات الغياب وفق قواعد السلوك والمواظبة`,
     steps: chosen.map(x => ({ t: x.t, date: st, who: who(x.grp), done: false })), tools: 'رسائل واتساب لأولياء الأمور، إذاعة مدرسية، لوحة الشرف، ملفات الغياب', evalm: 'مقارنة نسبة الغياب في التقرير الشهري القادم، وعدد كثيرات الغياب',
     results: '', recs: '', photos: [], caps: {}, absMonth: id, analysis: s.analysis.join('\n') });
@@ -1844,18 +1861,18 @@ const IDEAS = [
   { t: 'سفيرات البرنامج', d: 'اختيار طالبتين من كل فصل «سفيرات» بشارة خاصة، يذكّرن زميلاتهن ويشاركن في الإذاعة، ويُكرَّمن في النهاية.', k: ['*'] },
   { t: 'الجدارية الجماعية', d: 'جدارية كبيرة في الممر تضيف لها كل طالبة رسمة أو عبارة أو بصمة يد عن الموضوع، وتبقى شاهداً للبرنامج.', k: ['*'] },
   { t: 'ركن التصوير', d: 'إطار تصوير كبير بشعار البرنامج وعبارات مرحة، تتصور فيه الطالبات بعد النشاط (شاهد جميل للتقرير).', k: ['*'] },
-  { t: 'مسابقة الفصل المثالي', d: 'نقاط أسبوعية للفصول حسب الالتزام بهدف البرنامج، وكأس متنقل يزور الفصل الفائز كل أسبوع.', k: ['*', 'السلوكي', 'انضباط', 'مواظب'] },
+  { t: 'مسابقة الفصل المثالي', d: 'نقاط أسبوعية للفصول حسب الالتزام بهدف البرنامج، وكأس متنقل يزور الفصل الفائز كل أسبوع.', k: ['*', 'سلوكي', 'انضباط', 'مواظب'] },
   { t: 'تحدي الأسبوع', d: 'بطاقة تحدٍّ صغيرة كل يوم (مثلاً: «قولي كلمة لطيفة لثلاث زميلات»)، وتسجّل الطالبة إنجازها في بطاقتها.', k: ['*'] },
   { t: 'فيديو من إعداد الطالبات', d: 'مجموعة من الطالبات يصوّرن مقطعاً قصيراً (دقيقة) عن الموضوع بإشراف المعلمة، ويُعرض في الإذاعة أو للأمهات.', k: ['*'] },
-  { t: 'بطاقة الحضور المبكر', d: 'ختم يومي للطالبة اللي تحضر قبل الطابور، و١٠ أختام = هدية رمزية أو اسمها في لوحة الشرف.', k: ['انضباط', 'مواظب', 'غياب', 'السلوكي'] },
+  { t: 'بطاقة الحضور المبكر', d: 'ختم يومي للطالبة اللي تحضر قبل الطابور، و١٠ أختام = هدية رمزية أو اسمها في لوحة الشرف.', k: ['انضباط', 'مواظب', 'غياب', 'سلوكي'] },
   { t: 'قطار الانضباط', d: 'لوحة فيها قطار لكل فصل، تتقدم عربته محطة كل يوم حضور كامل، وأول قطار يوصل يحتفل.', k: ['انضباط', 'مواظب', 'غياب'] },
   { t: 'تحدي الحضور الكامل', d: 'الفصل اللي حضوره كامل طوال الأسبوع يحصل نجمة ذهبية على بابه وفسحة مميزة.', k: ['انضباط', 'مواظب', 'غياب'] },
-  { t: 'شجرة اللطف', d: 'شجرة على الجدار، كل موقف لطيف تشوفه الطالبات يُكتب على ورقة وتُعلَّق، وتكبر الشجرة مع الأيام.', k: ['تنمر', 'احترام', 'القيمي', 'اللطف', 'السلوكي'] },
-  { t: 'صندوق «أخبريني»', d: 'صندوق سري تكتب فيه الطالبة أي موقف أزعجها أو تبي تقوله، والموجهة تتابع بسرية.', k: ['تنمر', 'النفسي', 'سلامة', 'حماية'] },
+  { t: 'شجرة اللطف', d: 'شجرة على الجدار، كل موقف لطيف تشوفه الطالبات يُكتب على ورقة وتُعلَّق، وتكبر الشجرة مع الأيام.', k: ['تنمر', 'احترام', 'القيمي', 'اللطف', 'سلوكي'] },
+  { t: 'صندوق «أخبريني»', d: 'صندوق سري تكتب فيه الطالبة أي موقف أزعجها أو تبي تقوله، والموجهة تتابع بسرية.', k: ['تنمر', 'نفسي', 'سلامة', 'حماية'] },
   { t: 'سوار الصداقة', d: 'كل طالبة تصنع سواراً وتهديه لزميلة ما تعرفها كثيراً، مع بطاقة «أنا صديقتك».', k: ['تنمر', 'احترام', 'الاجتماعي', 'تقبل', 'صداق'] },
-  { t: 'ميزان المشاعر الصباحي', d: 'لوحة عند باب الفصل بوجوه مشاعر، كل طالبة تحط مشبكها على شعورها صباحاً، والمعلمة تنتبه لمن تحتاج دعماً.', k: ['النفسي', 'مشاعر', 'غضب'] },
-  { t: 'زجاجة الهدوء', d: 'تصنع الطالبات زجاجة فيها ماء ولمعان، وتتعلم إذا غضبت أو توترت تهزها وتتنفس حتى يهدأ اللمعان.', k: ['النفسي', 'مشاعر', 'غضب', 'قلق', 'اختبار'] },
-  { t: 'ركن الهدوء', d: 'ركن صغير في الفصل فيه وسائد وبطاقات تنفس ورسم، تلجأ له الطالبة إذا احتاجت تهدأ.', k: ['النفسي', 'مشاعر', 'غضب'] },
+  { t: 'ميزان المشاعر الصباحي', d: 'لوحة عند باب الفصل بوجوه مشاعر، كل طالبة تحط مشبكها على شعورها صباحاً، والمعلمة تنتبه لمن تحتاج دعماً.', k: ['نفسي', 'مشاعر', 'غضب'] },
+  { t: 'زجاجة الهدوء', d: 'تصنع الطالبات زجاجة فيها ماء ولمعان، وتتعلم إذا غضبت أو توترت تهزها وتتنفس حتى يهدأ اللمعان.', k: ['نفسي', 'مشاعر', 'غضب', 'قلق', 'اختبار'] },
+  { t: 'ركن الهدوء', d: 'ركن صغير في الفصل فيه وسائد وبطاقات تنفس ورسم، تلجأ له الطالبة إذا احتاجت تهدأ.', k: ['نفسي', 'مشاعر', 'غضب'] },
   { t: 'تجربة الجراثيم باللمعان', d: 'نحط لمعاناً على الأيدي ونشوف كيف ينتقل بالمصافحة، ثم نجرب الغسل بالماء فقط وبالصابون: تجربة لا تُنسى.', k: ['الصحي', 'نظافة', 'وقائ'] },
   { t: 'سوق الأكل الصحي', d: 'سوق صغير في الفسحة بأطعمة صحية من إعداد الأمهات أو المقصف، والطالبات يشترين بكوبونات.', k: ['الصحي', 'تغذي'] },
   { t: 'إشارة المرور الرقمية', d: 'بطاقات مواقف رقمية، والطالبات يرفعن أخضر (آمن) أو أصفر (اسألي الكبار) أو أحمر (توقفي وأخبري).', k: ['رقمي', 'الوقائي', 'سلامة'] },

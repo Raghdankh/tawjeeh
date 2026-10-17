@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>مسار · إحالات المعلمات</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Reem+Kufi:wght@500;600;700&display=swap">
+<style>
+/* Layout: wayfinding — a calm white map with colored "lines"; each case is a station on its route.
+   Color: violet route + three status lines (amber new, blue in progress, green closed), coral for urgent. */
+:root{
+  color-scheme:light;
+  --bg:#f6f5fb; --paper:#ffffff; --sunk:#efedf7;
+  --ink:#1f1d36; --muted:#6b6886; --faint:#9b98b3;
+  --line:#e3e0ef; --line2:#eeecf6;
+  --route:#5b45d6; --route-d:#4331b5; --route-l:#ebe7fd; --route-ll:#f5f3ff;
+  --new:#e8930c; --new-l:#fff3dc; --new-ink:#8a5300;
+  --prog:#2f7fe0; --prog-l:#e3efff; --prog-ink:#174f96;
+  --done:#1f9e6a; --done-l:#dff5ea; --done-ink:#0f6744;
+  --urgent:#e5533d; --urgent-l:#fde7e2; --urgent-ink:#a2301e;
+  --shadow:0 1px 2px rgba(31,29,54,.05),0 8px 24px rgba(31,29,54,.07);
+  --r:16px;
+  --display:"Reem Kufi","IBM Plex Sans Arabic","Geeza Pro",Tahoma,sans-serif;
+  --body:"IBM Plex Sans Arabic","Segoe UI","Geeza Pro",Tahoma,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#151422; --paper:#1e1c30; --sunk:#26243b;
+  --ink:#eeecfa; --muted:#a9a6c4; --faint:#7d7a98;
+  --line:#34314d; --line2:#2b2942;
+  --route:#9a88ff; --route-d:#b5a8ff; --route-l:#2e2856; --route-ll:#241f45;
+  --new:#f2a93b; --new-l:#3a2c12; --new-ink:#ffcf86;
+  --prog:#5ea2ff; --prog-l:#16304f; --prog-ink:#a9cdff;
+  --done:#3cc48b; --done-l:#123a2a; --done-ink:#93e6c2;
+  --urgent:#ff7a63; --urgent-l:#45201b; --urgent-ink:#ffb3a5;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#151422; --paper:#1e1c30; --sunk:#26243b;
+  --ink:#eeecfa; --muted:#a9a6c4; --faint:#7d7a98;
+  --line:#34314d; --line2:#2b2942;
+  --route:#9a88ff; --route-d:#b5a8ff; --route-l:#2e2856; --route-ll:#241f45;
+  --new:#f2a93b; --new-l:#3a2c12; --new-ink:#ffcf86;
+  --prog:#5ea2ff; --prog-l:#16304f; --prog-ink:#a9cdff;
+  --done:#3cc48b; --done-l:#123a2a; --done-ink:#93e6c2;
+  --urgent:#ff7a63; --urgent-l:#45201b; --urgent-ink:#ffb3a5;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased;min-height:100vh}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+h1,h2,h3{margin:0;line-height:1.3;text-wrap:balance}
+p{margin:0}
+.code,.num{font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate}
+svg{display:block;flex:none}
+[hidden]{display:none!important}
+:focus-visible{outline:2.5px solid var(--route);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.narrow{max-width:640px}
+
+/* ── top bar ── */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:12px;padding-block:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;min-width:0;border:0;background:none;padding:0;text-align:start}
+.brand b{font-family:var(--display);font-size:24px;font-weight:700;color:var(--route);line-height:1}
+.brand small{display:block;color:var(--muted);font-size:13px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46vw}
+.top .end{margin-inline-start:auto;display:flex;gap:6px;align-items:center}
+
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-bottom:8px}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{border:0;background:transparent;color:var(--muted);padding:7px 14px;border-radius:999px;font-weight:600;font-size:15px;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.tabs button:hover{background:var(--sunk)}
+.tabs button.on{background:var(--route);color:#fff}
+.tabs .cnt{background:var(--new);color:#fff;border-radius:999px;font-size:12px;padding:0 7px;line-height:20px}
+
+/* ── buttons & fields ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1.5px solid var(--line);background:var(--paper);border-radius:12px;padding:9px 16px;font-weight:600;min-height:44px;white-space:nowrap;transition:background .15s,border-color .15s,transform .06s}
+.btn:hover{border-color:var(--route);}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--route);border-color:var(--route);color:#fff}
+.btn.primary:hover{background:var(--route-d);border-color:var(--route-d)}
+.btn.soft{background:var(--route-l);border-color:transparent;color:var(--route-d)}
+.btn.danger{background:var(--urgent-l);border-color:transparent;color:var(--urgent-ink)}
+.btn.ghost{background:transparent;border-color:transparent}
+.btn.ghost:hover{background:var(--sunk)}
+.btn.sm{min-height:36px;padding:5px 12px;font-size:14.5px;border-radius:10px}
+.btn.block{width:100%}
+a.btn{color:var(--ink);text-decoration:none}
+a.btn.primary{color:#fff}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.icon-btn{border:0;background:transparent;border-radius:10px;width:40px;height:40px;display:grid;place-items:center;color:var(--muted)}
+.icon-btn:hover{background:var(--sunk);color:var(--ink)}
+
+label.f{display:flex;flex-direction:column;gap:6px}
+label.f>span{font-weight:600;font-size:14.5px;color:var(--muted)}
+input[type=text],input[type=password],input[type=email],input[type=search],input[type=date],input[type=url],select,textarea{
+  width:100%;border:1.5px solid var(--line);background:var(--paper);border-radius:12px;padding:10px 13px;min-height:46px;outline:none;transition:border-color .15s,box-shadow .15s}
+textarea{min-height:96px;resize:vertical;line-height:1.6}
+input:focus,select:focus,textarea:focus{border-color:var(--route);box-shadow:0 0 0 4px var(--route-l)}
+.stack{display:flex;flex-direction:column;gap:14px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.grow{flex:1 1 auto;min-width:0}
+.muted{color:var(--muted)} .small{font-size:14px} .tiny{font-size:12.5px}
+.err{background:var(--urgent-l);color:var(--urgent-ink);border-radius:12px;padding:10px 14px;font-weight:600}
+.info{background:var(--route-ll);color:var(--ink);border:1px solid var(--route-l);border-radius:12px;padding:12px 14px}
+.warn{background:var(--new-l);color:var(--new-ink);border-radius:12px;padding:12px 14px;font-weight:500}
+
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:20px}
+.sec-h{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.sec-h h2{font-family:var(--display);font-size:20px;font-weight:600}
+.eyebrow{font-size:12.5px;font-weight:700;letter-spacing:.04em;color:var(--route);}
+
+/* ── chips ── */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--line);background:var(--paper);border-radius:999px;padding:6px 13px;font-weight:500;font-size:15px;min-height:40px;transition:all .12s}
+.chip .dot{width:10px;height:10px;border-radius:50%;background:var(--c)}
+.chip[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb,var(--c) 14%,var(--paper));color:var(--ink);font-weight:700}
+.chip[aria-pressed="true"] .dot{box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 30%,transparent)}
+.tag{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:1px 10px;font-size:13px;font-weight:600;background:color-mix(in srgb,var(--c) 13%,var(--paper));color:var(--ink);white-space:nowrap}
+.tag .dot{width:7px;height:7px;border-radius:50%;background:var(--c)}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:2px 11px;font-size:13px;font-weight:700;white-space:nowrap}
+.pill.new{background:var(--new-l);color:var(--new-ink)}
+.pill.progress{background:var(--prog-l);color:var(--prog-ink)}
+.pill.closed{background:var(--done-l);color:var(--done-ink)}
+.pill.urgent{background:var(--urgent-l);color:var(--urgent-ink)}
+
+.fbl{margin-top:12px;display:flex;flex-direction:column;gap:8px;border-top:1px dashed var(--line);padding-top:10px}
+.fbi{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.fbi .small{flex:1 1 180px;min-width:0}
+.fbform{margin-top:12px;display:flex;flex-direction:column;gap:10px;background:var(--sunk);border-radius:14px;padding:12px}
+.fbform .chip[aria-pressed="true"]{color:var(--ink)}
+.meta{color:var(--muted);font-size:13.5px;display:flex;gap:4px 12px;flex-wrap:wrap}
+.empty{text-align:center;padding:40px 20px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:10px}
+/* ── public landing ── */
+.hero{padding-block:34px 18px;display:grid;gap:22px}
+.hero h1{font-family:var(--display);font-size:clamp(30px,7vw,46px);font-weight:700;line-height:1.15}
+.hero h1 em{font-style:normal;color:var(--route)}
+.hero p{color:var(--muted);font-size:17px;max-width:46ch}
+.routeart{width:100%;max-width:560px;height:auto}
+.doors{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;padding-block:6px 18px}
+.door{display:flex;gap:16px;align-items:center;text-align:start;background:var(--paper);border:1.5px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow);transition:transform .15s,border-color .15s}
+.door:hover{transform:translateY(-2px);border-color:var(--route)}
+.door b{display:block;font-family:var(--display);font-size:20px;font-weight:600}
+.door span{color:var(--muted);font-size:14.5px;line-height:1.5;display:block}
+.foot{padding-block:22px 34px;color:var(--faint);font-size:14px;display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;align-items:center}
+.linkbtn{border:0;background:none;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:6px 0;font-size:14px}
+
+/* ── referral form ── */
+.page{padding-block:22px 40px}
+.back{display:inline-flex;align-items:center;gap:6px;border:0;background:none;color:var(--muted);font-weight:600;padding:6px 0;margin-bottom:8px}
+.step{display:grid;grid-template-columns:32px 1fr;gap:12px;position:relative;padding-bottom:22px}
+.step:not(:last-child)::before{content:"";position:absolute;inset-inline-start:15px;top:34px;bottom:2px;width:3px;border-radius:3px;background:var(--route-l)}
+.step .st-n{width:32px;height:32px;border-radius:50%;background:var(--route);color:#fff;display:grid;place-items:center;font-weight:700;font-size:15px;box-shadow:0 0 0 5px var(--route-ll)}
+.step h3{font-size:17.5px;font-weight:700;margin:3px 0 10px}
+.picked{display:flex;align-items:center;gap:12px;background:var(--route-ll);border:1.5px solid var(--route-l);border-radius:14px;padding:10px 14px}
+.picked b{font-size:17px}
+.results{border:1.5px solid var(--line);border-radius:14px;margin-top:8px;max-height:280px;overflow:auto;background:var(--paper)}
+.results button{display:flex;width:100%;justify-content:space-between;gap:10px;border:0;border-bottom:1px solid var(--line2);background:none;padding:11px 14px;text-align:start}
+.results button:last-child{border-bottom:0}
+.results button:hover{background:var(--route-ll)}
+.switch{display:flex;align-items:center;gap:12px;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--paper)}
+.switch input{width:22px;height:22px;accent-color:var(--urgent)}
+
+.ticket{text-align:center;padding:30px 20px}
+.ticket .big{font-size:42px;font-weight:700;letter-spacing:.14em;color:var(--route);margin:10px 0;font-family:"IBM Plex Sans Arabic",monospace}
+
+/* ── tracker (transit line) ── */
+.trk{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:16px 18px;box-shadow:var(--shadow)}
+.trk-h{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.trk-h b{font-size:17px}
+.line{display:grid;grid-template-columns:repeat(3,1fr);margin:16px 0 4px;position:relative}
+.line .stn{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;position:relative;z-index:1}
+.line .stn i{width:22px;height:22px;border-radius:50%;background:var(--paper);border:4px solid var(--line);display:block}
+.line .stn.on i{border-color:var(--sc);background:var(--sc)}
+.line .stn.now i{background:var(--paper);box-shadow:0 0 0 6px color-mix(in srgb,var(--sc) 22%,transparent)}
+.line .stn b{font-size:14px}
+.line .stn small{font-size:12.5px;color:var(--muted)}
+.line .rail{position:absolute;top:9px;height:4px;inset-inline:16.6%;background:var(--line);border-radius:4px}
+.line .rail span{position:absolute;inset-block:0;inset-inline-start:0;border-radius:4px;background:linear-gradient(to left,var(--new),var(--prog),var(--done))}
+.msg{margin-top:12px;background:var(--route-ll);border-radius:12px;padding:10px 14px;font-size:15px}
+.msg b{color:var(--route-d);font-size:13px;display:block}
+
+.toast{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom,0px));inset-inline:0;margin:auto;width:max-content;max-width:calc(100% - 32px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:12px;font-weight:600;z-index:60;box-shadow:var(--shadow);animation:pop .2s ease-out}
+@keyframes pop{from{transform:translateY(10px);opacity:0}}
+.modal-bg{position:fixed;inset:0;background:rgba(20,18,40,.45);z-index:50;display:grid;place-items:center;padding:16px}
+.modal{background:var(--paper);border-radius:18px;padding:22px;max-width:420px;width:100%;box-shadow:var(--shadow)}
+.modal h3{font-size:18px;margin-bottom:8px}
+
+.demobar{background:var(--new-l);color:var(--new-ink);font-size:14px;border-bottom:1px solid color-mix(in srgb,var(--new) 30%,transparent)}
+.demobar .wrap{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-block:7px}
+.demobar button{border:1.5px solid color-mix(in srgb,var(--new) 45%,transparent);background:var(--paper);color:var(--new-ink);border-radius:999px;padding:2px 13px;font-weight:700;font-size:14px;min-height:32px}
+.demobar button[aria-pressed="true"]{background:var(--new);border-color:var(--new);color:#fff}
+
+
+@media print{
+  .top,.demobar,.noprint,.toast{display:none!important}
+  body{background:#fff}
+  .card{box-shadow:none;border-color:#ccc;break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div id="app"><p style="padding:24px;color:#6b6886">جارٍ التحميل…</p></div>
+<script src="config.js"></script>
+<script src="masar.js"></script>
+<script>
+"use strict";
+/* ───────────────── helpers ───────────────── */
+const $ = s => document.querySelector(s);
+function h(tag, props, ...kids) {
+  const el = document.createElement(tag);
+  let val;
+  if (props) for (const [k, v] of Object.entries(props)) {
+    if (v == null || v === false) continue;
+    if (k === 'class') el.className = v;
+    else if (k === 'value') val = v;
+    else if (k === 'style') el.style.cssText = v;
+    else if (k === 'html') el.innerHTML = v;
+    else if (k.startsWith('on') && typeof v === 'function') el.addEventListener(k.slice(2).toLowerCase(), v);
+    else el.setAttribute(k, v === true ? '' : v);
+  }
+  for (const c of kids.flat(Infinity)) {
+    if (c == null || c === false) continue;
+    el.append(c.nodeType ? c : document.createTextNode(String(c)));
+  }
+  if (val !== undefined) el.value = val;
+  return el;
+}
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('masar.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('masar.' + k, JSON.stringify(v)); } catch (e) {} },
+  del(k) { try { localStorage.removeItem('masar.' + k); } catch (e) {} }
+};
+const fmtD = (() => { try { return new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', { day: 'numeric', month: 'long', timeZone: 'Asia/Riyadh' }); } catch (e) { return new Intl.DateTimeFormat('ar', { day: 'numeric', month: 'long' }); } })();
+const dd = s => s ? fmtD.format(new Date(s)) : '';
+function toast(t) { const el = h('div', { class: 'toast', role: 'status' }, t); document.body.append(el); setTimeout(() => el.remove(), 2400); }
+async function copyText(t) { try { await navigator.clipboard.writeText(t); toast('تم النسخ'); } catch (e) { toast('حدّدي الرقم وانسخيه يدويًا'); } }
+
+/* ───────────────── icons (layered) ───────────────── */
+const IC = {
+  send: '<circle cx="24" cy="24" r="20" fill="var(--route-l)"/><path d="M8 23.5 39 10l-8.5 29-8-11.5z" fill="#7c67ef"/><path d="M22.5 27.5 39 10 30.5 39z" fill="#5b45d6"/><path d="M22.5 27.5 39 10 17 24z" fill="#a898ff"/><circle cx="38" cy="36" r="5" fill="#f2a93b"/><path d="M36 36h4M38 34v4" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>',
+  track: '<circle cx="24" cy="24" r="20" fill="#e0f3ea"/><path d="M12 36c8 0 6-12 12-12s4-12 12-12" fill="none" stroke="#1f9e6a" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="1 7.5"/><circle cx="12" cy="36" r="5" fill="#f2a93b"/><circle cx="24" cy="24" r="5" fill="#2f7fe0"/><path d="M36 4.5a6.5 6.5 0 0 1 6.5 6.5c0 5-6.5 10-6.5 10s-6.5-5-6.5-10A6.5 6.5 0 0 1 36 4.5z" fill="#1f9e6a"/><circle cx="36" cy="11" r="2.4" fill="#fff"/>',
+  lock: '<circle cx="24" cy="24" r="20" fill="var(--route-l)"/><rect x="12" y="21" width="24" height="18" rx="5" fill="#7c67ef"/><path d="M24 21h12v13a5 5 0 0 1-5 5h-7z" fill="#5b45d6"/><path d="M17 21v-4a7 7 0 0 1 14 0v4" fill="none" stroke="#4331b5" stroke-width="3.5"/><circle cx="24" cy="29" r="2.6" fill="#fff"/><path d="M24 30v4" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>',
+  cases: '<circle cx="24" cy="24" r="20" fill="#fdebd9"/><rect x="13" y="11" width="22" height="27" rx="4" fill="#e07a2e"/><rect x="18" y="8" width="12" height="6" rx="2" fill="#b85a18"/><path d="M18 22h12M18 27h12M18 32h7" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>',
+  user: '<circle cx="24" cy="24" r="20" fill="var(--route-l)"/><circle cx="24" cy="19" r="7" fill="#7c67ef"/><path d="M11 38c0-7 5.8-12 13-12s13 5 13 12z" fill="#5b45d6"/>'
+};
+const ic = (n, s = 44) => h('span', { 'aria-hidden': 'true', html: `<svg width="${s}" height="${s}" viewBox="0 0 48 48">${IC[n]}</svg>` });
+const LI = { back: '<path d="M9 6l6 6-6 6"/>', plus: '<path d="M12 5v14M5 12h14"/>', copy: '<rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"/>', refresh: '<path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6"/>' };
+const li = (n, s = 20) => h('span', { 'aria-hidden': 'true', html: `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${LI[n]}</svg>` });
+
+/* ───────────────── domain ───────────────── */
+const KINDS = {
+  study: { t: 'ضعف دراسي', c: '#2f7fe0' },
+  behavior: { t: 'سلوك', c: '#d9822b' },
+  withdrawn: { t: 'انطواء', c: '#7c67ef' },
+  anxiety: { t: 'قلق', c: '#9b4fd1' },
+  fear: { t: 'خوف', c: '#d6456b' }
+};
+const STATUS = { new: { c: 'var(--new)', st: 'استُلمت' }, progress: { c: 'var(--prog)', st: 'تحت المتابعة' }, closed: { c: 'var(--done)', st: 'أُغلقت' } };
+const GRADES = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس', 'السادس'];
+const PROG = { up: ['تحسّنت', 'closed', 'var(--done)'], same: ['كما هي', 'progress', 'var(--prog)'], down: ['تراجعت', 'urgent', 'var(--urgent)'] };
+const kindTag = k => KINDS[k] ? h('span', { class: 'tag', style: `--c:${KINDS[k].c}` }, h('span', { class: 'dot' }), KINDS[k].t) : null;
+const ERR = {
+  wrong: 'الأرقام غير صحيحة. اكتبي آخر ٤ أرقام من هويتك، أو اسألي الموجهة.',
+  locked: 'محاولات خاطئة كثيرة. انتظري ربع ساعة ثم أعيدي المحاولة.',
+  student_name_required: 'اكتبي اسم الطالبة.',
+  bad_kinds: 'اختاري سببًا واحدًا على الأقل.',
+  bad_prog: 'اختاري: تحسّنت أو كما هي أو تراجعت.',
+  not_found: 'لا يمكن إضافة ملاحظة على هذه الإحالة.',
+  teacher_name_required: 'اكتبي اسمك أولًا.',
+  'Failed to fetch': 'تعذّر الاتصال. تأكدي من الإنترنت ثم أعيدي المحاولة.'
+};
+function errText(e) { const m = (e && (e.message || e)) + ''; for (const k in ERR) if (m.includes(k)) return ERR[k]; return 'حدث خطأ: ' + m; }
+const call = async (fn, args) => { const r = await S.sb.rpc(fn, args); if (r.error) throw r.error; if (r.data && r.data.error) throw new Error(r.data.error); return r.data; };
+const cred = () => ({ p_tid: S.t.tid, p_pin: S.t.pin });
+
+/* ───────────────── state ───────────────── */
+const S = { route: 'home', sb: null, info: null, t: { tid: store.get('t.tid', null), pin: store.get('t.pin', ''), name: store.get('t.name', '') } };
+function go(route, extra) { Object.assign(S, extra || {}); S.route = route; render(); window.scrollTo(0, 0); }
+const wrongPw = (e, next) => { if (errText(e) === ERR.wrong) { S.t.pin = ''; store.del('t.pin'); go('gate', { next }); return true; } return false; };
+
+/* ───────────────── layout ───────────────── */
+function topBar(end) {
+  return h('header', { class: 'top' }, h('div', { class: 'wrap' },
+    h('button', { class: 'brand', onClick: () => go('home'), 'aria-label': 'الرئيسية' }, ic('track', 38),
+      h('span', null, h('b', null, 'مسار'), h('small', null, S.info ? S.info.school : ''))),
+    h('div', { class: 'end' }, end)));
+}
+const backBtn = (fn, label = 'رجوع') => h('button', { class: 'back', onClick: fn }, li('back', 18), label);
+function routeArt() {
+  return h('div', { html: `<svg class="routeart" viewBox="0 0 560 120" role="img" aria-label="مسار الإحالة من الاستلام إلى الإغلاق">
+    <path d="M520 60 C 440 60, 420 22, 340 22 S 230 98, 150 98 S 70 60, 40 60" fill="none" stroke="var(--line)" stroke-width="14" stroke-linecap="round"/>
+    <path d="M520 60 C 440 60, 420 22, 340 22 S 230 98, 150 98 S 70 60, 40 60" fill="none" stroke="url(#g)" stroke-width="6" stroke-linecap="round"/>
+    <defs><linearGradient id="g" x1="1" x2="0"><stop offset="0" stop-color="var(--new)"/><stop offset=".5" stop-color="var(--prog)"/><stop offset="1" stop-color="var(--done)"/></linearGradient></defs>
+    <g font-family="IBM Plex Sans Arabic, sans-serif" font-size="15" font-weight="700" text-anchor="middle" fill="var(--ink)">
+      <circle cx="520" cy="60" r="11" fill="var(--paper)" stroke="var(--new)" stroke-width="6"/><text x="520" y="98">إحالة</text>
+      <circle cx="340" cy="22" r="11" fill="var(--paper)" stroke="var(--prog)" stroke-width="6"/><text x="340" y="60">تدخّل</text>
+      <circle cx="150" cy="98" r="11" fill="var(--paper)" stroke="var(--prog)" stroke-width="6"/><text x="150" y="70">متابعة</text>
+      <circle cx="40" cy="60" r="11" fill="var(--done)" stroke="var(--done)" stroke-width="6"/><text x="40" y="98">إغلاق</text>
+    </g></svg>` });
+}
+
+/* ───────────────── landing ───────────────── */
+function viewHome() {
+  return [
+    topBar(S.isC ? h('a', { class: 'btn ghost sm', href: 'index.html' }, '← المنصة') : h('a', { class: 'btn ghost sm', href: 'index.html#login' }, 'دخول الموجهة')),
+    h('main', { class: 'wrap' },
+      h('section', { class: 'hero' },
+        h('div', { class: 'stack', style: 'gap:10px' },
+          h('div', { class: 'eyebrow' }, 'التوجيه الطلابي · ' + (S.info.school || '')),
+          h('h1', null, 'كل طالبة لها ', h('em', null, 'مسار'), ' واضح'),
+          h('p', null, 'أحيلي الطالبة للموجهة الطلابية في أقل من دقيقة، وتابعي أين وصلت حالتها دون أن تسألي.')),
+        routeArt()),
+      h('section', { class: 'doors' },
+        h('button', { class: 'door', onClick: () => gate('refer') }, ic('send', 56), h('div', null, h('b', null, 'إحالة طالبة'), h('span', null, 'ضعف دراسي، أو سلوك، أو ملاحظة نفسية كالانطواء والقلق والخوف.'))),
+        S.isC ? h('a', { class: 'door', href: 'counselor.html', style: 'text-decoration:none;color:inherit' }, ic('cases', 56), h('div', null, h('b', null, 'سجل الحالات'), h('span', null, 'الإحالات الواردة، والحالات وجلساتها، والخطط العلاجية والتقارير.'))) : null,
+        h('button', { class: 'door', onClick: () => gate('track') }, ic('track', 56), h('div', null, h('b', null, 'تتبّع إحالاتي'), h('span', null, 'محطات كل إحالة أرسلتِها، وأضيفي ملاحظتك عن تطور الطالبة.'))))),
+    h('footer', { class: 'wrap foot' },
+      h('span', null, 'تفاصيل الحالات وجلساتها لا يراها إلا الموجهة الطلابية.'),
+      S.t.pin ? h('button', { class: 'linkbtn', onClick: () => { S.t.pin = ''; store.del('t.pin'); toast('تم الخروج'); render(); } }, `خروج ${S.t.name} من هذا الجهاز`) : null)
+  ];
+}
+function gate(next) { if (S.t.tid && S.t.pin) go(next); else go('gate', { next }); }
+
+function viewGate() {
+  const sel = h('select', { id: 'tsel', 'aria-label': 'اسمك' }, h('option', { value: '' }, 'جارٍ تحميل الأسماء…'));
+  const pin = h('input', { type: 'password', id: 'tpin', inputmode: 'numeric', maxlength: '4', autocomplete: 'off', placeholder: '••••', style: 'letter-spacing:.5em;text-align:center;font-size:22px;direction:ltr', value: S.sb.demo ? '1234' : '' });
+  const errBox = h('div', { class: 'err', hidden: true });
+  const btn = h('button', { class: 'btn primary block', type: 'submit' }, 'دخول');
+  (async () => {
+    try {
+      const rows = await call('masar_teacher_names');
+      sel.replaceChildren(h('option', { value: '' }, rows.length ? 'اختاري اسمك…' : 'لم تُضف أسماء المعلمات بعد'), ...rows.map(r => h('option', { value: r.id, selected: String(r.id) === String(S.t.tid) || (S.sb.demo && !S.t.tid && r.name.startsWith('أ. هند')) }, r.name)));
+    } catch (e) { errBox.textContent = errText(e); errBox.hidden = false; }
+  })();
+  const form = h('form', { class: 'card stack', onSubmit: async e => {
+    e.preventDefault(); errBox.hidden = true;
+    if (!sel.value) { errBox.textContent = 'اختاري اسمك من القائمة.'; errBox.hidden = false; return; }
+    if (!/^[0-9٠-٩]{4}$/.test(pin.value.trim())) { errBox.textContent = 'اكتبي ٤ أرقام.'; errBox.hidden = false; return; }
+    const p = pin.value.trim().replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+    btn.disabled = true;
+    try {
+      const r = await call('masar_teacher_login', { p_tid: +sel.value, p_pin: p });
+      S.t.tid = +sel.value; S.t.pin = p; S.t.name = r.name;
+      store.set('t.tid', S.t.tid); store.set('t.pin', p); store.set('t.name', r.name);
+      go(S.next || 'refer');
+    } catch (er) { errBox.textContent = errText(er); errBox.hidden = false; btn.disabled = false; }
+  } },
+    h('div', { class: 'row' }, ic('lock', 48), h('div', null, h('h2', { style: 'font-family:var(--display);font-size:21px' }, 'دخول المعلمات'), h('p', { class: 'muted small' }, 'اختاري اسمك، واكتبي آخر ٤ أرقام من هويتك. يتذكرك جهازك فلا تُسألين كل مرة.'))),
+    h('label', { class: 'f' }, h('span', null, 'اسمك'), sel),
+    h('label', { class: 'f' }, h('span', null, 'آخر ٤ أرقام من الهوية'), pin),
+    S.sb.demo ? h('p', { class: 'tiny muted' }, 'في المعاينة: أ. هند (تجريبي) والأرقام 1234') : null,
+    errBox, btn);
+  return [topBar(null), h('main', { class: 'wrap narrow page' }, backBtn(() => go('home')), form)];
+}
+
+/* ───────────────── refer ───────────────── */
+function viewRefer() {
+  const kinds = new Set();
+  const name = h('input', { type: 'text', id: 'sn', placeholder: 'اسم الطالبة الثلاثي', autocomplete: 'off', maxlength: '120' });
+  const grade = h('select', { id: 'sg' }, h('option', { value: '' }, 'الصف'), GRADES.map(g => h('option', { value: g }, g)));
+  const sec = h('input', { type: 'text', id: 'ss', placeholder: 'الشعبة', maxlength: '20' });
+  const chips = h('div', { class: 'chips', role: 'group', 'aria-label': 'سبب الإحالة' }, Object.entries(KINDS).map(([k, v]) =>
+    h('button', { type: 'button', class: 'chip', style: `--c:${v.c}`, 'aria-pressed': 'false', onClick: e => { kinds.has(k) ? kinds.delete(k) : kinds.add(k); e.currentTarget.setAttribute('aria-pressed', kinds.has(k)); } }, h('span', { class: 'dot' }), v.t)));
+  const details = h('textarea', { id: 'det', maxlength: '2000', placeholder: 'ماذا لاحظتِ؟ متى بدأ؟ هل تكرر؟ مثال: لا تشارك وتجلس وحدها في الفسحة منذ أسبوعين.' });
+  const urgent = h('input', { type: 'checkbox', id: 'urg' });
+  const errBox = h('div', { class: 'err', hidden: true });
+  const btn = h('button', { class: 'btn primary block', type: 'submit', style: 'min-height:52px;font-size:17px' }, li('plus', 20), 'إرسال الإحالة');
+  const step = (n, title, ...body) => h('div', { class: 'step' }, h('div', { class: 'st-n' }, n), h('div', { style: 'min-width:0' }, h('h3', null, title), body));
+  const form = h('form', { onSubmit: async e => {
+    e.preventDefault(); errBox.hidden = true;
+    if (name.value.trim().length < 2) { errBox.textContent = ERR.student_name_required; errBox.hidden = false; name.focus(); return; }
+    if (!kinds.size) { errBox.textContent = ERR.bad_kinds; errBox.hidden = false; return; }
+    btn.disabled = true;
+    try {
+      const r = await call('masar_submit', { ...cred(), p_name: name.value.trim(), p_grade: grade.value, p_section: sec.value.trim(), p_kinds: [...kinds], p_details: details.value.trim(), p_urgent: urgent.checked });
+      go('done', { lastCode: r.code, lastName: name.value.trim() });
+    } catch (er) { if (!wrongPw(er, 'refer')) { errBox.textContent = errText(er); errBox.hidden = false; btn.disabled = false; } }
+  } },
+    step(1, 'من الطالبة؟', h('div', { class: 'stack', style: 'gap:10px' }, name, h('div', { class: 'row' }, h('div', { style: 'flex:2 1 140px' }, grade), h('div', { style: 'flex:1 1 90px' }, sec)))),
+    step(2, 'سبب الإحالة', h('p', { class: 'muted small', style: 'margin:-6px 0 10px' }, 'اختاري سببًا أو أكثر.'), chips),
+    step(3, 'ماذا لاحظتِ؟', details, h('label', { class: 'switch', style: 'margin-top:10px' }, urgent, h('span', null, h('b', null, 'حالة عاجلة'), h('span', { class: 'muted small', style: 'display:block' }, 'تحتاج الطالبة تدخلًا اليوم.')))),
+    h('div', { class: 'stack', style: 'gap:10px' }, errBox, btn,
+      h('p', { class: 'tiny muted', style: 'text-align:center' }, 'ما تكتبينه يصل للموجهة وحدها. ستحصلين على رقم لتتبّع الإحالة.')));
+  return [topBar(null), h('main', { class: 'wrap narrow page' }, backBtn(() => go('home')),
+    h('h1', { style: 'font-family:var(--display);font-size:28px;margin-bottom:6px' }, 'إحالة طالبة'),
+    h('p', { class: 'muted', style: 'margin-bottom:20px' }, `باسم ${S.t.name}`), form)];
+}
+
+function viewDone() {
+  return [topBar(null), h('main', { class: 'wrap narrow page' },
+    h('div', { class: 'card ticket' },
+      h('div', { style: 'display:grid;place-items:center' }, ic('track', 72)),
+      h('h1', { style: 'font-family:var(--display);font-size:26px;margin-top:8px' }, 'وصلت الإحالة للموجهة'),
+      h('p', { class: 'muted' }, `إحالة ${S.lastName}. رقم التتبّع:`),
+      h('div', { class: 'big code' }, S.lastCode),
+      h('p', { class: 'muted small' }, 'تجدين الإحالة ومحطاتها في «إحالاتي» من أي جهاز.'),
+      h('div', { class: 'row', style: 'justify-content:center;margin-top:16px' },
+        h('button', { class: 'btn', onClick: () => copyText(S.lastCode) }, li('copy', 18), 'نسخ الرقم'),
+        h('button', { class: 'btn soft', onClick: () => go('track') }, 'تتبّع إحالاتي'),
+        h('button', { class: 'btn primary', onClick: () => go('refer') }, li('plus', 18), 'إحالة أخرى'))))];
+}
+
+/* ───────────────── track ───────────────── */
+function trackCard(r, reload) {
+  const order = ['new', 'progress', 'closed'], idx = order.indexOf(r.status);
+  const when = [r.created_at, r.started_at, r.closed_at];
+  const fb = r.feedback || [];
+  const slot = h('div');
+  const openBtn = r.status !== 'closed' ? h('button', { class: 'btn soft sm', style: 'margin-top:12px', onClick: () => { openBtn.hidden = true; slot.replaceChildren(fbForm()); } }, li('plus', 16), 'ملاحظة عن تطورها') : null;
+  function fbForm() {
+    let prog = null;
+    const chips = h('div', { class: 'chips', role: 'group', 'aria-label': 'كيف تطورها' }, Object.entries(PROG).map(([k, v]) =>
+      h('button', { type: 'button', class: 'chip', style: `--c:${v[2]}`, 'aria-pressed': 'false', onClick: e => { prog = k; chips.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c === e.currentTarget)); } }, h('span', { class: 'dot' }), v[0])));
+    const body = h('textarea', { maxlength: '1500', placeholder: 'ماذا لاحظتِ؟ مثال: صارت تشارك في الحصة، وتجلس مع زميلاتها في الفسحة.', style: 'min-height:80px' });
+    const err = h('div', { class: 'err', hidden: true });
+    const send = h('button', { class: 'btn primary', type: 'submit' }, 'إرسال للموجهة');
+    return h('form', { class: 'fbform', onSubmit: async e => {
+      e.preventDefault(); err.hidden = true;
+      if (!prog) { err.textContent = ERR.bad_prog; err.hidden = false; return; }
+      send.disabled = true;
+      try { await call('masar_feedback_add', { ...cred(), p_code: r.code, p_prog: prog, p_body: body.value.trim() }); toast('وصلت ملاحظتك للموجهة'); reload(); }
+      catch (er) { if (!wrongPw(er, 'track')) { err.textContent = errText(er); err.hidden = false; send.disabled = false; } }
+    } },
+      h('b', null, `كيف ${r.student_name.split(' ')[0]} الآن؟`), chips, body, err,
+      h('div', { class: 'row' }, send, h('button', { type: 'button', class: 'btn ghost', onClick: () => { slot.replaceChildren(); openBtn.hidden = false; } }, 'إلغاء')));
+  }
+  return h('article', { class: 'trk' },
+    h('div', { class: 'trk-h' },
+      h('div', null, h('b', null, r.student_name), h('div', { class: 'meta' }, h('span', { class: 'code' }, r.code), h('span', null, 'أُرسلت ' + dd(r.created_at)))),
+      h('div', { class: 'chips' }, (r.kinds || []).map(kindTag))),
+    h('div', { class: 'line', role: 'img', 'aria-label': 'الحالة: ' + STATUS[r.status].st },
+      h('div', { class: 'rail' }, h('span', { style: `width:${idx * 50}%` })),
+      order.map((s, i) => h('div', { class: 'stn' + (i <= idx ? ' on' : '') + (i === idx && s !== 'closed' ? ' now' : ''), style: `--sc:${STATUS[s].c}` },
+        h('i'), h('b', null, STATUS[s].st), h('small', null, i <= idx && when[i] ? dd(when[i]) : '—')))),
+    r.public_note ? h('div', { class: 'msg' }, h('b', null, 'رسالة الموجهة'), r.public_note) : null,
+    fb.length ? h('div', { class: 'fbl' }, h('span', { class: 'tiny muted', style: 'font-weight:700' }, 'ملاحظاتك عن تطورها'),
+      fb.map(f => h('div', { class: 'fbi' }, h('span', { class: 'pill ' + PROG[f.prog][1] }, PROG[f.prog][0]), h('span', { class: 'small' }, f.body || ''), h('span', { class: 'tiny muted' }, dd(f.created_at))))) : null,
+    openBtn, slot);
+}
+function viewTrack() {
+  const list = h('div', { class: 'stack' }, h('p', { class: 'muted' }, 'جارٍ التحميل…'));
+  const load = async () => {
+    try {
+      const rows = (await call('masar_track', cred())).rows || [];
+      list.replaceChildren(...(rows.length ? rows.map(r => trackCard(r, load)) : [h('div', { class: 'card empty' }, ic('send', 64), h('b', null, 'لم ترسلي أي إحالة بعد'), h('p', null, 'كل إحالة ترسلينها تظهر هنا بمحطاتها.'), h('button', { class: 'btn primary', onClick: () => go('refer') }, 'إحالة طالبة'))]));
+    } catch (e) { if (!wrongPw(e, 'track')) list.replaceChildren(h('div', { class: 'err' }, errText(e))); }
+  };
+  setTimeout(load, 0);
+  return [topBar(h('button', { class: 'icon-btn', title: 'تحديث', 'aria-label': 'تحديث', onClick: load }, li('refresh'))),
+    h('main', { class: 'wrap narrow page' }, backBtn(() => go('home')),
+      h('div', { class: 'row', style: 'margin-bottom:16px;justify-content:space-between' },
+        h('h1', { style: 'font-family:var(--display);font-size:28px' }, 'إحالاتي'),
+        h('button', { class: 'btn primary sm', onClick: () => go('refer') }, li('plus', 18), 'إحالة جديدة')),
+      list)];
+}
+
+function viewNotReady(msg) {
+  return [topBar(null), h('main', { class: 'wrap narrow page' }, h('div', { class: 'card empty' }, ic('lock', 64),
+    h('b', null, msg || 'مسار لم يُجهَّز بعد'),
+    h('p', null, 'الموجهة الطلابية تكمل الربط من صفحتها، ثم يعمل الموقع للمعلمات.'),
+    h('a', { class: 'btn primary', href: 'index.html' }, 'منصة التوجيه الطلابي')))];
+}
+
+/* ───────────────── render & boot ───────────────── */
+function render() {
+  const V = { home: viewHome, gate: viewGate, refer: viewRefer, done: viewDone, track: viewTrack, notready: () => viewNotReady(S.nrMsg) }[S.route] || viewHome;
+  $('#app').replaceChildren(...[].concat(V()).filter(Boolean));
+}
+(async function boot() {
+  try { S.sb = await Masar.client(); } catch (e) { go('notready', { nrMsg: errText(e) }); return; }
+  if (!S.sb) { S.sb = { demo: false }; go('notready'); return; }
+  try { S.info = await call('masar_info'); } catch (e) { go('notready', { nrMsg: 'تعذّر الاتصال بقاعدة البيانات' }); return; }
+  document.title = 'مسار · ' + S.info.school;
+  try { if (S.sb.demo) S.isC = true; else { const ses = await S.sb.auth.getSession(); if (ses && ses.data && ses.data.session) { const r = await S.sb.rpc('masar_is_admin'); S.isC = !r.error && !!r.data; } } } catch (e) {}
+  render();
+})();
+</script>
+</body>
+</html>

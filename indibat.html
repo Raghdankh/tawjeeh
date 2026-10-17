@@ -1,0 +1,881 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>انضباط وتميّز · منصة التوجيه الطلابي</title>
+<meta name="description" content="لوحة شرف المواظبات والمتميزات سلوكياً، وقواعد السلوك والمواظبة لأولياء الأمور.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;700;800&family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<style id="app-style">
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+/* Layout: sunrise hero (teal sky + sun), colour-coded tabs (honor = sun, behavior = coral, attendance = sky), bright cards */
+:root{
+  --bg:#eef6f5; --surface:#ffffff; --ink:#0d2125; --muted:#43595e; --line:#cfe0de;
+  --brand:#08636b; --brand-2:#0a7f88; --on-brand:#ffffff; --brand-soft:#d6efec;
+  --gold:#a86f00; --gold-soft:#fff0c7; --sun:#ffc233; --on-sun:#3a2600;
+  --mint:#14824f; --mint-soft:#d7f3e4; --coral:#d9452a; --coral-soft:#ffe3db; --sky:#1f6fc4; --sky-soft:#dcebff;
+  --d1:#1f6fc4; --d1s:#dcebff; --d2:#a86f00; --d2s:#fff0c7; --d3:#d9452a; --d3s:#ffe3db; --d4:#b8263a; --d4s:#fde0e4;
+  --danger:#b8263a;
+  --display:"Alexandria","IBM Plex Sans Arabic",Tahoma,sans-serif;
+  --body:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0c1719; --surface:#142326; --ink:#eaf4f3; --muted:#a5bcbf; --line:#26393c;
+  --brand:#06464d; --brand-2:#4fc6cf; --on-brand:#f4fbfb; --brand-soft:#173638;
+  --gold:#ffcb57; --gold-soft:#3a2f12; --sun:#ffc233; --on-sun:#2e1f00;
+  --mint:#4fd393; --mint-soft:#143528; --coral:#ff8a70; --coral-soft:#3d221b; --sky:#7cb6ff; --sky-soft:#172c45;
+  --d1:#7cb6ff; --d1s:#172c45; --d2:#ffcb57; --d2s:#3a2f12; --d3:#ff8a70; --d3s:#3d221b; --d4:#ff7a8c; --d4s:#3f1a21;
+  --danger:#ff7a8c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0c1719; --surface:#142326; --ink:#eaf4f3; --muted:#a5bcbf; --line:#26393c;
+  --brand:#06464d; --brand-2:#4fc6cf; --on-brand:#f4fbfb; --brand-soft:#173638;
+  --gold:#ffcb57; --gold-soft:#3a2f12; --sun:#ffc233; --on-sun:#2e1f00;
+  --mint:#4fd393; --mint-soft:#143528; --coral:#ff8a70; --coral-soft:#3d221b; --sky:#7cb6ff; --sky-soft:#172c45;
+  --d1:#7cb6ff; --d1s:#172c45; --d2:#ffcb57; --d2s:#3a2f12; --d3:#ff8a70; --d3s:#3d221b; --d4:#ff7a8c; --d4s:#3f1a21;
+  --danger:#ff7a8c; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.75}
+#app{min-height:100%}
+.wrap{max-width:960px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3,h4{font-family:var(--display);margin:0;line-height:1.35;text-wrap:balance}
+p{margin:0}
+
+/* hero */
+.hero{background:var(--brand);color:var(--on-brand);position:relative;overflow:hidden;isolation:isolate}
+.hero .band{height:8px;background:linear-gradient(to left,var(--coral),var(--sun),var(--mint),var(--sky))}
+.hero::before{content:"";position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260' viewBox='0 0 260 260' fill='none' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E %3Cg transform='translate(30 40) rotate(-35)' stroke='%23ffd66b'%3E%3Crect x='0' y='-9' width='70' height='18' rx='3'/%3E%3Cpath d='M70-9l20 9-20 9'/%3E%3Cpath d='M14-9v18'/%3E%3C/g%3E %3Cpath d='M190 30l7 15 16 2-12 11 3 16-14-8-14 8 3-16-12-11 16-2z' stroke='%23ffa48f'/%3E %3Cg transform='translate(150 120)' stroke='%239fe0c0'%3E%3Cpath d='M0 8c14-8 28-8 40 0v42c-12-8-26-8-40 0z'/%3E%3Cpath d='M40 8c12-8 26-8 40 0v42c-14-8-28-8-40 0z'/%3E%3C/g%3E %3Cg transform='translate(20 170) rotate(12)' stroke='%23a9cdfb'%3E%3Crect x='0' y='0' width='90' height='22' rx='3'/%3E%3Cpath d='M12 0v9M24 0v6M36 0v9M48 0v6M60 0v9M72 0v6'/%3E%3C/g%3E %3Cpath d='M108 52c-8-12-26-6-22 8 3 10 22 22 22 22s19-12 22-22c4-14-14-20-22-8z' stroke='%23ffa48f'/%3E %3Cg transform='translate(212 212)' stroke='%23ffd66b'%3E%3Ccircle r='20'/%3E%3Cpath d='M0-11v11l8 6'/%3E%3C/g%3E %3Cg transform='translate(110 222)' stroke='%239fe0c0'%3E%3Ccircle r='5'/%3E%3Ccircle cx='22' r='5'/%3E%3Ccircle cx='44' r='5'/%3E%3C/g%3E %3Cpath d='M80 128l5 9 10 1-7 7 2 10-10-5-9 5 2-10-7-7 10-1z' stroke='%23ffd66b'/%3E %3C/svg%3E");background-size:260px 260px;opacity:.26;pointer-events:none;z-index:-1}
+.hero .wrap{position:relative;padding-block:40px 34px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end}
+.eyebrow{font-size:.9rem;font-weight:600;letter-spacing:.02em;color:color-mix(in srgb,var(--on-brand) 88%,transparent)}
+.hero h1{font-size:clamp(2.4rem,8vw,4rem);font-weight:800;letter-spacing:-.01em;margin-top:4px}
+.hero h1 .glow{color:var(--sun)}
+.hero .tag{display:inline-block;margin-top:10px;background:var(--sun);color:var(--on-sun);font-weight:700;font-size:.85rem;padding:3px 12px;border-radius:999px}
+.hero .lede{max-width:56ch;opacity:.92;margin-top:10px}
+.scores{display:flex;gap:14px}
+.ring{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.85rem;font-weight:700;background:color-mix(in srgb,var(--on-brand) 10%,transparent);border-radius:16px;padding:10px 12px}
+.ring svg{width:84px;height:84px;display:block}
+@media (max-width:620px){.hero .wrap{grid-template-columns:1fr}.scores{justify-content:flex-start}}
+
+/* nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;gap:6px;padding-block:10px;overflow-x:auto}
+.tab{font:inherit;font-weight:600;font-size:.95rem;white-space:nowrap;border:0;background:transparent;color:var(--muted);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tab{border:1.5px solid var(--line);background:var(--surface);color:var(--ink)}
+.tab:hover{border-color:var(--brand-2)}
+.tab[data-tab="honor"][aria-selected="true"]{background:var(--sun);border-color:var(--sun);color:var(--on-sun)}
+.tab[data-tab="behavior"][aria-selected="true"]{background:var(--coral);border-color:var(--coral);color:var(--surface)}
+.tab[data-tab="attendance"][aria-selected="true"]{background:var(--sky);border-color:var(--sky);color:var(--surface)}
+.t-honor{--sec:var(--gold);--sec-soft:var(--gold-soft)} .t-behavior{--sec:var(--coral);--sec-soft:var(--coral-soft)} .t-attendance{--sec:var(--sky);--sec-soft:var(--sky-soft)}
+
+main.wrap{padding-block:26px 56px;display:flex;flex-direction:column;gap:22px}
+.note{display:flex;gap:12px;align-items:flex-start;background:var(--gold-soft);border-radius:14px;padding:14px 16px;white-space:pre-line;color:var(--ink)}
+.note b{font-family:var(--display);color:var(--on-sun);background:var(--sun);border-radius:8px;padding:0 10px;flex:0 0 auto}
+.sec-head{display:flex;flex-direction:column;gap:4px}
+.sec-head h2{font-size:clamp(1.5rem,4.4vw,2rem);color:var(--sec,var(--ink));display:flex;align-items:center;gap:10px}
+.sec-head h2::before{content:"";width:14px;height:14px;border-radius:50%;background:var(--sec,var(--brand));box-shadow:0 0 0 5px var(--sec-soft,transparent);flex:0 0 auto}
+.sec-head p{color:var(--muted)}
+
+/* honor */
+.months{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.chip{font:inherit;font-weight:500;white-space:nowrap;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:7px 16px;border-radius:10px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--sun);border-color:var(--sun);color:var(--on-sun);font-weight:700}
+.month-title{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.month-title h3{font-size:1.35rem}
+.month-title span{color:var(--muted);font-size:.9rem}
+.board{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:18px}
+.col{background:var(--surface);border:1px solid var(--line);border-radius:16px;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+.col-top{padding:16px 20px;display:flex;align-items:center;gap:12px;background:var(--c-soft)}
+.col-top .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--c);color:var(--surface);font-size:1.1rem;font-weight:700;flex:0 0 auto}
+.col-top h3{font-size:1.15rem}
+.col-top .count{margin-inline-start:auto;font-family:var(--display);font-weight:700;font-size:1.4rem;color:var(--c);font-variant-numeric:tabular-nums}
+.col-top .count small{font-family:var(--body);font-size:.75rem;font-weight:500;color:var(--muted);margin-inline-start:4px}
+.col.reg{--c:var(--mint);--c-soft:var(--mint-soft)}
+.col.exc{--c:var(--gold);--c-soft:var(--gold-soft)}
+.col-body{padding:8px 20px 18px;display:flex;flex-direction:column;gap:14px;flex:1}
+ul.names{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,180px),1fr));gap:0 18px}
+ul.names li{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px dashed var(--line);min-width:0}
+.star{color:var(--c);flex:0 0 auto}
+.nm{font-weight:600;flex:1;min-width:0;overflow-wrap:anywhere}
+.cls{color:var(--muted);font-size:.8rem;white-space:nowrap}
+.empty{color:var(--muted);font-size:.95rem;padding:10px 0}
+.quote{margin:8px 0 0;padding:12px 16px;border-radius:12px;background:var(--c-soft);color:var(--ink);font-size:.93rem;line-height:1.85;position:relative}
+.quote::before{content:"”";font-family:var(--display);font-size:2.4rem;line-height:0;color:var(--c);opacity:.5;position:relative;top:.42em;margin-inline-end:4px}
+.grp{font-size:.88rem;font-weight:700;color:var(--c);display:flex;align-items:center;gap:6px;margin-top:4px}
+.grp span{font-family:var(--body);font-size:.75rem;background:var(--c-soft);color:var(--c);border-radius:999px;padding:0 8px}
+ul.cards{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,170px),1fr));gap:8px}
+.ncard{min-width:0;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
+.ncard-in{display:flex;align-items:center;gap:8px;padding:10px 12px;color:var(--ink);text-decoration:none;flex:1;flex-wrap:wrap}
+.ncard-in.has{cursor:pointer}
+button.ncard-in{font:inherit;border:0;background:none;width:100%;text-align:start;margin:0}
+.ncard-in.has:hover{background:var(--c-soft)}
+.cmodal{position:fixed;inset:0;z-index:50;background:rgba(10,20,24,.62);display:flex;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.cmodal[hidden]{display:none}
+.cbox{background:var(--surface);color:var(--ink);border-radius:18px;width:min(100%,920px);max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:16px;box-sizing:border-box;font-family:var(--body)}
+.chead{display:flex;align-items:center;gap:10px}
+.chead h3{font-family:var(--display);font-size:1.1rem;flex:1;min-width:0;margin:0}
+.cimg{border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--bg);display:grid;place-items:center;min-height:160px}
+.cimg img{display:block;width:100%;height:auto;-webkit-touch-callout:default}
+.cact{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.medal{font-size:1.25rem;line-height:1;flex:0 0 auto}
+.nmw{display:flex;flex-direction:column;flex:1;min-width:0;line-height:1.4}
+.streak{align-self:flex-start;font-size:.7rem;font-weight:700;color:var(--surface);background:var(--c);border-radius:999px;padding:1px 8px;margin-top:3px}
+.ctag{font-size:.75rem;font-weight:700;color:var(--c);white-space:nowrap}
+.ncard-tools{display:flex;flex-wrap:wrap;gap:4px;padding:6px 8px;border-top:1px dashed var(--line);background:var(--bg)}
+.mini{font:inherit;font-size:.78rem;font-weight:600;color:var(--brand-2);background:none;border:1px solid var(--line);border-radius:6px;padding:2px 8px;cursor:pointer;text-decoration:none;display:inline-block}
+.search{background:var(--sky-soft);border:0;border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.search-l{font-family:var(--display);font-weight:700;color:var(--ink);font-size:1rem}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--surface);border:2px solid color-mix(in srgb,var(--sky) 35%,transparent);border-radius:12px;padding:0 12px}
+.search-box span{color:var(--sky);font-size:1.3rem;font-weight:700}
+.search-box input{border:0;background:transparent;padding:10px 0}
+.search-box:focus-within{border-color:var(--sky)}
+.search-box input:focus-visible{outline:none}
+ul.hits{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+ul.hits li{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-bottom:1px dashed var(--line)}
+ul.hits li:last-child{border-bottom:0}
+.hit-m{display:flex;flex-wrap:wrap;gap:6px}
+.hchip{font:inherit;font-size:.82rem;border:1px solid var(--line);background:var(--gold-soft);color:var(--ink);border-radius:999px;padding:3px 12px;cursor:pointer;text-decoration:none}
+.certs{display:flex;flex-direction:column;gap:8px;margin-top:auto}
+.certs h4{font-size:.9rem;color:var(--muted);font-weight:500}
+.cert{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;color:var(--ink);text-decoration:none;background:var(--bg)}
+a.cert:hover{border-color:var(--c)}
+.cert .pdf{flex:0 0 auto;width:38px;height:44px;border-radius:6px;background:var(--d4);color:var(--surface);display:grid;place-items:end center;padding-bottom:5px;box-sizing:border-box;font:700 .62rem/1 var(--body);letter-spacing:.06em;clip-path:polygon(0 0,70% 0,100% 22%,100% 100%,0 100%)}
+.cert .t{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.4}
+.cert .t b{font-weight:600;overflow-wrap:anywhere}
+.cert .t span{color:var(--muted);font-size:.8rem}
+.cert .go{color:var(--c);font-weight:700}
+.x{font:inherit;font-size:.85rem;border:0;background:none;color:var(--danger);cursor:pointer;padding:2px 6px;border-radius:6px}
+
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.steps li{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;background:var(--surface);border-radius:14px;padding:12px 6px;border:1px solid var(--line)}
+.steps b{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-size:1rem;color:var(--on-sun);background:var(--sun)}
+.steps li:nth-child(2) b{background:var(--mint);color:var(--surface)}
+.steps li:nth-child(3) b{background:var(--sky);color:var(--surface)}
+.steps span{font-size:.85rem;font-weight:700;line-height:1.4}
+.or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.85rem;font-weight:600}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.mrow{display:flex;align-items:center;gap:10px;min-width:0}
+.mlabel{font-weight:700;flex:0 0 auto}
+.mrow .months{flex:1;min-width:0}
+.seg{display:none;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px}
+.seg button{flex:1;font:inherit;font-weight:700;font-size:.92rem;border:0;border-radius:10px;padding:10px 6px;background:transparent;color:var(--muted);cursor:pointer}
+.seg button span{display:inline-block;min-width:22px;border-radius:999px;background:var(--line);color:var(--ink);font-size:.78rem;margin-inline-start:4px}
+.seg button[data-sec="regular"][aria-selected="true"]{background:var(--mint-soft);color:var(--mint)}
+.seg button[data-sec="excellent"][aria-selected="true"]{background:var(--gold-soft);color:var(--gold)}
+@media (max-width:720px){.seg{display:flex}.board[data-sec="regular"] .col.exc,.board[data-sec="excellent"] .col.reg{display:none}}
+.tap{font-size:.85rem;color:var(--muted);margin-top:8px}
+.ncls{font-size:.78rem;color:var(--muted);font-weight:500}
+.ncard-in{padding:12px 14px;min-height:56px}
+.ctag{font-size:.78rem;font-weight:700;color:var(--c);background:var(--c-soft);border-radius:999px;padding:4px 10px;white-space:nowrap}
+ul.cards{grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr))}
+.hit-n{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hit-n b{font-size:1.1rem;font-family:var(--display)}
+.hit-ok{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--mint);color:var(--surface);font-size:.85rem;font-weight:700}
+.hit-say{font-size:.9rem;color:var(--muted)}
+.hchip{display:flex!important;flex-direction:column;align-items:flex-start;gap:2px;border-radius:12px!important;padding:10px 14px!important;text-align:start;min-width:170px}
+.hc-reg{background:var(--mint-soft)!important;border-color:color-mix(in srgb,var(--mint) 35%,transparent)!important}
+.hc-exc{background:var(--gold-soft)!important;border-color:color-mix(in srgb,var(--gold) 35%,transparent)!important}
+.hc-k{font-weight:700}
+.hc-m{font-size:.8rem;color:var(--muted)}
+.nores{font-size:.92rem;color:var(--ink);background:var(--surface);border-radius:10px;padding:10px 12px}
+.linkish{font:inherit;font-weight:700;color:var(--sky);background:none;border:0;padding:0;text-decoration:underline;cursor:pointer}
+.footlink{font:inherit;font-size:.85rem;font-weight:700;color:var(--on-brand);background:transparent;border:1px solid color-mix(in srgb,var(--on-brand) 40%,transparent);border-radius:999px;padding:3px 12px;cursor:pointer}
+.lgerr{background:var(--d4s);color:var(--d4);border-radius:10px;padding:8px 12px;font-size:.9rem;margin:0}
+.crit{background:var(--surface);border:2px solid color-mix(in srgb,var(--gold) 45%,transparent);border-radius:16px;overflow:hidden;scroll-margin-top:70px}
+.crit summary{list-style:none;display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer;background:var(--gold-soft)}
+.crit summary::-webkit-details-marker{display:none}
+.crit summary > span:nth-child(2){display:flex;flex-direction:column;flex:1;min-width:0;line-height:1.5}
+.crit summary b{font-family:var(--display);font-size:1.08rem;color:var(--ink)}
+.crit summary small{color:var(--muted);font-size:.85rem}
+.crit-ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--gold);color:var(--surface);font-size:1.2rem;flex:0 0 auto}
+.crit-arrow{font-size:1.4rem;color:var(--gold);transition:transform .2s}
+.crit[open] .crit-arrow{transform:rotate(180deg)}
+.crit-body{padding:14px 18px 18px;display:flex;flex-direction:column;gap:10px}
+.crit-lede{color:var(--muted);font-size:.95rem}
+.split{display:flex;border-radius:14px;overflow:hidden;font-family:var(--display);text-align:center}
+.split > div{display:flex;flex-direction:column;justify-content:center;padding:12px 8px;min-width:0}
+.split .base{flex:80;background:var(--brand);color:var(--on-brand)}
+.split .plus{flex:20;background:var(--sun);color:var(--on-sun);min-width:96px}
+.split b{font-size:1.7rem;line-height:1.1}
+.split span{font-family:var(--body);font-size:.8rem;font-weight:600}
+ol.how{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:10px;counter-reset:h}
+ol.how li{counter-increment:h;background:var(--bg);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;position:relative}
+ol.how li::before{content:counter(h,arabic-indic);position:absolute;inset-inline-end:12px;top:8px;font-family:var(--display);font-weight:800;font-size:1.4rem;color:color-mix(in srgb,var(--gold) 55%,transparent)}
+ol.how b{font-family:var(--display);font-size:.98rem;padding-inline-end:28px}
+ol.how span{color:var(--muted);font-size:.9rem}
+.crit-tip{background:var(--mint-soft);color:var(--ink);border-radius:12px;padding:10px 14px;font-size:.93rem}
+.crit-h{font-size:1.02rem;margin-top:4px}
+.critlink{align-self:flex-start}
+.crit-row{display:grid;grid-template-columns:110px 1fr;gap:14px;align-items:start;padding:12px;border-radius:12px;background:var(--bg)}
+.crit-row.special{background:var(--sky-soft)}
+.pts{display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;background:var(--surface);border-radius:12px;padding:8px 6px;border:1px solid var(--line)}
+.pts b{font-family:var(--display);font-size:1.7rem;line-height:1.1;color:var(--gold);font-variant-numeric:tabular-nums}
+.special .pts b{color:var(--sky)}
+.pts span{font-size:.75rem;color:var(--muted);font-weight:600;line-height:1.35}
+.crit-items{min-width:0}
+.crit-items ul{margin:0;padding-inline-start:1.1em;display:flex;flex-direction:column;gap:4px}
+.crit-items li::marker{color:var(--gold)}
+.crit-head{font-weight:700;margin-bottom:4px}
+@media (max-width:480px){.crit-row{grid-template-columns:84px 1fr;gap:10px}.pts b{font-size:1.4rem}}
+.critlink{font:inherit;font-size:.8rem;font-weight:700;color:var(--gold);background:var(--surface);border:1px solid color-mix(in srgb,var(--gold) 40%,transparent);border-radius:999px;padding:3px 10px;cursor:pointer;margin-inline-start:8px;white-space:nowrap}
+/* degrees */
+.deg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:18px}
+.deg{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.deg-top{display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--c-soft);border-bottom:3px solid var(--c)}
+.deg-top .n{font-family:var(--display);font-weight:800;font-size:1.6rem;color:var(--c);width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--surface);flex:0 0 auto}
+.deg-top h3{font-size:1.1rem}
+.pill{margin-inline-start:auto;background:var(--c);color:var(--surface);font-weight:700;font-size:.82rem;padding:4px 12px;border-radius:999px;white-space:nowrap}
+.deg ol{margin:0;padding:14px 18px 16px;padding-inline-start:2.4em;display:flex;flex-direction:column;gap:6px}
+.deg ol li::marker{color:var(--c);font-weight:700;font-family:var(--display)}
+.c1{--c:var(--d1);--c-soft:var(--d1s)} .c2{--c:var(--d2);--c-soft:var(--d2s)} .c3{--c:var(--d3);--c-soft:var(--d3s)} .c4{--c:var(--d4);--c-soft:var(--d4s)}
+.scale{display:flex;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.scale div{flex:1;padding:10px 8px;text-align:center;background:var(--c-soft);border-inline-start:1px solid var(--line);min-width:0}
+.scale div:first-child{border-inline-start:0}
+.scale b{display:block;font-family:var(--display);font-size:1.5rem;color:var(--c);line-height:1.2;font-variant-numeric:tabular-nums}
+.scale span{font-size:.8rem;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card h3{font-size:1.15rem}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:.92rem}
+th,td{text-align:start;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{font-family:var(--display);font-weight:700;color:var(--c);background:var(--c-soft);font-size:.9rem}
+td ul{margin:0;padding-inline-start:1.1em;display:flex;flex-direction:column;gap:4px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px}
+.fact{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.fact .big{font-family:var(--display);font-weight:800;font-size:1.7rem;color:var(--brand-2);line-height:1.1;flex:0 0 auto;font-variant-numeric:tabular-nums}
+
+/* attendance timeline */
+.tl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.tl > li{display:grid;grid-template-columns:96px 1fr;gap:16px;position:relative;padding-bottom:22px}
+.tl > li:last-child{padding-bottom:0}
+.tl .day{display:flex;flex-direction:column;align-items:center;gap:6px;position:relative}
+.tl .day::after{content:"";position:absolute;top:58px;bottom:-22px;width:2px;background:var(--line)}
+.tl > li:last-child .day::after{display:none}
+.tl .dn{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:var(--c-soft);color:var(--c);border:2px solid var(--c);font-family:var(--display);font-weight:800;font-size:1.3rem;font-variant-numeric:tabular-nums}
+.tl .dl{font-size:.8rem;font-weight:600;color:var(--c);text-align:center}
+.tl .body{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;min-width:0}
+.tl .body h4{font-size:1rem;margin-bottom:6px}
+.tl .body ul{margin:0;padding-inline-start:1.1em;display:flex;flex-direction:column;gap:4px}
+@media (max-width:520px){.tl > li{grid-template-columns:64px 1fr;gap:10px}.tl .dn{width:46px;height:46px;font-size:1.1rem}.tl .day::after{top:50px}}
+.zones{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:14px}
+.zone{border-radius:14px;overflow:hidden;border:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column}
+.zone h4{background:var(--c);color:var(--surface);padding:10px 14px;font-size:1rem}
+.zone ul{margin:0;padding:12px 14px 14px;padding-inline-start:2em;display:flex;flex-direction:column;gap:5px;font-size:.93rem}
+.zone li::marker{color:var(--c)}
+.warn{background:var(--d4s);border:1px solid var(--line);border-inline-start:4px solid var(--d4);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.warn h4{color:var(--d4);font-size:1rem}
+.warn ul{margin:0;padding-inline-start:1.1em;display:flex;flex-direction:column;gap:4px}
+
+/* editing */
+.editbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{font:inherit;font-weight:600;font-size:.95rem;border:1px solid var(--brand-2);background:var(--brand-2);color:var(--surface);padding:8px 16px;border-radius:10px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--brand-2)}
+.btn.sm{font-size:.85rem;padding:6px 12px}
+.btn:disabled{opacity:.5;cursor:default}
+.status{color:var(--muted);font-size:.9rem}
+.panel{background:var(--surface);border:2px dashed var(--brand-2);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:14px}
+.panel h3{font-size:1.02rem}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.row > label{flex:1 1 150px;min-width:0}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%;box-sizing:border-box}
+textarea{min-height:76px;resize:vertical}
+label{font-size:.85rem;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.hint{color:var(--muted);font-size:.82rem}
+.upl{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.upl input[type=file]{display:none}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+footer{background:var(--brand);color:color-mix(in srgb,var(--on-brand) 82%,transparent)}
+footer::before{content:"";display:block;height:6px;background:linear-gradient(to left,var(--coral),var(--sun),var(--mint),var(--sky))}
+footer .wrap{padding-block:22px;display:flex;flex-wrap:wrap;gap:12px 32px;justify-content:space-between;font-size:.88rem}
+footer b{color:var(--on-brand);font-weight:600}
+@media (prefers-reduced-motion:no-preference){.tab,.chip,.btn,a.cert{transition:background .15s,border-color .15s,color .15s}}
+</style>
+</head>
+<body>
+<div id="app" dir="rtl" lang="ar"></div>
+<script src="config.js"></script>
+<script src="masar.js"></script>
+<script id="app-script">
+(function(){
+var HM=['محرم','صفر','ربيع الأول','ربيع الآخر','جمادى الأولى','جمادى الآخرة','رجب','شعبان','رمضان','شوال','ذو القعدة','ذو الحجة'];
+var S={school:'ابتدائية الخنساء برغدان',note:'',quotes:{regular:'',excellent:''},months:[]};
+var app=document.getElementById('app');
+var ui={tab:'honor',month:0,editing:false,canEdit:false,assets:null,busy:false,uploading:'',status:'',loading:true,error:''};
+try{var t=sessionStorage.getItem('indibat-tab');if(t)ui.tab=t;}catch(e){}
+if(/^#(honor|behavior|attendance)$/.test(location.hash))ui.tab=location.hash.slice(1);
+/* ---------- Supabase backend ---------- */
+function supaApi(sb){
+  function ok(r){if(r.error)throw r.error;return r.data;}
+  async function all(table,cols,order){
+    var out=[],from=0;
+    for(;;){var q=sb.from(table).select(cols);if(order)q=q.order(order);var d=ok(await q.range(from,from+999));out=out.concat(d);if(d.length<1000)break;from+=1000;}
+    return out;
+  }
+  return {
+    loadAll:async function(){var r=await Promise.all([all('indibat_months','hy,hm'),all('indibat_honors','id,hy,hm,list,name,cls','id'),all('indibat_settings','key,value')]);return {months:r[0],honors:r[1],settings:r[2]};},
+    addMonth:async function(hy,hm){ok(await sb.from('indibat_months').upsert({hy:hy,hm:hm},{onConflict:'hy,hm',ignoreDuplicates:true}));},
+    delMonth:async function(hy,hm){ok(await sb.from('indibat_months').delete().eq('hy',hy).eq('hm',hm));},
+    addNames:async function(rows){ok(await sb.from('indibat_honors').insert(rows));},
+    delHonor:async function(id){ok(await sb.from('indibat_honors').delete().eq('id',id));},
+    saveSettings:async function(obj){ok(await sb.from('indibat_settings').upsert(Object.keys(obj).map(function(k){return {key:k,value:obj[k]};})));},
+    session:async function(){var d=ok(await sb.auth.getSession());return d.session;},
+    signIn:async function(email,pw){ok(await sb.auth.signInWithPassword({email:email,password:pw}));},
+    signUp:async function(email,pw){var d=ok(await sb.auth.signUp({email:email,password:pw}));return !!d.session;},
+    signOut:async function(){await sb.auth.signOut();},
+    isAdmin:async function(){return !!ok(await sb.rpc('masar_is_admin'));}
+  };
+}
+var api=null;
+function errMsg(e){
+  var m=(e&&(e.message||e.error_description))||String(e||'');
+  if(/Invalid login credentials/i.test(m))return 'البريد أو كلمة المرور غير صحيحة.';
+  if(/Email not confirmed/i.test(m))return 'لم يُفعَّل البريد بعد. افتحي رسالة التفعيل في بريدك أو فعّلي الحساب من Supabase.';
+  if(/fetch|network|Load failed/i.test(m))return 'تعذّر الاتصال. تأكدي من الإنترنت وحاولي مرة أخرى.';
+  if(/row-level security|permission|42501/i.test(m))return 'ليس لهذا الحساب صلاحية التعديل.';
+  if(/duplicate key/i.test(m))return 'هذا العنصر موجود مسبقاً.';
+  if(/not_configured/.test(m))return 'المنصة لم تُربط بقاعدة البيانات بعد.';
+  return 'حدث خطأ: '+m;
+}
+function toState(d){
+  var keys={};function mk(y,m){var k=y*100+m;if(!keys[k])keys[k]={m:m,y:y,regular:[],excellent:[],certs:{regular:[],excellent:[]}};return keys[k];}
+  d.months.forEach(function(r){mk(r.hy,r.hm);});
+  d.honors.forEach(function(r){mk(r.hy,r.hm)[r.list].push({id:r.id,name:r.name,cls:r.cls||''});});
+  S.months=Object.keys(keys).map(Number).sort(function(a,b){return a-b;}).map(function(k){return keys[k];});
+  var st={};d.settings.forEach(function(r){st[r.key]=r.value;});
+  S.note=st.note||'';S.quotes={regular:st.quote_regular||'',excellent:st.quote_excellent||''};
+}
+async function reload(keepKey){
+  var cur=keepKey!=null?keepKey:(S.months[ui.month]?S.months[ui.month].y*100+S.months[ui.month].m:null);
+  toState(await api.loadAll());
+  var i=cur==null?-1:S.months.findIndex(function(x){return x.y*100+x.m===cur;});
+  ui.month=i>-1?i:Math.max(0,S.months.length-1);
+}
+async function act(fn,okMsg,keepKey){
+  if(ui.busy)return;ui.busy=true;ui.status='جارٍ الحفظ…';render();
+  try{await fn();await reload(keepKey);ui.status=okMsg||'تم الحفظ ✓';}
+  catch(e){ui.status=errMsg(e);}
+  ui.busy=false;render();
+}
+async function boot(){
+  try{
+    if(window.INDIBAT_MOCK)api=window.INDIBAT_MOCK;
+    else{var c=window.Masar?await Masar.client():null;if(!c)throw new Error('not_configured');api=supaApi(c);}
+    await reload(null);ui.loading=false;render();
+  }catch(e){ui.loading=false;ui.error=errMsg(e);render();return;}
+  try{var s=await api.session();if(s&&await api.isAdmin()){ui.canEdit=true;render();}}catch(e){}
+}
+
+/* ---------- counselor login lives on the platform home ---------- */
+function openLogin(){location.href='index.html#login';}
+
+
+function ar(n){return String(n).replace(/\d/g,function(d){return '٠١٢٣٤٥٦٧٨٩'[d];});}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function mLabel(m){return HM[m.m]+' '+ar(m.y)+'هـ';}
+function currentHijri(){
+  try{var p=new Intl.DateTimeFormat('en-u-ca-islamic-umalqura',{month:'numeric',year:'numeric'}).formatToParts(new Date());
+    var mo=+p.find(function(x){return x.type==='month';}).value,yr=parseInt(p.find(function(x){return x.type==='year';}).value,10);
+    if(mo>=1&&mo<=12&&yr>1400)return {m:mo-1,y:yr};}catch(e){}
+  return {m:4,y:1448};
+}
+
+/* ---------- fixed content: قواعد السلوك والمواظبة للمرحلة الابتدائية ١٤٤٧هـ ---------- */
+var DEG=[
+ {n:1,title:'مشكلات الدرجة الأولى',pill:'حسم درجة واحدة',items:[
+  'عدم التقيّد باللباس الرسمي الخاص بالمدرسة.',
+  'النوم داخل الفصل بصفة متكررة.',
+  'الدخول إلى الفصل أو الخروج منه دون استئذان.',
+  'تكرار الخروج والدخول من بوابة المدرسة قبل الانصراف أو الحضور، والتجمهر أمام البوابة.',
+  'التأخر عن الاصطفاف الصباحي.']},
+ {n:2,title:'مشكلات الدرجة الثانية',pill:'حسم درجتين',items:[
+  'سرقة شيء من ممتلكات الزميلات.',
+  'الشجار أو الاشتراك في مضاربة جماعية (عراك).',
+  'إلحاق الضرر المتعمد بممتلكات الزميلات.',
+  'التلفظ على الزميلات بكلمات نابية أو تهديدهن وإثارة الرعب.',
+  'عدم حضور الحصة الدراسية أو الهروب منها.',
+  'العبث بتجهيزات المدرسة أو مبانيها، مثل أجهزة الحاسب وأدوات الأمن والسلامة والكهرباء والمعامل والحافلة المدرسية.',
+  'إثارة الفوضى داخل الفصل أو المدرسة أو في وسائل النقل المدرسي.']},
+ {n:3,title:'مشكلات الدرجة الثالثة',pill:'حسم ثلاث درجات',items:[
+  'إلحاق الضرر المتعمد بتجهيزات المدرسة أو مبانيها، مثل أجهزة الحاسب وأدوات الأمن والسلامة والكهرباء والمعامل والحافلة المدرسية.',
+  'إحضار المواد أو الألعاب الخطرة إلى المدرسة أو استخدامها، مثل الألعاب النارية والبخاخات الغازية الملونة والمواد الكيميائية.',
+  'سرقة شيء من ممتلكات المعلمات أو المدرسة.',
+  'حيازة المواد الإعلامية الممنوعة أو عرضها، مقروءة كانت أو مسموعة أو مرئية.',
+  'إحضار أجهزة الاتصال الشخصية وفيها صور أو مقاطع غير لائقة.',
+  'التوقيع عن ولي الأمر دون علمه على المكاتبات المتبادلة بين المدرسة وولي الأمر.',
+  'مهاجمة إحدى الطالبات بالضرب.',
+  'التنمر.',
+  'الهروب من المدرسة.',
+  'تصوير الطالبات بالأجهزة الإلكترونية أيّاً كان نوعها.',
+  'امتهان الكتب الدراسية.']},
+ {n:4,title:'مشكلات الدرجة الرابعة',pill:'حسم عشر درجات',items:[
+  'التحرش الجنسي.',
+  'إشعال النار داخل المدرسة.',
+  'حيازة السجائر أو التدخين.',
+  'إحضار آلة حادة إلى المدرسة بقصد التهديد أو الاعتداء.']}
+];
+var REMOTE=[
+ ['تعطيل الحصص الافتراضية.','الخروج المتكرر من الحصص الافتراضية دون عذر مقبول.','الكتابة في المحادثة وتشتيت انتباه الطالبات أثناء الحصة.'],
+ ['الإرسال المتعمد لمواد أو روابط لا علاقة لها بالمحتوى.','التلفظ أو كتابة عبارات أو إرسال صور أو مقاطع مخلة بالآداب للزميلات.','استخدام صور غير مناسبة في حالة الطالبة.'],
+ ['التلفظ أو كتابة عبارات أو إرسال صور أو مقاطع مخلة بالآداب للمعلمات.','التنمر الإلكتروني.','تصوير الطالبات أو المعلمات ونشر الصور.','التحرش الجنسي الإلكتروني.']
+];
+var TL=[
+ {d:1,c:'c1',label:'اليوم الأول',title:'الرصد والإبلاغ',items:['تدوّن المعلمة غياب الطالبة في النموذج الخاص بالفصل.','ترصد المساعدة الإدارية الغياب في النظام يومياً، وتبلّغ ولي الأمر برسالة نصية أو عبر الوسائل الرسمية.','تحسم وكيلة شؤون الطالبات درجة من المواظبة عن كل يوم غياب دون عذر.']},
+ {d:2,c:'c1',label:'اليوم الثاني',title:'مقابلة الطالبة',items:['تقابل وكيلة شؤون الطالبات الطالبة لمعرفة أسباب الغياب، وتبلّغ ولي الأمر بالإجراءات.']},
+ {d:3,c:'c1',label:'اليوم الثالث',title:'التحويل إلى الموجهة الطلابية',items:['تُحوَّل الطالبة إلى الموجهة الطلابية حسب النموذج المعتمد، وتُوضع خطة علاجية تربوية.','تتابع معلمات الطالبة مدى تحسنها وفق الخطة، ويستمر الرصد والإبلاغ اليومي.']},
+ {d:5,c:'c2',label:'اليوم الخامس',title:'التحويل إلى وكيلة شؤون الطالبات',items:['عند عدم تحسن الحالة تُحوَّل إلى وكيلة شؤون الطالبات، مع استمرار المتابعة والخطة العلاجية.','يُبلَّغ ولي الأمر بالإجراءات المترتبة على استمرار الغياب.']},
+ {d:10,c:'c4',label:'اليوم العاشر',title:'إجراءات النطاقات',items:['تُطبَّق إجراءات النطاق المناسب لحالة الطالبة (الأزرق، البرتقالي، الأحمر) كما هو موضح أدناه.']}
+];
+var ZONES=[
+ {c:'c1',t:'النطاق الأزرق',items:['تحويل الطالبة إلى الموجهة الطلابية لمتابعة حالتها وتقديم الخدمات المناسبة.','عند استمرار الغياب يُستدعى ولي الأمر ويُعقد اجتماع حضوري لإبلاغه بالإجراءات وتقييم الخطة العلاجية وأخذ التعهد.','استمرار تقديم الخدمات التربوية ومتابعة الحالة.']},
+ {c:'c2',t:'النطاق البرتقالي',items:['استدعاء ولي الأمر من وكيلة شؤون الطالبات لمناقشة أسباب الغياب.','إحالة الطالبة إلى لجنة التوجيه الطلابي ومراجعة الخطة العلاجية وتحديثها.','تنبيه ولي الأمر بالإجراءات المترتبة على استمرار الغياب.']},
+ {c:'c4',t:'النطاق الأحمر',items:['مخاطبة إدارة المدرسة للجهات ذات الاختصاص وفق نظام حماية الطفل، مع إشعار الإدارة العامة للتعليم.','متابعة الإجراءات والتنسيق مع الجهات المختصة حيال الحالة.']}
+];
+
+function ringSvg(label,col){
+  return '<div class="ring"><svg viewBox="0 0 84 84" aria-hidden="true"><circle cx="42" cy="42" r="36" fill="none" stroke="#ffffff" stroke-opacity=".22" stroke-width="6"/><circle cx="42" cy="42" r="36" fill="none" stroke="'+col+'" stroke-width="7" stroke-dasharray="226.2" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 42 42)"/><text x="42" y="49" text-anchor="middle" fill="#ffffff" font-family="Alexandria, sans-serif" font-weight="800" font-size="20">١٠٠</text></svg>'+label+'</div>';
+}
+
+/* ---------- honor ---------- */
+function norm(s){return String(s||'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/[ً-ْ]/g,'').replace(/\s+/g,' ').trim();}
+function timesHonored(key,name){var n=norm(name),c=0;S.months.forEach(function(m){if(m[key].some(function(p){return norm(p.name)===n;}))c++;});return c;}
+function card(key,p,i){
+  var medal=key==='regular'?'🏅':'🎖️';
+  var times=timesHonored(key,p.name);
+  var badge=times>1?'<span class="streak">'+(key==='regular'?'مواظبة ':'متميزة ')+ar(times)+' أشهر</span>':'';
+  var inner='<span class="medal" aria-hidden="true">'+medal+'</span><span class="nmw"><span class="nm">'+esc(p.name)+'</span>'+(p.cls?'<span class="ncls">'+esc(p.cls)+'</span>':'')+badge+'</span>'+
+    (!ui.editing?'<span class="ctag">عرض الشهادة</span>':'');
+  if(ui.editing){
+    return '<li class="ncard"><div class="ncard-in">'+inner+'</div><div class="ncard-tools">'+
+      (!p.cert?'<button class="mini" data-gcert="'+ui.month+':'+key+':'+i+'">معاينة الشهادة</button>':'')+
+      (p.cert?'<a class="mini" href="/_blob/'+esc(p.cert)+'" target="_blank" rel="noopener">عرض الشهادة</a><button class="x" data-uncert="'+key+':'+i+'">إزالة الشهادة</button>'
+        :(ui.assets?'<input type="file" id="pc-'+key+'-'+i+'" accept="application/pdf" data-pcert="'+key+':'+i+'" hidden><label for="pc-'+key+'-'+i+'" class="mini">'+(ui.uploading===key+':'+i?'جارٍ الرفع…':'＋ شهادة PDF')+'</label>':''))+
+      '<button class="x" data-del="'+key+':'+i+'" aria-label="حذف '+esc(p.name)+'">حذف</button></div></li>';
+  }
+  return p.cert?'<li class="ncard"><a class="ncard-in has" href="/_blob/'+esc(p.cert)+'" target="_blank" rel="noopener">'+inner+'</a></li>'
+    :'<li class="ncard"><button class="ncard-in has" data-gcert="'+ui.month+':'+key+':'+i+'" aria-label="شهادة '+esc(p.name)+'">'+inner+'</button></li>';
+}
+function col(key){
+  var m=S.months[ui.month];var list=m[key];var certs=m.certs[key];
+  var isReg=key==='regular';
+  var groups={},order=[];
+  list.forEach(function(p,i){var g=p.cls||'';if(!(g in groups)){groups[g]=[];order.push(g);}groups[g].push(card(key,p,i));});
+  order.sort(function(a,b){return a===''?1:b===''?-1:a.localeCompare(b,'ar');});
+  var hasCls=order.some(function(g){return g!=='';});
+  var names=list.length?order.map(function(g){
+      return (hasCls?'<h4 class="grp">'+(g?esc(g):'بدون صف')+' <span>'+ar(groups[g].length)+'</span></h4>':'')+'<ul class="cards">'+groups[g].join('')+'</ul>';}).join('')
+    :'<p class="empty">'+(ui.editing?'أضيفي الأسماء من لوحة التعديل أعلاه.':'تُعلن الأسماء قريباً بإذن الله.')+'</p>';
+  if(S.quotes[key])names+='<blockquote class="quote">'+esc(S.quotes[key])+'</blockquote>';
+  var certHtml='';
+  if(certs.length){
+    certHtml='<div class="certs"><h4>شهادات الشكر</h4>'+certs.map(function(c,i){
+      return '<div style="display:flex;gap:6px;align-items:center"><a class="cert" style="flex:1;min-width:0" href="/_blob/'+esc(c.id)+'" target="_blank" rel="noopener"><span class="pdf">PDF</span><span class="t"><b>'+esc(c.name)+'</b><span>اضغطي لفتح الشهادات</span></span><span class="go" aria-hidden="true">←</span></a>'+
+        (ui.editing?'<button class="x" data-delcert="'+key+':'+i+'" aria-label="إزالة الملف">✕</button>':'')+'</div>';}).join('')+
+      (ui.editing&&ui.assets?'<div class="upl"><input type="file" id="file-'+key+'" accept="application/pdf" data-upkey="'+key+'"><label for="file-'+key+'" class="btn ghost sm" style="flex-direction:row;color:var(--brand-2);font-size:.85rem">'+(ui.uploading===key?'جارٍ الرفع…':'رفع ملف PDF')+'</label></div>':'')+
+      (ui.editing&&!ui.assets?'<p class="hint">رفع الملفات غير متاح في هذا العرض.</p>':'')+'</div>';
+  }
+  return '<section class="col '+(isReg?'reg':'exc')+'"><div class="col-top"><span class="ic" aria-hidden="true">'+(isReg?'✓':'★')+'</span><div><h3>'+(isReg?'الطالبات المواظبات':'المتميزات سلوكياً')+'</h3></div><span class="count">'+ar(list.length)+'<small>طالبة</small></span></div><div class="col-body">'+(list.length&&!ui.editing?'<p class="tap">اضغطي على اسم الطالبة لعرض شهادتها وحفظها</p>':'')+names+(isReg?'':'<button class="critlink" data-crit="1">كيف تُختار المتميزات سلوكياً؟</button>')+certHtml+'</div></section>';
+}
+function searchHtml(q){
+  q=norm(q);if(q.length<2)return '';
+  var hits={};
+  S.months.forEach(function(m,mi){['regular','excellent'].forEach(function(k){m[k].forEach(function(p){
+    if(norm(p.name).indexOf(q)>-1){var id=norm(p.name);hits[id]=hits[id]||{name:p.name,cls:p.cls,rows:[]};hits[id].rows.push({mi:mi,k:k,cert:p.cert,i:m[k].indexOf(p)});}});});});
+  var ids=Object.keys(hits);
+  if(!ids.length)return '<p class="nores">لم نجد هذا الاسم في لوحة الشرف حتى الآن. تأكدي من كتابة الاسم، أو اطّلعي على <button class="linkish" data-crit="1">طريقة اختيار المتميزات</button>.</p>';
+  return '<ul class="hits">'+ids.slice(0,20).map(function(id){var h=hits[id];
+    return '<li><div class="hit-n"><span class="hit-ok" aria-hidden="true">✓</span><b>'+esc(h.name)+'</b>'+(h.cls?' <span class="cls">'+esc(h.cls)+'</span>':'')+'</div><p class="hit-say">مبروك! كُرِّمت في '+(h.rows.length>2?ar(h.rows.length)+' أشهر':h.rows.length===2?'شهرين':'شهر واحد')+'. اضغطي على الشهادة لعرضها وحفظها:</p><div class="hit-m">'+h.rows.map(function(r){
+      var lbl='<span class="hc-k">'+(r.k==='regular'?'🏅 شهادة الانضباط':'🎖️ شهادة التميّز السلوكي')+'</span><span class="hc-m">'+esc(mLabel(S.months[r.mi]))+'</span>';
+      var cls='hchip '+(r.k==='regular'?'hc-reg':'hc-exc');
+      return r.cert?'<a class="'+cls+'" href="/_blob/'+esc(r.cert)+'" target="_blank" rel="noopener">'+lbl+'</a>':'<button class="'+cls+'" data-gcert="'+r.mi+':'+r.k+':'+r.i+'">'+lbl+'</button>';}).join('')+'</div></li>';}).join('')+'</ul>';
+}
+function honor(){
+  if(ui.loading)return '<div class="sec-head"><h2>لوحة الشرف الشهرية</h2><p>جارٍ تحميل الأسماء…</p></div>';
+  if(ui.error)return '<div class="sec-head"><h2>لوحة الشرف الشهرية</h2></div><p class="nores">'+esc(ui.error)+'</p>';
+  if(!S.months.length)return '<div class="sec-head"><h2>لوحة الشرف الشهرية</h2><p>تُعلن الأسماء قريباً بإذن الله.</p></div>';
+  var m=S.months[ui.month];var sec=ui.sec||'regular';
+  return '<div class="sec-head"><h2>لوحة الشرف الشهرية</h2><p>نفخر بطالباتنا المواظبات والمتميزات سلوكياً، وتُحدَّث اللوحة في كل شهر هجري.</p></div>'+
+    '<ol class="steps" aria-label="طريقة الاستخدام"><li><b>١</b><span>ابحثي عن اسم ابنتك</span></li><li><b>٢</b><span>اضغطي على الشهادة</span></li><li><b>٣</b><span>احفظيها أو شاركيها</span></li></ol>'+
+    '<div class="search"><label for="q" class="search-l">ابحثي عن اسم ابنتك</label><div class="search-box"><span aria-hidden="true">⌕</span><input id="q" type="search" autocomplete="off" placeholder="مثال: لورا عادل" value="'+esc(ui.q||'')+'"></div><div id="results" aria-live="polite">'+searchHtml(ui.q||'')+'</div></div>'+
+    '<div class="or"><span>أو تصفّحي لوحة الشرف</span></div>'+
+    '<div class="mrow"><span class="mlabel">الشهر:</span><div class="months" role="group" aria-label="الأشهر">'+S.months.map(function(x,i){return i;}).reverse().map(function(i){return '<button class="chip" data-month="'+i+'" aria-pressed="'+(i===ui.month)+'">'+esc(mLabel(S.months[i]))+'</button>';}).join('')+'</div></div>'+
+    '<div class="seg" role="tablist" aria-label="القائمة"><button role="tab" data-sec="regular" aria-selected="'+(sec==='regular')+'">🏅 المواظبات <span>'+ar(m.regular.length)+'</span></button><button role="tab" data-sec="excellent" aria-selected="'+(sec==='excellent')+'">🎖️ المتميزات سلوكياً <span>'+ar(m.excellent.length)+'</span></button></div>'+
+    '<div class="board" data-sec="'+sec+'">'+col('regular')+col('excellent')+'</div>'+criteria(false);
+}
+
+
+
+var CRIT=[
+ {n:6,label:'ست درجات',items:['انضباط الطالبة وعدم غيابها دون عذر خلال الفصل الدراسي.']},
+ {n:6,label:'ست درجات لكل مشاركة',items:['المشاركة في الخدمة المجتمعية خارج المدرسة.','تقديم فعالية حوارية.','المشاركة في حملة توعوية.','عرض تجارب شخصية ناجحة.','الالتحاق ببرنامج أو دورة.']},
+ {n:4,label:'أربع درجات لكل مشاركة',head:'المشاركة في الأنشطة المدرسية التالية:',items:['مهارات الاتصال (العمل الجماعي، التعلّم بالأقران…).','مهارات القيادة والمسؤولية (التخطيط، التحفيز…).','المهارات الرقمية (إعداد العروض، تصميم المحتوى الإلكتروني).','مهارة إدارة الوقت.']},
+ {n:2,label:'درجتان لكل مشاركة',items:['كتابة رسالة شكر (مثلاً: رسالة للوطن، للقيادة، للأسرة، للمعلمة…).','المشاركة في الإذاعة المدرسية.','تقديم مقترح لصالح المجتمع المدرسي.','التعاون مع الزميلات والمعلمات وإدارة المدرسة.']}
+];
+function criteria(open){
+  return '<details class="crit" id="crit"'+(open?' open':'')+'><summary><span class="crit-ic" aria-hidden="true">★</span><span><b>كيف تُختار المتميزات سلوكياً؟</b><small>طريقة حساب درجة السلوك وممارسات السلوك المتميز</small></span><span class="crit-arrow" aria-hidden="true">⌄</span></summary>'+
+    '<div class="crit-body">'+
+    '<div class="split" role="img" aria-label="درجة السلوك ١٠٠: ٨٠ أساسية و٢٠ للسلوك المتميز"><div class="base"><b>٨٠</b><span>درجة أساسية</span></div><div class="plus"><b>٢٠</b><span>سلوك متميز</span></div></div>'+
+    '<ol class="how">'+
+      '<li><b>٨٠ درجة لكل طالبة من البداية</b><span>تبدأ كل طالبة بـ٨٠ درجة من درجة السلوك (١٠٠)، وتُحسم منها المخالفات بحسب درجتها.</span></li>'+
+      '<li><b>٢٠ درجة ترصدها المعلمات</b><span>ترصد المعلمات الدرجات العشرين المتبقية خلال الحصص، بحسب ممارسات السلوك المتميز الموضحة أدناه.</span></li>'+
+      '<li><b>شهادة التميّز السلوكي</b><span>الطالبة التي ترصد لها معلماتها درجات السلوك المتميز تُكرَّم في لوحة الشرف، وتصدر لها شهادة التميّز السلوكي من هذه الصفحة.</span></li>'+
+    '</ol>'+
+    '<p class="crit-tip">إذا لم يظهر اسم ابنتك هذا الشهر، فشجّعيها على هذه الممارسات داخل المدرسة وخارجها، فكل مشاركة تُحسب لها.</p>'+
+    '<h4 class="crit-h">ممارسات السلوك المتميز ودرجاتها</h4>'+
+    CRIT.map(function(g){return '<div class="crit-row"><div class="pts"><b>'+ar(g.n)+'</b><span>'+g.label+'</span></div><div class="crit-items">'+(g.head?'<p class="crit-head">'+g.head+'</p>':'')+'<ul>'+g.items.map(function(i){return '<li>'+i+'</li>';}).join('')+'</ul></div></div>';}).join('')+
+    '<div class="crit-row special"><div class="pts"><b>٦</b><span>حدّ أعلى بتقدير المدرسة</span></div><div class="crit-items"><p>إذا اكتسبت الطالبة سلوكاً متميزاً غير ما ذُكر، تقدّر المدرسة الدرجة المناسبة بناءً على توصية لجنة التوجيه الطلابي، بما لا يتجاوز ست درجات.</p></div></div>'+
+    '</div></details>';
+}
+/* ---------- behavior ---------- */
+function behavior(){
+  return '<div class="sec-head"><h2>قواعد السلوك</h2><p>تُصنَّف المشكلات السلوكية في أربع درجات، ولكل درجة حسم محدد من درجة السلوك.</p></div>'+
+    '<div class="scale">'+DEG.map(function(d){return '<div class="c'+d.n+'"><b>'+ar([1,2,3,10][d.n-1])+'</b><span>الدرجة '+['الأولى','الثانية','الثالثة','الرابعة'][d.n-1]+'</span></div>';}).join('')+'</div>'+
+    '<div class="deg-grid">'+DEG.map(function(d){
+      return '<section class="deg c'+d.n+'"><div class="deg-top"><span class="n">'+ar(d.n)+'</span><h3>'+d.title+'</h3><span class="pill">'+d.pill+'</span></div><ol>'+d.items.map(function(i){return '<li>'+i+'</li>';}).join('')+'</ol></section>';}).join('')+'</div>'+
+    '<div class="sec-head" style="margin-top:8px"><h2>السلوك المتميز</h2><p>كيف تُحسب درجة السلوك، وما الممارسات التي ترصدها المعلمات للطالبة.</p></div>'+criteria(true)+'<section class="card"><h3>المشكلات السلوكية في التعليم عن بُعد</h3><div class="tbl-wrap"><table><thead><tr>'+
+      ['الدرجة الأولى','الدرجة الثانية','الدرجة الثالثة'].map(function(h,i){return '<th class="c'+(i+1)+'">'+h+'</th>';}).join('')+
+      '</tr></thead><tbody><tr>'+REMOTE.map(function(c,i){return '<td><ul class="c'+(i+1)+'">'+c.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul></td>';}).join('')+'</tr></tbody></table></div></section>'+
+    '<div class="facts"><div class="fact"><span class="big">١٠٠</span><p>درجة للسلوك في كل فصل دراسي، من الصف الثالث إلى السادس الابتدائي.</p></div></div>';
+}
+
+/* ---------- attendance ---------- */
+function attendance(){
+  return '<div class="sec-head"><h2>قواعد المواظبة</h2><p>تُخصَّص للمواظبة ١٠٠ درجة في كل فصل دراسي من الصف الثالث إلى السادس، ثم يُؤخذ متوسط الدرجات.</p></div>'+
+    '<div class="facts">'+
+      '<div class="fact"><span class="big" style="color:var(--d4)">−١</span><p>تُحسم درجة واحدة من المواظبة عن كل يوم غياب دون عذر مقبول.</p></div>'+
+      '<div class="fact"><span class="big" style="color:var(--d2)">✕</span><p>لا تُمنح الطالبة الدرجة الكاملة في المشاركة والتفاعل في المقرر الذي غابت عنه دون عذر.</p></div>'+
+      '<div class="fact"><span class="big" style="color:var(--d3)">↺</span><p>لا تُعاد للطالبة الغائبة دون عذر الاختبارات القصيرة، ولا تُمنح درجات تعويضية.</p></div>'+
+    '</div>'+
+    '<section class="card"><h3>إجراءات التعامل مع الطالبات متكررات الغياب</h3><ol class="tl">'+TL.map(function(s){
+      return '<li class="'+s.c+'"><div class="day"><span class="dn">'+ar(s.d)+'</span><span class="dl">'+s.label+'</span></div><div class="body"><h4>'+s.title+'</h4><ul>'+s.items.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul></div></li>';}).join('')+'</ol></section>'+
+    '<div class="zones">'+ZONES.map(function(z){return '<section class="zone '+z.c+'"><h4>'+z.t+'</h4><ul>'+z.items.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul></section>';}).join('')+'</div>'+
+    '<div class="warn"><h4>توجيهات مهمة لأولياء الأمور</h4><ul><li>تُحرم الطالبة من الانتقال إلى العام التالي إذا تجاوز غيابها ١٠٪ من العام الدراسي دون عذر مقبول.</li><li>يُقدَّم عذر الغياب لإدارة المدرسة خلال ثلاثة أيام، ولمديرة المدرسة صلاحية تمديد القبول حتى نهاية الفصل الدراسي عند وجود مبرر.</li></ul></div>';
+}
+
+/* ---------- edit panel ---------- */
+function monthForm(){
+  var cur=currentHijri();
+  return '<form id="monthForm" class="row"><label>الشهر الهجري<select id="fM">'+HM.map(function(h,i){return '<option value="'+i+'"'+(i===cur.m?' selected':'')+'>'+h+'</option>';}).join('')+'</select></label>'+
+    '<label>السنة<input id="fY" type="number" inputmode="numeric" value="'+cur.y+'" min="1440" max="1500"></label>'+
+    '<button class="btn ghost" type="submit">إضافة الشهر</button>'+
+    (S.months.length>1?'<button class="btn ghost" type="button" id="delMonth" style="color:var(--danger);border-color:var(--danger)">'+(ui.confirmDel?'تأكيد حذف '+esc(mLabel(S.months[ui.month])):'حذف هذا الشهر')+'</button>':'')+
+    '</form>';
+}
+function panel(){
+  if(!ui.editing||ui.tab!=='honor'||ui.loading||ui.error)return '';
+  if(!S.months.length)return '<div class="panel"><h3>أضيفي أول شهر</h3>'+monthForm()+'</div>';
+  var cur=currentHijri();
+  return '<div class="panel"><h3>إضافة طالبات لشهر '+esc(mLabel(S.months[ui.month]))+'</h3>'+
+    '<form id="addForm" class="row"><label>اسم الطالبة (أو عدة أسماء، كل اسم في سطر)<textarea id="fName" required rows="3" autocomplete="off" style="min-height:0"></textarea></label>'+
+    '<label>الصف (اختياري)<input id="fCls" autocomplete="off" placeholder="مثال: الرابع أ"></label>'+
+    '<label>القائمة<select id="fKey"><option value="regular">المواظبات</option><option value="excellent">المتميزات سلوكياً</option></select></label>'+
+    '<button class="btn" type="submit">إضافة</button></form>'+
+    '<p class="hint">لإضافة قائمة كاملة: الصقي الأسماء في خانة الاسم، بشرط أن يكون كل اسم في سطر مستقل.</p>'+
+    '<h3>شهر جديد</h3>'+monthForm()+
+    '<h3>النصوص</h3><label>رسالة أولياء الأمور<textarea id="fNote">'+esc(S.note)+'</textarea></label>'+
+    '<label>عبارة تحفيزية للمواظبات<textarea id="fQR">'+esc(S.quotes.regular)+'</textarea></label>'+
+    '<label>عبارة تحفيزية للمتميزات سلوكياً<textarea id="fQE">'+esc(S.quotes.excellent)+'</textarea></label>'+
+    '<div><button class="btn ghost sm" type="button" id="applyNote">تحديث النصوص</button></div>'+
+    '<p class="hint">كل تعديل يُحفظ مباشرة ويظهر لأولياء الأمور فوراً. الشهادات تصدر تلقائياً لكل اسم.</p></div>';
+}
+
+function render(){
+  var tabs=[['honor','لوحة الشرف'],['behavior','قواعد السلوك'],['attendance','قواعد المواظبة']];
+  var body=ui.tab==='behavior'?behavior():ui.tab==='attendance'?attendance():honor();
+  var bar='';
+  if(ui.canEdit){
+    bar='<div class="editbar">'+(ui.editing
+      ?'<button class="btn ghost" id="toggleEdit">إنهاء التعديل</button>'
+      :'<button class="btn ghost" id="toggleEdit">تعديل لوحة الشرف</button>')+'<a class="btn ghost sm" href="index.html" style="text-decoration:none">← المنصة</a><button class="btn ghost sm" id="logout">تسجيل الخروج</button>'+
+      '<span class="status" role="status">'+esc(ui.status)+'</span></div>';
+  }
+  var y=window.scrollY;
+  app.innerHTML=
+    '<header class="hero"><div class="wrap"><div><div class="eyebrow">'+esc(S.school)+' · التوجيه الطلابي</div>'+
+      '<h1>انضباط <span class="glow">وتميّز</span></h1><span class="tag">لوحة الشرف · قواعد السلوك والمواظبة</span><p class="lede">نعزّز السلوك الإيجابي والمواظبة المدرسية لدى طالباتنا، ونضع بين يدي أولياء الأمور قواعد السلوك والمواظبة وأسماء المتميزات كل شهر.</p></div>'+
+      '<div class="scores">'+ringSvg('درجة السلوك','#ffa48f')+ringSvg('درجة المواظبة','#ffd66b')+'</div></div><div class="band"></div></header>'+
+    '<nav class="nav" aria-label="أقسام الصفحة"><div class="wrap" role="tablist">'+tabs.map(function(t){return '<button class="tab" role="tab" data-tab="'+t[0]+'" aria-selected="'+(ui.tab===t[0])+'">'+t[1]+'</button>';}).join('')+'</div></nav>'+
+    '<main class="wrap t-'+ui.tab+'">'+(S.note&&ui.tab==='honor'?'<div class="note"><b>رسالة</b><p>'+esc(S.note)+'</p></div>':'')+bar+panel()+body+'</main>'+
+    '<footer><div class="wrap"><span>انضباط وتميّز · '+esc(S.school)+'</span><span>مديرة المدرسة: <b>أ. هند علي هياس</b></span><span>الموجهة الطلابية: <b>أ. أمل علي محمد</b></span><span>المرجع: قواعد السلوك والمواظبة للمرحلة الابتدائية ١٤٤٧هـ</span>'+(ui.canEdit?'':'<button class="footlink" id="openLogin">دخول الموجهة</button>')+'</div></footer>';
+  window.scrollTo(0,y);
+}
+
+function addNames(txt){
+  var names=txt.split(/\r?\n/).map(function(s){return s.trim();}).filter(Boolean);
+  var long=names.filter(function(n){return n.split(/\s+/).length>5;});
+  if(long.length){ui.status='يبدو أن عدة أسماء لُصقت في سطر واحد. اجعلي كل اسم في سطر مستقل ثم أعيدي الإضافة.';render();return;}
+  var cls=document.getElementById('fCls').value.trim();var key=document.getElementById('fKey').value;
+  if(!names.length)return;var mo=S.months[ui.month];
+  act(function(){return api.addNames(names.map(function(n){return {hy:mo.y,hm:mo.m,list:key,name:n,cls:cls};}));},'أُضيفت '+ar(names.length)+' ✓').then(function(){var f=document.getElementById('fName');if(f)f.focus();});
+}
+
+app.addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  if(b.dataset.sec){ui.sec=b.dataset.sec;render();return;}
+  if(b.dataset.crit){var d=document.getElementById('crit');if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'});}return;}
+  if(b.dataset.gcert){var g=b.dataset.gcert.split(':');openCert(+g[0],g[1],+g[2]);return;}
+  if(b.dataset.tab){ui.tab=b.dataset.tab;try{sessionStorage.setItem('indibat-tab',ui.tab);}catch(x){}render();window.scrollTo(0,0);return;}
+  if(b.dataset.month){ui.month=+b.dataset.month;ui.confirmDel=false;render();return;}
+  if(b.dataset.del){var p=b.dataset.del.split(':');var row=S.months[ui.month][p[0]][+p[1]];if(row)act(function(){return api.delHonor(row.id);},'حُذفت '+row.name+' ✓');return;}
+  if(b.id==='toggleEdit'){ui.editing=!ui.editing;ui.confirmDel=false;ui.status='';if(ui.editing)ui.tab='honor';render();return;}
+  if(b.id==='openLogin'){openLogin();return;}
+  if(b.id==='logout'){api.signOut().then(function(){ui.canEdit=false;ui.editing=false;ui.status='';render();});return;}
+  if(b.id==='applyNote'){var o={note:document.getElementById('fNote').value.trim(),quote_regular:document.getElementById('fQR').value.trim(),quote_excellent:document.getElementById('fQE').value.trim()};act(function(){return api.saveSettings(o);},'حُدّثت النصوص ✓');return;}
+  if(b.id==='delMonth'){if(!ui.confirmDel){ui.confirmDel=true;render();return;}
+    var dm=S.months[ui.month];ui.confirmDel=false;act(function(){return api.delMonth(dm.y,dm.m);},'حُذف شهر '+mLabel(dm)+' ✓',-1);return;}
+});
+app.addEventListener('submit',function(e){
+  e.preventDefault();
+  if(e.target.id==='addForm'){addNames(document.getElementById('fName').value);}
+  else if(e.target.id==='monthForm'){
+    var mm=+document.getElementById('fM').value,yy=parseInt(document.getElementById('fY').value,10);if(!(yy>1400))return;
+    var ex=S.months.findIndex(function(x){return x.m===mm&&x.y===yy;});
+    if(ex>-1){ui.month=ex;ui.status='الشهر موجود مسبقاً';render();return;}
+    act(function(){return api.addMonth(yy,mm);},'أُضيف شهر '+mLabel({m:mm,y:yy})+' ✓',yy*100+mm);
+  }
+});
+app.addEventListener('paste',function(e){
+  if(e.target.id!=='fName')return;var txt=e.clipboardData?e.clipboardData.getData('text'):'';
+  if(txt&&/\n/.test(txt.trim())){e.preventDefault();addNames(txt);}
+});
+app.addEventListener('input',function(e){
+  if(e.target.id!=='q')return;ui.q=e.target.value;var r=document.getElementById('results');if(r)r.innerHTML=searchHtml(ui.q);
+});
+/* ---------- auto certificates (drawn on canvas, one per student) ---------- */
+var cert={blob:null,url:'',name:'',dl:true};
+var modal=document.createElement('div');modal.id='certModal';modal.className='cmodal';modal.hidden=true;modal.setAttribute('dir','rtl');modal.setAttribute('lang','ar');
+modal.innerHTML='<div class="cbox" role="dialog" aria-modal="true" aria-labelledby="cTitle"><div class="chead"><h3 id="cTitle">شهادة شكر وتقدير</h3><button class="x" id="cClose" aria-label="إغلاق" style="font-size:1.2rem;color:var(--muted)">✕</button></div>'+
+  '<div class="cimg"><p class="empty" id="cWait">جارٍ تجهيز الشهادة…</p><img id="cImg" alt="" hidden></div>'+
+  '<div class="cact"><button class="btn" id="cSave" hidden>حفظ الشهادة</button><span class="hint" id="cHint">على الجوال: اضغطي مطوّلاً على الشهادة لحفظها في الصور أو مشاركتها.</span></div></div>';
+document.body.appendChild(modal);
+modal.addEventListener('click',function(e){if(e.target===modal||e.target.id==='cClose')closeCert();if(e.target.id==='cSave')saveCert();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!modal.hidden)closeCert();});
+function closeCert(){modal.hidden=true;if(cert.url){URL.revokeObjectURL(cert.url);cert.url='';}document.body.style.overflow='';}
+function saveCert(){
+  if(!cert.blob)return;var fn='شهادة-'+cert.name.replace(/[\\/:*?"<>|]/g,'')+'.png';
+  try{var f=new File([cert.blob],fn,{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:fn}).catch(function(){});return;}}catch(e){}
+  var u=URL.createObjectURL(cert.blob),a=document.createElement('a');a.href=u;a.download=fn;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},4000);
+}
+function openCert(mi,key,i){
+  var m=S.months[mi];if(!m)return;var p=m[key]&&m[key][i];if(!p)return;
+  cert.name=p.name;modal.hidden=false;document.body.style.overflow='hidden';
+  var img=document.getElementById('cImg'),wait=document.getElementById('cWait');img.hidden=true;wait.hidden=false;
+  document.getElementById('cTitle').textContent='شهادة '+p.name;
+  document.getElementById('cSave').hidden=!cert.dl;
+  document.getElementById('cHint').textContent='على الجوال: اضغطي مطوّلاً على الشهادة لحفظها في الصور أو مشاركتها.';
+  drawCert(p,key,m).then(function(blob){
+    cert.blob=blob;
+    var fr=new FileReader();fr.onload=function(){img.src=fr.result;};fr.readAsDataURL(blob);
+    img.alt='شهادة شكر وتقدير للطالبة '+p.name;img.hidden=false;wait.hidden=true;
+  },function(){wait.textContent='تعذّر تجهيز الشهادة.';});
+}
+function drawCert(p,key,m){
+  var NS='"Amiri", "Times New Roman", serif';
+  var fontsReady=(document.fonts&&document.fonts.load)?Promise.all([
+    document.fonts.load('700 100px "Amiri"','شهادة'),document.fonts.load('400 50px "Amiri"','شهادة')]).catch(function(){}):Promise.resolve();
+  return fontsReady.then(function(){return new Promise(function(res,rej){
+    var W=2000,H=1414,c=document.createElement('canvas');c.width=W;c.height=H;var x=c.getContext('2d');if(!x)return rej();
+    var gold=key!=='regular';
+    var T=gold?{c0:'#fffdf8',c1:'#f5ead2',title:'#6b1c2e',name:'#8f5410',ink:'#2b2420',muted:'#6d6258',accent:'#b0822a'}
+              :{c0:'#fdfefb',c1:'#eaf3e5',title:'#1d5a37',name:'#9a5a14',ink:'#1f2a22',muted:'#56665a',accent:'#2f7a4b'};
+    var bg=x.createRadialGradient(W/2,H/2,200,W/2,H/2,1150);bg.addColorStop(0,T.c0);bg.addColorStop(1,T.c1);
+    x.fillStyle=bg;x.fillRect(0,0,W,H);
+    if(gold)goldFrame(x,W,H);else greenFrame(x,W,H);
+    x.direction='rtl';x.textBaseline='alphabetic';
+    // header
+    x.textAlign='right';x.fillStyle=T.muted;x.font='700 34px '+NS;
+    x.fillText('المملكة العربية السعودية',W-225,232);x.font='400 34px '+NS;x.fillText('وزارة التعليم',W-225,278);x.fillText(S.school,W-225,324);
+    x.textAlign='left';x.fillText('التاريخ: '+mLabel(m),225,232);
+    // title
+    x.textAlign='center';
+    x.save();x.shadowColor='rgba(0,0,0,.12)';x.shadowOffsetY=4;x.shadowBlur=6;
+    x.fillStyle=T.title;x.font='700 140px '+NS;x.fillText('شهادة شكر وتقدير',W/2,440);x.restore();
+    divider(x,W/2,500,300,T.accent,gold);
+    // intro + name
+    x.fillStyle=T.ink;x.font='400 50px '+NS;x.fillText('تتقدّم إدارة '+S.school+' بخالص الشكر والتقدير إلى الطالبة:',W/2,592);
+    var size=118;x.font='700 '+size+'px '+NS;while(x.measureText(p.name).width>W-600&&size>64){size-=6;x.font='700 '+size+'px '+NS;}
+    x.fillStyle=T.name;x.fillText(p.name,W/2,735);
+    var nw=Math.min(x.measureText(p.name).width/2+90,560);
+    x.strokeStyle=T.accent;x.globalAlpha=.55;x.lineWidth=2;x.beginPath();x.moveTo(W/2-nw,770);x.lineTo(W/2+nw,770);x.stroke();x.globalAlpha=1;
+    x.fillStyle=T.accent;x.save();x.translate(W/2,770);x.rotate(Math.PI/4);x.fillRect(-7,-7,14,14);x.restore();
+    var y=780;
+    if(p.cls){x.fillStyle=T.muted;x.font='400 34px '+NS;x.fillText('الصف: '+p.cls,W/2,822);y=830;}
+    var reason=gold?'نظير تميّزها السلوكي، وتحلّيها بالأخلاق الحسنة، وتعاونها واحترامها لمعلماتها وزميلاتها، مما جعلها قدوةً في السلوك الإيجابي.'
+                   :'وذلك لانضباطها ومواظبتها على الحضور خلال شهر '+mLabel(m).replace(/ /g,' ')+'.';
+    var bless=gold?'بارك الله فيكِ، وزادكِ خُلقًا وعلمًا وتميّزًا':'سائلين الله لها دوام التوفيق والنجاح';
+    x.fillStyle=T.ink;x.font='400 48px '+NS;
+    var L=wrap(x,reason,1360);y+=Math.max(0,2-L.length)*40;L.forEach(function(l){y+=70;x.fillText(l,W/2,y);});
+    x.fillStyle=T.accent;x.font='700 48px '+NS;x.fillText(bless,W/2,y+80);
+    // seal + signatures
+    seal(x,W/2,1150,gold);
+    function sig(xx,role,name){x.textAlign='center';x.fillStyle=T.muted;x.font='700 36px '+NS;x.fillText(role,xx,1118);
+      x.fillStyle=T.ink;x.font='400 44px '+NS;x.fillText(name,xx,1176);
+      x.strokeStyle=T.accent;x.globalAlpha=.6;x.lineWidth=2;x.beginPath();x.moveTo(xx-190,1206);x.lineTo(xx+190,1206);x.stroke();x.globalAlpha=1;}
+    sig(W-560,'مديرة المدرسة','أ. هند علي هياس');sig(560,'الموجهة الطلابية','أ. أمل علي محمد');
+    c.toBlob(function(b){b?res(b):rej();},'image/png');
+  });});
+}
+function divider(x,cx,cy,half,col,gold){
+  x.save();x.translate(cx,cy);x.strokeStyle=col;x.fillStyle=col;x.lineWidth=2.5;x.lineCap='round';
+  [1,-1].forEach(function(s){
+    x.beginPath();x.moveTo(s*26,0);x.lineTo(s*half,0);x.stroke();
+    x.beginPath();x.moveTo(s*40,-8);x.bezierCurveTo(s*80,-30,s*120,10,s*160,-6);x.stroke();
+    x.beginPath();x.arc(s*(half+10),0,5,0,Math.PI*2);x.fill();
+    for(var d=0;d<3;d++){x.beginPath();x.arc(s*(60+d*34),12,3,0,Math.PI*2);x.fill();}
+  });
+  x.save();x.rotate(Math.PI/4);x.fillRect(-12,-12,24,24);x.restore();
+  x.fillStyle=gold?'#fffdf8':'#fdfefb';x.save();x.rotate(Math.PI/4);x.fillRect(-5,-5,10,10);x.restore();
+  x.restore();
+}
+function ribbons(x,cx,cy,gold){
+  var a=gold?'#7a1f35':'#1d5a37',b=gold?'#5c1526':'#14432a';
+  [1,-1].forEach(function(s){x.save();x.translate(cx,cy);x.rotate(s*0.38);
+    x.fillStyle=s>0?a:b;x.beginPath();x.moveTo(-26,20);x.lineTo(26,20);x.lineTo(26,104);x.lineTo(0,84);x.lineTo(-26,104);x.closePath();x.fill();x.restore();});
+}
+function wrap(x,t,max){var w=t.split(' '),out=[],cur='';w.forEach(function(s){var n=cur?cur+' '+s:s;if(x.measureText(n).width>max&&cur){out.push(cur);cur=s;}else cur=n;});if(cur)out.push(cur);return out;}
+
+/* green guilloche frame (الانضباط) */
+function rosette(x,cx,cy,s,col,petals,copies){
+  x.save();x.translate(cx,cy);x.strokeStyle=col;x.lineWidth=1.1;
+  for(var j=0;j<copies;j++){x.beginPath();var rot=j*Math.PI/(petals*copies);
+    for(var t=0;t<=Math.PI*2+.01;t+=.01){var r=s*(.42+.58*Math.abs(Math.sin(petals*t/2)));var a=t+rot;var px=r*Math.cos(a),py=r*Math.sin(a);t===0?x.moveTo(px,py):x.lineTo(px,py);}
+    x.stroke();}
+  x.restore();
+}
+function greenFrame(x,W,H){
+  var G1='#24693f',G2='#4f9463',G3='#8fc19a',BAND='#e3efdf';
+  // engraved watermark: interlaced wave field + central rosette
+  x.save();x.globalAlpha=.09;x.lineWidth=1.3;
+  for(var yy=165;yy<H-160;yy+=14){x.strokeStyle=(yy/14)%2?G1:G2;x.beginPath();for(var xx=165;xx<=W-165;xx+=6){var v=yy+7*Math.sin(xx/30+yy/45)+4*Math.sin(xx/11);xx===165?x.moveTo(xx,v):x.lineTo(xx,v);}x.stroke();}
+  x.globalAlpha=.07;rosette(x,W/2,H/2+40,330,G1,12,6);
+  x.restore();
+  var o=30,i=150,m=(o+i)/2;
+  x.fillStyle=BAND;x.fillRect(o,o,W-2*o,i-o);x.fillRect(o,H-i,W-2*o,i-o);x.fillRect(o,o,i-o,H-2*o);x.fillRect(W-i,o,i-o,H-2*o);
+  // scalloped outer edge (double)
+  var r=12;
+  function scal(rad,col,inset){x.fillStyle=col;for(var a=o+inset;a<=W-o-inset;a+=2*rad){x.beginPath();x.arc(a,o+inset,rad,0,Math.PI*2);x.fill();x.beginPath();x.arc(a,H-o-inset,rad,0,Math.PI*2);x.fill();}
+    for(var b=o+inset;b<=H-o-inset;b+=2*rad){x.beginPath();x.arc(o+inset,b,rad,0,Math.PI*2);x.fill();x.beginPath();x.arc(W-o-inset,b,rad,0,Math.PI*2);x.fill();}}
+  scal(r,G2,0);scal(4,BAND,0);
+  // fine engraved ropes
+  function rope(horiz,mid,from,to,amp,n,freq,col,lw,alpha){
+    x.strokeStyle=col;x.lineWidth=lw;x.globalAlpha=alpha;
+    for(var k=0;k<n;k++){x.beginPath();
+      for(var s=from;s<=to;s+=3){var env=.62+.38*Math.cos(s/(freq*3.2));var off=amp*env*Math.sin(s/freq+k*Math.PI*2/n);var px=horiz?s:mid+off,py=horiz?mid+off:s;s===from?x.moveTo(px,py):x.lineTo(px,py);}
+      x.stroke();}
+    x.globalAlpha=1;
+  }
+  var amp=(i-o)/2-20;
+  [[true,m,i,W-i],[true,H-m,i,W-i],[false,m,i,H-i],[false,W-m,i,H-i]].forEach(function(s){
+    rope(s[0],s[1],s[2],s[3],amp,12,24,G2,1,.8);
+    rope(s[0],s[1],s[2],s[3],amp*.55,8,13,G1,1,.7);
+  });
+  // band edge lines + inner guilloche strip
+  x.strokeStyle=G1;x.lineWidth=4;x.strokeRect(o+22,o+22,W-2*o-44,H-2*o-44);
+  x.lineWidth=5;x.strokeRect(i,i,W-2*i,H-2*i);
+  x.lineWidth=1.2;x.strokeRect(i+8,i+8,W-2*i-16,H-2*i-16);x.strokeRect(i+22,i+22,W-2*i-44,H-2*i-44);
+  [[true,i+15,i+30,W-i-30],[true,H-i-15,i+30,W-i-30],[false,i+15,i+30,H-i-30],[false,W-i-15,i+30,H-i-30]].forEach(function(s){rope(s[0],s[1],s[2],s[3],5,3,7,G2,.9,.8);});
+  // corner rosettes (spirograph)
+  [[m,m],[W-m,m],[m,H-m],[W-m,H-m]].forEach(function(pt){
+    x.fillStyle=BAND;x.beginPath();x.arc(pt[0],pt[1],62,0,Math.PI*2);x.fill();
+    x.strokeStyle=G1;x.lineWidth=3;x.beginPath();x.arc(pt[0],pt[1],60,0,Math.PI*2);x.stroke();
+    rosette(x,pt[0],pt[1],54,G2,10,5);rosette(x,pt[0],pt[1],30,G1,8,3);
+    x.fillStyle=G1;x.beginPath();x.arc(pt[0],pt[1],6,0,Math.PI*2);x.fill();});
+  // mid-side medallions
+  [[W/2,m],[W/2,H-m],[m,H/2],[W-m,H/2]].forEach(function(pt){
+    x.fillStyle=BAND;x.beginPath();x.ellipse(pt[0],pt[1],52,44,0,0,Math.PI*2);x.fill();
+    x.strokeStyle=G1;x.lineWidth=2.5;x.beginPath();x.ellipse(pt[0],pt[1],50,42,0,0,Math.PI*2);x.stroke();
+    rosette(x,pt[0],pt[1],38,G2,12,4);x.fillStyle=G1;x.beginPath();x.arc(pt[0],pt[1],5,0,Math.PI*2);x.fill();});
+}
+
+/* gold ornamental frame (التميّز السلوكي) */
+function goldGrad(x,x0,y0,x1,y1){var g=x.createLinearGradient(x0,y0,x1,y1);g.addColorStop(0,'#7c5512');g.addColorStop(.25,'#d9ab45');g.addColorStop(.45,'#fff0bd');g.addColorStop(.6,'#e2b85a');g.addColorStop(.8,'#a8781f');g.addColorStop(1,'#f4d98c');return g;}
+function emboss(x,fn){
+  x.save();x.shadowColor='rgba(70,45,5,.5)';x.shadowBlur=5;x.shadowOffsetX=2;x.shadowOffsetY=3;fn(false);x.restore();
+  x.save();x.globalAlpha=.55;x.translate(-1,-1.5);fn(true);x.restore();
+}
+function goldFrame(x,W,H){
+  var o=40,i=130;
+  x.save();x.beginPath();x.rect(o,o,W-2*o,H-2*o);x.rect(i,i,W-2*i,H-2*i);x.clip('evenodd');
+  var sg=x.createLinearGradient(0,0,W,H);sg.addColorStop(0,'#eceff3');sg.addColorStop(.5,'#f8f9fb');sg.addColorStop(1,'#e4e8ee');x.fillStyle=sg;x.fillRect(0,0,W,H);
+  x.strokeStyle='#bcc3cd';x.lineWidth=4;for(var d=-H;d<W;d+=13){x.beginPath();x.moveTo(d,0);x.lineTo(d+H,H);x.stroke();}
+  x.strokeStyle='rgba(255,255,255,.8)';x.lineWidth=1.5;for(d=-H+5;d<W;d+=13){x.beginPath();x.moveTo(d,0);x.lineTo(d+H,H);x.stroke();}
+  x.restore();
+  emboss(x,function(hi){x.lineWidth=hi?2:11;x.strokeStyle=hi?'#fff6d6':goldGrad(x,0,0,W,H);x.strokeRect(o,o,W-2*o,H-2*o);x.strokeRect(i,i,W-2*i,H-2*i);});
+  x.lineWidth=2;x.strokeStyle='#b8892c';x.strokeRect(i+16,i+16,W-2*i-32,H-2*i-32);
+  // beaded inner line
+  x.fillStyle='#c99a3a';
+  for(var a=i+30;a<=W-i-30;a+=16){x.beginPath();x.arc(a,i+28,2.6,0,Math.PI*2);x.fill();x.beginPath();x.arc(a,H-i-28,2.6,0,Math.PI*2);x.fill();}
+  for(var b=i+30;b<=H-i-30;b+=16){x.beginPath();x.arc(i+28,b,2.6,0,Math.PI*2);x.fill();x.beginPath();x.arc(W-i-28,b,2.6,0,Math.PI*2);x.fill();}
+  [[0,0,1,1],[W,0,-1,1],[0,H,1,-1],[W,H,-1,-1]].forEach(function(cn){x.save();x.translate(cn[0],cn[1]);x.scale(cn[2],cn[3]);corner(x);x.restore();});
+  [[W/2,o+2,0],[W/2,H-o-2,Math.PI],[o+2,H/2,-Math.PI/2],[W-o-2,H/2,Math.PI/2]].forEach(function(pt){x.save();x.translate(pt[0],pt[1]);x.rotate(pt[2]);midOrn(x);x.restore();});
+}
+function spiral(x,cx,cy,r0,turns,dir,start){x.beginPath();var T=turns*Math.PI*2;for(var t=0;t<=T;t+=.06){var r=r0*(1-t/T*.88);var a=(start||0)+dir*t;var px=cx+r*Math.cos(a),py=cy+r*Math.sin(a);t===0?x.moveTo(px,py):x.lineTo(px,py);}x.stroke();}
+function leafShape(x,px,py,len,wid,ang){x.save();x.translate(px,py);x.rotate(ang);x.beginPath();x.moveTo(0,0);x.bezierCurveTo(len*.3,-wid,len*.75,-wid*.8,len,0);x.bezierCurveTo(len*.75,wid*.35,len*.3,wid*.5,0,0);x.fill();x.restore();}
+function corner(x){
+  var G=goldGrad(x,0,0,340,340);
+  emboss(x,function(hi){
+    x.strokeStyle=hi?'#fff6d6':G;x.fillStyle=hi?'#fff6d6':G;x.lineCap='round';x.lineJoin='round';
+    // L-bracket with inward scroll at the elbow
+    x.lineWidth=hi?2:10;x.beginPath();x.moveTo(26,360);x.lineTo(26,150);x.bezierCurveTo(26,70,70,26,150,26);x.lineTo(360,26);x.stroke();
+    // big volutes
+    x.lineWidth=hi?1.5:8;spiral(x,175,82,52,1.7,1,Math.PI);spiral(x,82,175,52,1.7,-1,-Math.PI/2);
+    // S-scroll arms
+    x.lineWidth=hi?1.5:6;
+    x.beginPath();x.moveTo(110,110);x.bezierCurveTo(200,80,260,140,330,96);x.stroke();
+    x.beginPath();x.moveTo(110,110);x.bezierCurveTo(80,200,140,260,96,330);x.stroke();
+    x.lineWidth=hi?1:5;spiral(x,346,104,18,1.3,-1,Math.PI);spiral(x,104,346,18,1.3,1,-Math.PI/2);
+    if(!hi){
+      // acanthus leaves
+      [[200,60,62,16,-0.15],[262,52,48,13,-0.05],[310,48,36,10,0],[60,200,62,16,Math.PI/2+0.15],[52,262,48,13,Math.PI/2+0.05],[48,310,36,10,Math.PI/2],
+       [210,118,46,12,0.55],[118,210,46,12,Math.PI/2-0.55],[150,150,44,14,Math.PI/4]].forEach(function(l){leafShape(x,l[0],l[1],l[2],l[3],l[4]);});
+    }
+    // shell fan at the elbow
+    x.save();x.translate(64,64);x.rotate(Math.PI/4);
+    if(!hi){x.beginPath();x.moveTo(0,0);x.arc(0,0,46,-Math.PI*0.9,-Math.PI*0.1);x.closePath();x.fill();}
+    x.strokeStyle=hi?'#fff6d6':'rgba(110,70,10,.7)';x.lineWidth=hi?1:2;
+    for(var k=0;k<=8;k++){var a=-Math.PI*0.9+k*Math.PI*0.8/8;x.beginPath();x.moveTo(0,0);x.lineTo(44*Math.cos(a),44*Math.sin(a));x.stroke();}
+    x.restore();
+    if(!hi){x.beginPath();x.arc(64,64,11,0,Math.PI*2);x.fill();}
+  });
+  x.fillStyle='#fffdf7';x.beginPath();x.arc(64,64,4.5,0,Math.PI*2);x.fill();
+}
+function midOrn(x){
+  var G=goldGrad(x,-230,0,230,0);
+  emboss(x,function(hi){
+    x.strokeStyle=hi?'#fff6d6':G;x.fillStyle=hi?'#fff6d6':G;x.lineCap='round';
+    if(!hi){x.beginPath();x.ellipse(0,44,40,26,0,0,Math.PI*2);x.fill();}
+    x.lineWidth=hi?1.5:6;
+    [1,-1].forEach(function(s){x.beginPath();x.moveTo(s*38,44);x.bezierCurveTo(s*90,14,s*140,74,s*200,40);x.stroke();
+      x.lineWidth=hi?1:5;spiral(x,s*214,58,22,1.4,s,s>0?Math.PI:0);x.lineWidth=hi?1.5:6;
+      if(!hi){leafShape(x,s*86,30,40,11,s>0?-0.5:Math.PI+0.5);leafShape(x,s*150,56,34,9,s>0?0.4:Math.PI-0.4);}});
+    if(!hi){leafShape(x,0,20,40,12,-Math.PI/2);}
+  });
+  x.fillStyle='#fffdf7';x.beginPath();x.ellipse(0,44,16,10,0,0,Math.PI*2);x.fill();
+  x.fillStyle='#b8892c';x.beginPath();x.ellipse(0,44,8,5,0,0,Math.PI*2);x.fill();
+}
+function seal(x,cx,cy,gold){
+  ribbons(x,cx,cy,gold);var R=90;x.save();x.translate(cx,cy);
+  x.shadowColor='rgba(0,0,0,.3)';x.shadowBlur=10;x.shadowOffsetY=4;
+  var g=x.createRadialGradient(-28,-32,8,0,0,R);
+  if(gold){g.addColorStop(0,'#fff6cf');g.addColorStop(.4,'#e6bb55');g.addColorStop(.8,'#a8781f');g.addColorStop(1,'#7c5512');}
+  else{g.addColorStop(0,'#d6efd8');g.addColorStop(.4,'#4c9a66');g.addColorStop(.8,'#24693f');g.addColorStop(1,'#163f26');}
+  x.fillStyle=g;x.beginPath();for(var k=0;k<72;k++){var a=k*Math.PI/36,r=k%2?R:R-8;x.lineTo(r*Math.cos(a),r*Math.sin(a));}x.closePath();x.fill();
+  x.shadowColor='transparent';
+  var lc=gold?'rgba(255,246,214,.55)':'rgba(235,250,235,.45)';
+  rosette(x,0,0,R-14,lc,16,3);
+  var ig=x.createRadialGradient(-18,-20,4,0,0,R-30);
+  if(gold){ig.addColorStop(0,'#fff2c4');ig.addColorStop(1,'#c79634');}else{ig.addColorStop(0,'#8fcf9f');ig.addColorStop(1,'#2a7347');}
+  x.fillStyle=ig;x.beginPath();x.arc(0,0,R-32,0,Math.PI*2);x.fill();
+  x.strokeStyle=gold?'#fff6d6':'#e8f6e9';x.lineWidth=2;x.beginPath();x.arc(0,0,R-32,0,Math.PI*2);x.stroke();
+  x.fillStyle=gold?'#5a3d08':'#ffffff';x.direction='rtl';x.textAlign='center';x.font='700 26px "Amiri", serif';
+  if(gold){x.fillText('التميّز',0,-2);x.fillText('السلوكي',0,26);}else x.fillText('الانضباط',0,9);
+  x.restore();
+}
+
+render();
+boot();
+})();
+</script>
+</body>
+</html>

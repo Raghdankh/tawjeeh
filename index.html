@@ -61,7 +61,7 @@ button{cursor:pointer}
 .band{background:radial-gradient(60% 120% at 100% 0%,rgba(255,255,255,.14),transparent 60%),linear-gradient(115deg,var(--hero-1) 0%,var(--hero-2) 50%,var(--hero-3) 100%);color:var(--brand-ink);position:relative;overflow:hidden}
 .band::after{content:"";position:absolute;inset-inline-start:-90px;top:-130px;width:360px;height:360px;border-radius:50%;border:46px solid color-mix(in srgb,var(--brand-ink) 6%,transparent);pointer-events:none}
 .band::before{content:"";position:absolute;inset-inline-start:24%;bottom:-70px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--gold) 13%,transparent),transparent 70%);pointer-events:none}
-.band .wrap{position:relative;padding-block:20px 34px;display:flex;flex-direction:column;gap:16px;min-height:178px}
+.band .wrap{position:relative;padding-block:20px 34px;display:flex;flex-direction:column;gap:16px}
 .hero-art{position:absolute;inset-inline-end:max(130px,12%);bottom:6px;width:260px;height:auto;pointer-events:none}
 @media (max-width:700px){.hero-art{display:none}}
 .sec-t::after{content:"";flex:1;height:1px;background:linear-gradient(to left,var(--line),transparent);margin-inline-start:6px}
@@ -201,13 +201,12 @@ const IC = {
 const S = { sb: null, info: null, admin: false, mode: 'login', msg: '', msgOk: false, busy: false, stats: null, view: 'home' };
 
 const COUNSELOR = 'أ. أمل علي محمد';
-const HERO_ART = `<svg class="hero-art" viewBox="0 0 300 170" aria-hidden="true"><defs><linearGradient id="hg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9BE3C4"/><stop offset="1" stop-color="#4FB892"/></linearGradient></defs><ellipse cx="150" cy="160" rx="132" ry="16" fill="#fff" opacity=".07"/><path d="M150 150c-22-12-56-14-88-8V86c32-6 66-4 88 8z" fill="#fff" opacity=".96"/><path d="M150 150c22-12 56-14 88-8V86c-32-6-66-4-88 8z" fill="#EAF6F2"/><path d="M150 94v56" stroke="#1F5E58" stroke-width="2" opacity=".35"/><path d="M76 104c20-3 40-2 60 4M76 116c20-3 40-2 60 4M76 128c20-3 40-2 60 4M164 108c20-6 40-7 60-4M164 120c20-6 40-7 60-4M164 132c20-6 40-7 60-4" stroke="#1F5E58" stroke-width="2.2" stroke-linecap="round" opacity=".18" fill="none"/><path d="M150 96C150 72 146 56 150 34" stroke="#3E9C7A" stroke-width="3.2" stroke-linecap="round" fill="none"/><path d="M149 70c-14 0-26-9-28-24 15-1 27 8 28 24z" fill="url(#hg1)"/><path d="M151 56c4-14 17-22 31-20-2 14-15 22-31 20z" fill="url(#hg1)"/><path d="M150 40c-8-7-9-17-3-24 7 6 8 17 3 24z" fill="#B8EED7"/><circle cx="150" cy="30" r="6" fill="var(--gold)"/><g fill="var(--gold)"><path d="M92 40l3 8 8 3-8 3-3 8-3-8-8-3 8-3z"/><path d="M222 24l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" opacity=".85"/><path d="M60 72l1.6 4.4 4.4 1.6-4.4 1.6L60 84l-1.6-4.4L54 78l4.4-1.6z" opacity=".7"/></g><g transform="translate(206 52)"><path d="M0 12a14 14 0 0 1 14-14h30a14 14 0 0 1 14 14v6a14 14 0 0 1-14 14H18l-10 9 2-9a14 14 0 0 1-10-14z" fill="#fff" opacity=".95"/><path d="M29 24s-8-4.6-8-10a4.2 4.2 0 0 1 8-1.8 4.2 4.2 0 0 1 8 1.8c0 5.4-8 10-8 10z" fill="#E36D8C"/></g><circle cx="250" cy="120" r="4" fill="#fff" opacity=".35"/><circle cx="48" cy="120" r="3" fill="#fff" opacity=".3"/><circle cx="118" cy="22" r="2.5" fill="#fff" opacity=".4"/></svg>`;
 function header(end) {
   return `<div class="bar"><div class="t"><b>منصة التوجيه الطلابي</b><span class="who">${esc(COUNSELOR)}<i>الموجهة الطلابية</i></span><small>${esc(S.info ? S.info.school : 'ابتدائية الخنساء برغدان')}</small></div><div class="end">${end || ''}</div></div>`;
 }
 
 function viewPublic() {
-  return `<header class="band"><div class="wrap">${HERO_ART}${header(`<button class="ghostbtn" data-act="login">دخول الموجهة</button>`)}
+  return `<header class="band"><div class="wrap">${header(`<button class="ghostbtn" data-act="login">دخول الموجهة</button>`)}
     <div class="hello"><h1>التوجيه الطلابي بين يديك</h1><p>اختاري الصفحة المناسبة لك.</p></div></div></header>
     <main class="wrap"><section class="doors">
       <a class="door" href="teachers.html" style="--c:var(--masar);--cs:var(--masar-soft)"><span class="ic">${IC.teacher}</span><span><b>المعلمات</b><span>إحالة طالبة للموجهة، وتتبّع الإحالات.</span></span></a>
@@ -243,7 +242,7 @@ function viewDesk() {
   const shareRow = (title, desc, file) => isDemo
     ? `<div class="sh"><b>${title}</b><span class="muted">${desc}</span><div class="link"><code>github.io/…/${esc(file)}</code><button class="btn" data-act="demoLink">نسخ</button></div><span class="muted" style="font-size:.8rem">هذي نسخة تجريبية، فالرابط الحقيقي يطلع هنا بعد رفع المنصة على GitHub.</span></div>`
     : `<div class="sh"><b>${title}</b><span class="muted">${desc}</span><div class="link"><code>${esc(base + file)}</code><button class="btn" data-copy="${esc(base + file)}">نسخ</button></div></div>`;
-  return `<header class="band"><div class="wrap">${HERO_ART}${header(`<button class="ghostbtn" data-act="logout">خروج</button>`)}
+  return `<header class="band"><div class="wrap">${header(`<button class="ghostbtn" data-act="logout">خروج</button>`)}
     <div class="hello today"><p>${esc(hijriToday())}</p></div></div></header>
     <div class="wrap"><div class="tiles">
       ${tile(st.newRefs, 'إحالات جديدة', 'var(--new)', st.newRefs > 0, 'inbox')}

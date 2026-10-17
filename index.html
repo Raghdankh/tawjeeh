@@ -335,7 +335,8 @@ document.addEventListener('click', async e => {
 });
 document.addEventListener('submit', async e => {
   if (e.target.id !== 'lform') return; e.preventDefault();
-  const m = e.target.dataset.mode; const v = id => ($('#' + id) || {}).value || '';
+  const m = e.target.dataset.mode; const F = {}; e.target.querySelectorAll('input[id]').forEach(i => { F[i.id] = i.value; }); const v = id => F[id] || '';
+  if ((m === 'login' || m === 'first') && (!v('g-em').trim() || !v('g-pw'))) { S.msg = 'اكتبي البريد الإلكتروني وكلمة المرور.'; S.msgOk = false; render(); return; }
   S.busy = true; S.msg = ''; render();
   try {
     if (m === 'config') {
@@ -354,7 +355,7 @@ document.addEventListener('submit', async e => {
     }
     if (m === 'first' || m === 'claim') { await q(S.sb.rpc('masar_claim', { p_code: v('g-code').trim() })); S.info.has_admin = true; }
     S.busy = false; await afterAuth();
-  } catch (er) { S.busy = false; S.msg = er && er.message && /^[؀-ۿ]/.test(er.message) ? er.message : errT(er); render(); }
+  } catch (er) { S.busy = false; S.msg = er && er.message && /^[؀-ۿ]/.test(er.message) ? er.message : errT(er); render(); Object.entries(F).forEach(([id, val]) => { const el = document.getElementById(id); if (el) el.value = val; }); }
 });
 
 (async function boot() {

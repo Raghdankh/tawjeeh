@@ -237,6 +237,7 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .dayf{border:1px solid var(--line);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:6px}.dayf legend{font-weight:800;color:var(--fil);padding:0 6px}
 .dayf textarea,.dayf input:not([type=checkbox]){width:100%}.dayrow{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}@media(max-width:600px){.dayrow{grid-template-columns:1fr}}
 .fx-rows{display:flex;flex-direction:column}.fx-rows>div{display:grid;grid-template-columns:150px minmax(0,1fr) minmax(0,1.4fr);gap:10px;align-items:baseline;padding:8px 4px;border-bottom:1px solid var(--line)}.fx-rows>div:last-child{border-bottom:0}.fx-rows small{color:var(--muted)}.fx-rows b{font-weight:700}.fx-rows span{color:var(--muted);font-size:.88rem}@media(max-width:600px){.fx-rows>div{grid-template-columns:1fr}}
+.wk-ev{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border:1px dashed var(--line);border-radius:12px;background:var(--surface);font-size:.9rem;color:var(--muted)}.wk-ev span{flex:1}.wk-ev b{color:var(--ink,#16201e)}
 .fx-parts{display:flex;flex-direction:column}.fx-parts>div{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid var(--line)}.fx-parts>div:last-child{border-bottom:0}.fx-parts span{flex:1;font-weight:600}.fx-parts .sub span{padding-inline-start:16px;font-weight:500;color:var(--muted)}
 .a4 .sp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .a4 .sp{border:1px solid #c9d3d0;border-radius:7px;overflow:hidden;display:flex;flex-direction:column;break-inside:avoid}
@@ -2470,6 +2471,15 @@ function planWeeks(p) {
   return out;
 }
 const plans = () => list('plan').sort((a, b) => String(b.year || '').localeCompare(String(a.year || '')) || PTERM.indexOf(b.term) - PTERM.indexOf(a.term));
+function wkProg(s) {
+  if (s.progId && DB.docs[s.progId]) return { id: s.progId, ...DB.docs[s.progId].data, auto: false };
+  if (s.progId === '-') return null;
+  const txt = ' ' + norm([s.title].concat(s.items || []).join(' ')).replace(/[«»"()،.:]/g, ' ').replace(/\s+/g, ' ') + ' '; const strip = t => norm(t).replace(/^برنامج\s+/, '').replace(/[«»"()]/g, '').trim();
+  const hit = t => { if (t.length < 3) return false; const v = [t, t.replace(/^ال/, 'لل'), t.replace(/^ال/, 'بال')]; return v.some(x => txt.includes(' ' + x + ' ')); };
+  const p = list('program').sort((a, b) => b.title.length - a.title.length).find(x => hit(strip(x.title)));
+  return p ? { ...p, auto: true } : null;
+}
+const wkPhotos = s => { const p = wkProg(s); return p ? (p.photos || []).concat(...list('group').filter(g => g.progId === p.id).map(g => g.photos || [])) : []; };
 const wkDone = s => (s.days || []).filter(d => !d.off && d.done).length;
 const wkTotal = s => (s.days || []).filter(d => !d.off).length;
 function curWeek(p) { const td = todayG(); return planWeeks(p).find(w => !w.br && td >= w.from && td <= w.from + 6 * DAYMS); }
@@ -2525,15 +2535,16 @@ function vWeek() {
   const doc = DB.docs[S.param]; if (!doc) return '<div class="empty"><b>الخطة غير موجودة</b></div>';
   const p = doc.data; const ws = planWeeks(p); const w = ws.find(x => String(x.i) === String(S.param2) && !x.br); if (!w) return `<div class="empty"><b>الأسبوع غير موجود</b><a class="btn" href="#files/${S.param}">رجوع</a></div>`;
   const s = w.s; const c = FX.plans.c; const wi = ws.filter(x => !x.br); const k = wi.indexOf(w); const prev = wi[k - 1], next = wi[k + 1];
-  const prog = s.progId && DB.docs[s.progId] ? DB.docs[s.progId].data : null;
+  const prog = wkProg(s); const wph = wkPhotos(s);
   return `<div class="toolbar" style="justify-content:space-between"><a class="btn ghost" href="#files/${S.param}">→ ${esc(p.title)}</a><span>${prev ? `<a class="btn sm" href="#files/${S.param}/${prev.i}">→ الأسبوع ${ORD[prev.n]}</a>` : ''} ${next ? `<a class="btn sm" href="#files/${S.param}/${next.i}">الأسبوع ${ORD[next.n]} ←</a>` : ''}</span></div>
     <div class="wk-head" style="--c:${c}"><div><small>الخطة الأسبوعية · ${hShort(w.from)} — ${hShort(w.to)}</small><h1>الأسبوع ${ORD[w.n]}${s.title ? ': ' + esc(s.title) : ''}</h1></div>
       <div class="wk-val"><small>قيمة الأسبوع</small><b>${esc(s.value || '—')}</b></div></div>
     <div class="toolbar" style="justify-content:flex-start"><button class="btn primary" data-fx="wkEdit" style="background:${c};border-color:${c}">تعديل الأسبوع</button><button class="btn" data-fx="wkBank">من البنك الجاهز</button><button class="btn" data-fxwk="${S.param}:${w.i}">طباعة الأسبوع</button><button class="btn danger" data-fx="wkDel">حذف الأسبوع</button></div>
     <div class="wk-two"><section class="panel"><div class="head"><h3>برامج الأسبوع</h3></div>${(s.items || []).length ? `<ul class="goals">${s.items.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : '<p class="small muted">لم تُحدد.</p>'}
-      <label class="f"><span class="tiny muted">ربط ببرنامج من قسم البرامج (اختياري)</span><select class="sel" data-fxprog="1"><option value="">بدون ربط</option>${list('program').map(x => `<option value="${x.id}"${x.id === s.progId ? ' selected' : ''}>${esc(x.title)}</option>`).join('')}</select></label>
-      ${prog ? `<a class="btn sm" href="#programs/${s.progId}" style="align-self:flex-start">فتح برنامج «${esc(prog.title)}» ←</a>` : ''}</section>
+      <label class="f"><span class="tiny muted">ربط ببرنامج من قسم البرامج (اختياري)</span><select class="sel" data-fxprog="1"><option value=""${!s.progId ? ' selected' : ''}>${prog && prog.auto ? 'تلقائي: ' + esc(prog.title) : 'تلقائي حسب اسم البرنامج'}</option><option value="-"${s.progId === '-' ? ' selected' : ''}>بدون ربط</option>${list('program').map(x => `<option value="${x.id}"${x.id === s.progId ? ' selected' : ''}>${esc(x.title)}</option>`).join('')}</select></label>
+      ${prog ? `<a class="btn sm" href="#programs/${prog.id}" style="align-self:flex-start">فتح برنامج «${esc(prog.title)}» ←</a>` : ''}</section>
       <section class="panel"><div class="head"><h3>أهداف الأسبوع</h3></div>${(s.goals || []).length ? `<ol class="goals">${s.goals.map(t => `<li>${esc(t)}</li>`).join('')}</ol>` : '<p class="small muted">لم تُكتب.</p>'}</section></div>
+    ${prog ? `<div class="wk-ev"><span>${wph.length ? `شواهد برنامج «${esc(prog.title)}»: <b>${ar(wph.length)} ${wph.length >= 3 && wph.length <= 10 ? 'صور' : 'صورة'}</b>` : `ما فيه شواهد في برنامج «${esc(prog.title)}» بعد`}</span><a class="btn sm" href="#programs/${prog.id}">${wph.length ? 'عرضها' : 'أضيفيها'} ←</a></div>` : ''}
     <section class="panel"><div class="head"><h3>أنشطة الأيام</h3><span class="tiny muted">${ar(wkDone(s))} من ${ar(wkTotal(s))} منفذ</span></div>
       <div class="days">${(s.days || []).map((d, i) => `<div class="day${d.off ? ' off' : d.done ? ' done' : ''}"><div class="dn"><b>${WDAYS[i]}</b><small>${hShort(w.from + i * DAYMS)}</small></div>
         ${d.off ? `<div class="da"><b class="offt">${esc(d.off)}</b></div>` : `<div class="da"><p>${esc(d.a || '—')}</p><div class="meta">${d.t ? `<span class="chip">${esc(d.t)}</span>` : ''}${d.w ? `<span class="chip">${esc(d.w)}</span>` : ''}${d.e ? `<span class="chip">الشاهد: ${esc(d.e)}</span>` : ''}</div></div>

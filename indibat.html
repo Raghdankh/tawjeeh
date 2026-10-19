@@ -289,6 +289,7 @@ footer{background:var(--brand);color:color-mix(in srgb,var(--on-brand) 82%,trans
 footer::before{content:"";display:block;height:6px;background:linear-gradient(to left,var(--coral),var(--sun),var(--mint),var(--sky))}
 footer .wrap{padding-block:22px;display:flex;flex-wrap:wrap;gap:12px 32px;justify-content:space-between;font-size:.88rem}
 footer b{color:var(--on-brand);font-weight:600}
+.survbn{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 16px;margin-bottom:14px;border-radius:16px;background:var(--paper,#fff);border:1.5px solid var(--mint,#2E7A72);color:inherit;text-decoration:none}.survbn span{font-weight:700;font-size:.85rem;opacity:.75}.survbn b{flex:1;min-width:160px}.survbn em{font-style:normal;font-weight:700;color:var(--mint,#2E7A72)}
 @media (prefers-reduced-motion:no-preference){.tab,.chip,.btn,a.cert{transition:background .15s,border-color .15s,color .15s}}
 </style>
 </head>
@@ -300,7 +301,7 @@ footer b{color:var(--on-brand);font-weight:600}
 (function(){
 var HM=['محرم','صفر','ربيع الأول','ربيع الآخر','جمادى الأولى','جمادى الآخرة','رجب','شعبان','رمضان','شوال','ذو القعدة','ذو الحجة'];
 var S={school:'ابتدائية الخنساء برغدان',note:'',quotes:{regular:'',excellent:''},months:[]};
-var app=document.getElementById('app');
+var app=document.getElementById('app');var SURV=[];
 var ui={tab:'honor',month:0,editing:false,canEdit:false,assets:null,busy:false,uploading:'',status:'',loading:true,error:''};
 try{var t=sessionStorage.getItem('indibat-tab');if(t)ui.tab=t;}catch(e){}
 if(/^#(honor|behavior|attendance)$/.test(location.hash))ui.tab=location.hash.slice(1);
@@ -360,7 +361,7 @@ async function act(fn,okMsg,keepKey){
 async function boot(){
   try{
     if(window.INDIBAT_MOCK)api=window.INDIBAT_MOCK;
-    else{var c=window.Masar?await Masar.client():null;if(!c)throw new Error('not_configured');api=supaApi(c);}
+    else{var c=window.Masar?await Masar.client():null;if(!c)throw new Error('not_configured');api=supaApi(c);c.from('survey_forms').select('id,data').eq('active',true).then(function(r){if(r&&r.data){SURV=r.data;render();}}).catch(function(){});}
     await reload(null);ui.loading=false;render();
   }catch(e){ui.loading=false;ui.error=errMsg(e);render();return;}
   try{var s=await api.session();if(s&&await api.isAdmin()){ui.canEdit=true;render();}}catch(e){}
@@ -595,7 +596,7 @@ function render(){
       '<h1>انضباط <span class="glow">وتميّز</span></h1><span class="tag">لوحة الشرف · قواعد السلوك والمواظبة</span><p class="lede">نعزّز السلوك الإيجابي والمواظبة المدرسية لدى طالباتنا، ونضع بين يدي أولياء الأمور قواعد السلوك والمواظبة وأسماء المتميزات كل شهر.</p></div>'+
       '<div class="scores">'+ringSvg('درجة السلوك','#ffa48f')+ringSvg('درجة المواظبة','#ffd66b')+'</div></div><div class="band"></div></header>'+
     '<nav class="nav" aria-label="أقسام الصفحة"><div class="wrap" role="tablist">'+tabs.map(function(t){return '<button class="tab" role="tab" data-tab="'+t[0]+'" aria-selected="'+(ui.tab===t[0])+'">'+t[1]+'</button>';}).join('')+'</div></nav>'+
-    '<main class="wrap t-'+ui.tab+'">'+(S.note&&ui.tab==='honor'?'<div class="note"><b>رسالة</b><p>'+esc(S.note)+'</p></div>':'')+bar+panel()+body+'</main>'+
+    '<main class="wrap t-'+ui.tab+'">'+(SURV.length&&ui.tab==='honor'?SURV.map(function(f){return '<a class="survbn" href="survey.html?s='+encodeURIComponent(f.id)+'"><span>📝 استبانة</span><b>'+esc(f.data.title)+'</b><em>شاركينا رأيك ←</em></a>';}).join(''):'')+(S.note&&ui.tab==='honor'?'<div class="note"><b>رسالة</b><p>'+esc(S.note)+'</p></div>':'')+bar+panel()+body+'</main>'+
     '<footer><div class="wrap"><span>انضباط وتميّز · '+esc(S.school)+'</span><span>مديرة المدرسة: <b>أ. هند علي هياس</b></span><span>الموجهة الطلابية: <b>أ. أمل علي الغامدي</b></span><span>المرجع: قواعد السلوك والمواظبة للمرحلة الابتدائية ١٤٤٧هـ</span>'+(ui.canEdit?'':'<button class="footlink" id="openLogin">دخول الموجهة</button>')+'</div></footer>';
   window.scrollTo(0,y);
 }

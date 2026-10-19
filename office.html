@@ -239,6 +239,15 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .fx-rows{display:flex;flex-direction:column}.fx-rows>div{display:grid;grid-template-columns:150px minmax(0,1fr) minmax(0,1.4fr);gap:10px;align-items:baseline;padding:8px 4px;border-bottom:1px solid var(--line)}.fx-rows>div:last-child{border-bottom:0}.fx-rows small{color:var(--muted)}.fx-rows b{font-weight:700}.fx-rows span{color:var(--muted);font-size:.88rem}@media(max-width:600px){.fx-rows>div{grid-template-columns:1fr}}
 .wk-ev{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border:1px dashed var(--line);border-radius:12px;background:var(--surface);font-size:.9rem;color:var(--muted)}.wk-ev span{flex:1}.wk-ev b{color:var(--ink,#16201e)}
 .waprev{white-space:pre-wrap;background:var(--sunk);border-radius:10px;padding:10px 12px;font-size:.88rem;color:var(--ink,#16201e)}
+.sv-panel{border-color:color-mix(in srgb,var(--fam) 35%,var(--line))}
+.sv-list{display:flex;flex-direction:column}.sv-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 2px;border-bottom:1px solid var(--line)}.sv-row:last-child{border-bottom:0}
+.sv-row>div:first-child{flex:1;min-width:200px;display:flex;flex-direction:column}.sv-row .acts{display:flex;gap:6px;flex-wrap:wrap}
+.sv-qs{display:flex;flex-direction:column;gap:10px;margin:10px 0}.sv-q{border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:6px;background:var(--surface)}
+.sv-qh{display:flex;align-items:center;gap:8px}.sv-qh b{width:26px;height:26px;border-radius:50%;background:var(--fam-soft);color:var(--fam);display:grid;place-items:center;font-size:.85rem}.sv-qh select{max-width:220px}
+.sv-q textarea{width:100%}
+.a4 .svq{border:1px solid #d6dfdc;border-radius:8px;padding:8px 10px;break-inside:avoid}.a4 .svq h4{margin:0 0 6px;font-size:13.5px;color:#16201e}.a4 .svag{font-size:11.5px;color:var(--rc);font-weight:700;margin-inline-start:6px}
+.a4 .svb{display:flex;flex-direction:column;gap:3px}.a4 .svb-r{display:grid;grid-template-columns:120px 1fr 78px;gap:8px;align-items:center;font-size:12px}
+.a4 .svb-t{height:10px;border-radius:6px;background:#eef2f1;overflow:hidden}.a4 .svb-t i{display:block;height:100%;background:var(--rc);border-radius:6px}.a4 .svb-r b{font-weight:600;color:#3c4a47;text-align:left}
 .fx-parts{display:flex;flex-direction:column}.fx-parts>div{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid var(--line)}.fx-parts>div:last-child{border-bottom:0}.fx-parts span{flex:1;font-weight:600}.fx-parts .sub span{padding-inline-start:16px;font-weight:500;color:var(--muted)}
 .a4 .sp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .a4 .sp{border:1px solid #c9d3d0;border-radius:7px;overflow:hidden;display:flex;flex-direction:column;break-inside:avoid}
@@ -1005,6 +1014,7 @@ function vFamily() {
   return `<div class="head"><h1><span class="dot"></span>علاقة الأسرة بالمدرسة</h1><span class="sp"></span><button class="btn" data-binder="family">📁 الملف الشامل</button></div>
     <p class="lede">إدارة التواصل والشراكة مع الأسر، مع الشواهد والتقارير الجاهزة للطباعة.</p>
     <div class="subtabs" role="tablist">${FAMILY.map(f => `<button role="tab" data-fam="${f.k}" aria-selected="${f.k === k}">${f.t}<span class="n">${ar(list(f.k).length)}</span></button>`).join('')}</div>
+    ${k === 'survey' ? eSurveys() : ''}
     <div class="toolbar"><label class="search"><span aria-hidden="true">⌕</span><input id="famQ" type="search" placeholder="بحث في ${esc(cfg.t)}" value="${esc(S.filter.fam || '')}" aria-label="بحث"></label>
       <button class="btn" data-act="famWA">📲 دعوة أولياء الأمور</button><button class="btn" data-act="famLog">طباعة السجل</button><button class="btn primary" data-act="famAdd">＋ ${cfg.add}</button></div>
     ${k === 'contact' ? contactLog(shown) : shown.length ? `<div class="list">${shown.map(r => famCard(cfg, r)).join('')}</div>` : `<div class="empty"><b>لا توجد سجلات بعد</b><button class="btn primary" data-act="famAdd">＋ ${cfg.add}</button></div>`}${stuDatalist()}`;
@@ -2858,6 +2868,156 @@ async function syncIndibat() {
   try { if (add.length) await saveMany(add); for (const h of gone) await delDoc(h.id); } catch (e) { return; }
   if ((add.length || gone.length) && ['honors', 'files'].includes(S.route)) rerender();
 }
+
+/* ═════════ الاستبانات الإلكترونية (تُعبّأ في الموقع وتُحلَّل فيه) ═════════ */
+const SV_SCALE = ['موافق بشدة', 'موافق', 'محايد', 'غير موافق', 'غير موافق بشدة'];
+const SV_TYPES = { scale: 'مقياس موافقة (٥ درجات)', yesno: 'نعم / لا', choice: 'اختيار واحد', multi: 'اختيار أكثر من إجابة', text: 'إجابة مكتوبة' };
+const svQ = (t, q, opts) => ({ id: 'q' + Math.random().toString(36).slice(2, 8), t, q, opts: opts || [] });
+const SV_TPL = [
+  { title: 'رضا أولياء الأمور عن خدمات التوجيه الطلابي', target: 'أولياء الأمور', intro: 'حرصاً على تطوير خدمات التوجيه الطلابي، نأمل التكرم بالإجابة على الأسئلة التالية. ولا تستغرق أكثر من دقيقتين.', qs: () => [
+    svQ('scale', 'أعرف خدمات التوجيه الطلابي التي تقدمها المدرسة لابنتي'), svQ('scale', 'التواصل مع الموجهة الطلابية سهل ومتاح'), svQ('scale', 'تهتم المدرسة بمتابعة سلوك ابنتي ومواظبتها'),
+    svQ('scale', 'تبلغني المدرسة بما يخص ابنتي في الوقت المناسب'), svQ('scale', 'البرامج والأنشطة الإرشادية مفيدة لابنتي'), svQ('scale', 'ابنتي تشعر بالأمان والارتياح في المدرسة'),
+    svQ('scale', 'أنا راضية عن خدمات التوجيه الطلابي بشكل عام'), svQ('text', 'ما اقتراحك لتطوير خدمات التوجيه الطلابي؟')] },
+  { title: 'التواصل بين الأسرة والمدرسة', target: 'أولياء الأمور', intro: 'نسعد بمعرفة رأيك في طرق التواصل بين المدرسة والأسرة، لنختار الأنسب لكم.', qs: () => [
+    svQ('choice', 'ما أفضل طريقة للتواصل معك؟', ['الواتساب', 'رسائل نور', 'منصة مدرستي', 'الاتصال الهاتفي', 'الحضور للمدرسة']),
+    svQ('choice', 'ما الوقت المناسب لحضور اللقاءات في المدرسة؟', ['بداية اليوم الدراسي', 'منتصف اليوم الدراسي', 'نهاية اليوم الدراسي', 'لقاء عن بُعد']),
+    svQ('scale', 'رسائل المدرسة واضحة ومفهومة'), svQ('scale', 'أجد تجاوباً عند تواصلي مع المدرسة'), svQ('yesno', 'هل حضرتِ لقاءً أو مجلساً للأمهات هذا العام؟'),
+    svQ('text', 'ملاحظاتك على التواصل مع المدرسة')] },
+  { title: 'احتياجات الأسرة من التوجيه الطلابي', target: 'أولياء الأمور', intro: 'ساعدينا نختار موضوعات البرامج واللقاءات القادمة بما يناسب احتياجات بناتنا.', qs: () => [
+    svQ('multi', 'ما الموضوعات التي تودين أن تتناولها لقاءات الأمهات؟', ['تنظيم وقت المذاكرة', 'الاستخدام الآمن للأجهزة', 'التعامل مع عناد الطفل', 'تعزيز الثقة بالنفس', 'التهيئة للاختبارات', 'التنمر وكيف أحمي ابنتي', 'التغذية الصحية والنوم']),
+    svQ('choice', 'كم ساعة تقريباً تقضي ابنتك على الأجهزة يومياً؟', ['أقل من ساعة', 'من ساعة إلى ساعتين', 'من ٣ إلى ٤ ساعات', 'أكثر من ٤ ساعات']),
+    svQ('scale', 'أحتاج إلى نصائح لمساعدة ابنتي في المذاكرة'), svQ('yesno', 'هل ترغبين في المشاركة متطوعة في فعاليات المدرسة؟'),
+    svQ('text', 'موضوع آخر تحبين أن نتناوله')] },
+  { title: 'تقييم لقاء الأمهات', target: 'الأمهات الحاضرات', intro: 'شكراً لحضورك، ورأيك يهمنا لتطوير اللقاءات القادمة.', qs: () => [
+    svQ('scale', 'موضوع اللقاء مهم ومفيد'), svQ('scale', 'طريقة العرض واضحة وممتعة'), svQ('scale', 'الوقت والمكان مناسبان'), svQ('scale', 'استفدت معلومات سأطبقها مع ابنتي'),
+    svQ('yesno', 'هل ترغبين في حضور لقاءات قادمة؟'), svQ('text', 'ما الموضوع الذي تقترحينه للقاء القادم؟')] },
+  { title: 'تقييم برنامج', target: 'أولياء الأمور', intro: 'نفذت المدرسة برنامجاً لبناتنا، ونأمل معرفة رأيك في أثره.', qs: () => [
+    svQ('scale', 'سمعت عن البرنامج من ابنتي أو من المدرسة'), svQ('scale', 'لاحظت أثراً إيجابياً للبرنامج على ابنتي'), svQ('scale', 'موضوع البرنامج مناسب لعمر ابنتي'),
+    svQ('yesno', 'هل تحدثت ابنتك في البيت عن أنشطة البرنامج؟'), svQ('text', 'اقتراحاتك للبرنامج')] },
+  { title: 'شركاء في التعلم والمستقبل', target: 'أولياء الأمور', intro: 'استبانة قصيرة عن متابعة تعلم بناتنا في البيت، والتحضير لمستقبلهن.', qs: () => [
+    svQ('scale', 'النشرة الأسبوعية ساعدتني أعرف ما تتعلمه ابنتي'), svQ('scale', 'أتابع مذاكرة ابنتي بشكل يومي'), svQ('scale', 'ورشة «كيف أذاكر مع بنتي» كانت مفيدة'),
+    svQ('scale', 'تحدثت مع ابنتي عن المهن والمستقبل'), svQ('choice', 'كم مرة في الأسبوع تجلسين مع ابنتك للمذاكرة؟', ['يومياً', '٣ إلى ٤ مرات', 'مرة أو مرتين', 'نادراً']),
+    svQ('text', 'كيف نساعدك أكثر في متابعة ابنتك؟')] },
+  { title: 'استبانة فارغة', target: 'أولياء الأمور', intro: '', qs: () => [svQ('scale', '')] }
+];
+const SVD = { key: 'tawjeeh.sv.demo', load() { try { return JSON.parse(localStorage.getItem(this.key) || 'null') || { forms: {}, resp: {} }; } catch (e) { return { forms: {}, resp: {} }; } }, save(d) { try { localStorage.setItem(this.key, JSON.stringify(d)); } catch (e) {} } };
+const SV = {
+  async list() {
+    if (DB.demo) { const d = SVD.load(); return Object.entries(d.forms).map(([id, f]) => ({ id, ...f, n: (d.resp[id] || []).length })); }
+    const rows = await q(DB.sb.from('survey_forms').select('id,data,active,updated_at').order('updated_at', { ascending: false }));
+    let counts = {}; try { const r = await q(DB.sb.from('survey_responses').select('form_id')); r.forEach(x => { counts[x.form_id] = (counts[x.form_id] || 0) + 1; }); } catch (e) {}
+    return rows.map(r => ({ id: r.id, data: r.data, active: r.active, n: counts[r.id] || 0 }));
+  },
+  async save(id, data, active) {
+    if (DB.demo) { const d = SVD.load(); d.forms[id] = { data, active }; SVD.save(d); return; }
+    await q(DB.sb.from('survey_forms').upsert({ id, data, active, updated_at: new Date().toISOString() }));
+  },
+  async del(id) { if (DB.demo) { const d = SVD.load(); delete d.forms[id]; delete d.resp[id]; SVD.save(d); return; } await q(DB.sb.from('survey_forms').delete().eq('id', id)); },
+  async answers(id) {
+    if (DB.demo) return (SVD.load().resp[id] || []);
+    const out = []; let from = 0; for (;;) { const r = await q(DB.sb.from('survey_responses').select('answers').eq('form_id', id).range(from, from + 999)); r.forEach(x => out.push(x.answers)); if (r.length < 1000) break; from += 1000; }
+    return out;
+  }
+};
+const svURL = id => location.href.split('#')[0].replace(/[^/]*$/, '') + 'survey.html?s=' + encodeURIComponent(id);
+async function svLoad() { S.svLoading = true; try { S.svList = await SV.list(); } catch (e) { S.svList = []; S.svErr = errT(e); } S.svLoading = false; if (S.route === 'family') rerender(); }
+function eSurveys() {
+  if (!S.svList && !S.svLoading) svLoad();
+  const L = S.svList || [];
+  return `<section class="panel sv-panel"><div class="head"><h3>الاستبانات الإلكترونية</h3><span class="tiny muted">تعبّيها الأمهات من موقعك، والنتائج تتحلل هنا</span><span class="sp"></span><button class="btn primary sm" data-sv="new">＋ استبانة جديدة</button></div>
+    ${S.svErr ? `<p class="small" style="color:var(--bad)">${esc(S.svErr)}</p>` : ''}
+    ${S.svLoading && !L.length ? '<p class="small muted">جارٍ التحميل…</p>' : L.length ? `<div class="sv-list">${L.map(f => `<div class="sv-row"><div><b>${esc(f.data.title)}</b><span class="tiny muted">${esc(f.data.target || '')} · ${ar((f.data.qs || []).length)} سؤال · <b>${ar(f.n)}</b> استجابة</span></div>
+      <span class="pill" style="--pc:${f.active ? 'var(--good)' : 'var(--muted)'};--ps:${f.active ? 'var(--good-soft)' : 'var(--sunk)'}">${f.active ? 'مفتوحة' : 'مغلقة'}</span>
+      <div class="acts"><button class="btn sm primary" data-sv="res:${f.id}">النتائج</button>${f.active ? `<button class="btn sm wa" data-sv="send:${f.id}">📲 إرسال</button><button class="btn sm" data-sv="copy:${f.id}">نسخ الرابط</button>` : ''}<button class="btn sm" data-sv="edit:${f.id}">تعديل</button><button class="btn sm" data-sv="toggle:${f.id}">${f.active ? 'إغلاق' : 'فتح'}</button><button class="btn sm danger" data-sv="del:${f.id}">حذف</button></div></div>`).join('')}</div>`
+      : '<p class="small muted">ما فيه استبانات بعد. اضغطي «＋ استبانة جديدة» واختاري نموذج جاهز.</p>'}</section>`;
+}
+function svPick() {
+  const bg = openSheet('استبانة جديدة', `<p class="small muted">اختاري نموذج جاهز، وبعدها تعدلين الأسئلة اللي تبينها.</p>
+    <div class="tpl">${SV_TPL.map((t, i) => `<button type="button" data-svt="${i}"><b>${esc(t.title)}</b><small>${esc(t.target)} · ${ar(t.qs().length)} سؤال</small></button>`).join('')}</div>`, async () => false, `--c:var(--fam);--cs:var(--fam-soft)`);
+  bg.addEventListener('click', e => { const b = e.target.closest('[data-svt]'); if (!b) return; const t = SV_TPL[+b.dataset.svt]; setTimeout(() => svEdit(null, { title: t.title === 'استبانة فارغة' ? '' : t.title, target: t.target, intro: t.intro, askName: true, qs: t.qs() }), 30); });
+}
+function svEdit(id, data) {
+  const F = JSON.parse(JSON.stringify(data)); const f0 = id && (S.svList || []).find(x => x.id === id); const locked = f0 && f0.n > 0;
+  const qHTML = () => F.qs.map((qq, i) => `<div class="sv-q"><div class="sv-qh"><b>${ar(i + 1)}</b><select data-svf="t:${i}"${locked ? ' disabled' : ''}>${Object.entries(SV_TYPES).map(([k, v]) => `<option value="${k}"${k === qq.t ? ' selected' : ''}>${v}</option>`).join('')}</select>
+      <span class="sp"></span><button type="button" class="btn sm ghost" data-svm="up:${i}" ${i ? '' : 'disabled'} aria-label="لأعلى">↑</button>${locked ? '' : `<button type="button" class="btn sm ghost" data-svm="del:${i}" aria-label="حذف السؤال">✕</button>`}</div>
+      <textarea data-svf="q:${i}" placeholder="نص السؤال" style="min-height:52px">${esc(qq.q)}</textarea>
+      ${qq.t === 'choice' || qq.t === 'multi' ? `<textarea data-svf="o:${i}" placeholder="الخيارات، كل خيار في سطر" style="min-height:70px">${esc((qq.opts || []).join('\n'))}</textarea>` : qq.t === 'scale' ? `<span class="tiny muted">${SV_SCALE.join(' · ')}</span>` : ''}</div>`).join('');
+  const bg = openSheet(id ? 'تعديل الاستبانة' : 'استبانة جديدة', `<div class="form">
+    <label class="f full"><span>عنوان الاستبانة</span><input id="sv_t" required value="${esc(F.title)}"></label>
+    <label class="f"><span>الفئة المستهدفة</span><input id="sv_g" value="${esc(F.target || '')}"></label>
+    <label class="chk f" style="--sc:var(--fam);align-self:end"><input type="checkbox" id="sv_n" ${F.askName ? 'checked' : ''}><span>اسم الطالبة واسم الأم إجباري</span></label>
+    <label class="f full"><span>مقدمة تظهر للأمهات</span><textarea id="sv_i" style="min-height:60px">${esc(F.intro || '')}</textarea></label></div>
+    ${locked ? '<p class="tiny muted">فيها استجابات، فتقدرين تعدلين صياغة الأسئلة بس، بدون حذف أو تغيير نوعها.</p>' : ''}
+    <div id="svQs" class="sv-qs">${qHTML()}</div>
+    ${locked ? '' : `<div class="presets">${Object.entries(SV_TYPES).map(([k, v]) => `<button type="button" data-svadd="${k}">＋ ${v}</button>`).join('')}</div>`}
+    <label class="chk" style="--sc:var(--good)"><input type="checkbox" id="sv_a" ${!f0 || f0.active ? 'checked' : ''}><span>مفتوحة (الأمهات يقدرون يعبونها)</span></label>
+    <div class="toolbar"><button class="btn primary" type="submit">حفظ الاستبانة</button></div>`,
+    async f => {
+      F.title = f.querySelector('#sv_t').value.trim(); if (!F.title) throw new Error('اكتبي عنوان الاستبانة');
+      F.target = f.querySelector('#sv_g').value.trim(); F.intro = f.querySelector('#sv_i').value.trim(); F.askName = f.querySelector('#sv_n').checked;
+      F.qs = F.qs.filter(x => x.q.trim()); if (!F.qs.length) throw new Error('أضيفي سؤال واحد على الأقل');
+      const bad = F.qs.find(x => (x.t === 'choice' || x.t === 'multi') && (x.opts || []).length < 2); if (bad) throw new Error('السؤال «' + bad.q + '» يحتاج خيارين على الأقل');
+      const nid = id || uid('sv'); await SV.save(nid, F, f.querySelector('#sv_a').checked); toast('حُفظت الاستبانة'); await svLoad();
+    }, `--c:var(--fam);--cs:var(--fam-soft)`);
+  const redraw = () => { bg.querySelector('#svQs').innerHTML = qHTML(); };
+  bg.addEventListener('input', e => { const t = e.target.dataset.svf; if (!t) return; const [k, i] = t.split(':'); if (k === 'q') F.qs[+i].q = e.target.value; if (k === 'o') F.qs[+i].opts = e.target.value.split('\n').map(x => x.trim()).filter(Boolean); });
+  bg.addEventListener('change', e => { const t = e.target.dataset.svf; if (!t || !t.startsWith('t:')) return; const i = +t.slice(2); F.qs[i].t = e.target.value; if ((F.qs[i].t === 'choice' || F.qs[i].t === 'multi') && !(F.qs[i].opts || []).length) F.qs[i].opts = ['', '']; redraw(); });
+  bg.addEventListener('click', e => {
+    const a = e.target.closest('[data-svadd]'); if (a) { F.qs.push(svQ(a.dataset.svadd, '', a.dataset.svadd === 'choice' || a.dataset.svadd === 'multi' ? ['', ''] : [])); redraw(); bg.querySelector('#svQs').lastElementChild.querySelector('textarea').focus(); return; }
+    const m = e.target.closest('[data-svm]'); if (m) { const [k, i] = m.dataset.svm.split(':'); const n = +i; if (k === 'del') F.qs.splice(n, 1); if (k === 'up' && n) [F.qs[n - 1], F.qs[n]] = [F.qs[n], F.qs[n - 1]]; redraw(); }
+  });
+}
+function svAnalyze(F, A) {
+  const n = A.length; const out = [];
+  F.qs.forEach(qq => {
+    const vals = A.map(a => a[qq.id]).filter(v => v != null && v !== '' && !(Array.isArray(v) && !v.length));
+    if (qq.t === 'scale') { const c = [0, 0, 0, 0, 0]; vals.forEach(v => { const k = 5 - (+v); if (k >= 0 && k < 5) c[k]++; }); const m = vals.length ? vals.reduce((s, v) => s + (+v), 0) / vals.length : null; out.push({ qq, n: vals.length, rows: SV_SCALE.map((l, i) => [l, c[i]]), mean: m, agree: vals.length ? 100 * (c[0] + c[1]) / vals.length : null }); }
+    else if (qq.t === 'yesno') { const y = vals.filter(v => v === 'نعم').length; out.push({ qq, n: vals.length, rows: [['نعم', y], ['لا', vals.length - y]] }); }
+    else if (qq.t === 'choice' || qq.t === 'multi') { const c = {}; (qq.opts || []).forEach(o => { c[o] = 0; }); vals.forEach(v => [].concat(v).forEach(o => { c[o] = (c[o] || 0) + 1; })); out.push({ qq, n: vals.length, rows: Object.entries(c).sort((a, b) => b[1] - a[1]) }); }
+    else out.push({ qq, n: vals.length, texts: vals.map(String) });
+  });
+  const sc = out.filter(x => x.qq.t === 'scale' && x.mean != null);
+  const sat = sc.length ? sc.reduce((s, x) => s + x.mean, 0) / sc.length / 5 * 100 : null;
+  const best = sc.slice().sort((a, b) => b.agree - a.agree)[0], low = sc.slice().sort((a, b) => a.agree - b.agree)[0];
+  const people = A.filter(a => a._name || a._mother).map(a => [a._name || '', a._mother || '']);
+  return { n, out, sat, best, low, people };
+}
+const svPct = v => v == null ? '—' : ar(Math.round(v)) + '٪';
+function svReport(F, R) {
+  const bars = x => `<div class="svb">${x.rows.map(([l, c]) => { const p = x.n ? 100 * c / x.n : 0; return `<div class="svb-r"><span>${esc(l)}</span><div class="svb-t"><i style="width:${p}%"></i></div><b>${ar(c)} · ${svPct(p)}</b></div>`; }).join('')}</div>`;
+  const blocks = R.out.filter(x => x.qq.t !== 'text').map((x, i) => `<div class="svq"><h4>${ar(i + 1)}. ${esc(x.qq.q)}${x.qq.t === 'scale' && x.agree != null ? ` <span class="svag">موافقة ${svPct(x.agree)}</span>` : ''}</h4>${bars(x)}</div>`);
+  const pages = []; for (let i = 0; i < Math.max(blocks.length, 1); i += 6) pages.push(blocks.slice(i, i + 6));
+  const sum = [R.best && R.best.agree != null ? `أعلى موافقة: «${R.best.qq.q}» (${svPct(R.best.agree)})` : '', R.low && R.low !== R.best && R.low.agree != null ? `تحتاج اهتماماً: «${R.low.qq.q}» (${svPct(R.low.agree)})` : ''].filter(Boolean);
+  let h = pages.map((ch, pi) => `<div class="a4">${repHead('نتائج استبانة')}${pi ? '' : `<div class="pband"><small>${esc(F.target || '')}</small><b>${esc(F.title)}</b></div>${repTiles([[R.n, 'استجابة'], [R.sat == null ? '—' : svPct(R.sat), 'نسبة الرضا العامة'], [F.qs.length, 'سؤال']])}${sum.length ? `<div class="box full"><h4>أبرز النتائج</h4><ul>${sum.map(t => `<li>${esc(t)}</li>`).join('')}</ul></div>` : ''}`}${ch.join('')}${pi === pages.length - 1 && !(R.people || []).length && !R.out.some(x => x.texts && x.texts.length) ? repSigs() : ''}</div>`).join('');
+  const P = (R.people || []); if (P.length) { const per = 26; for (let i = 0; i < P.length; i += per) h += `<div class="a4">${repHead('المشاركات في الاستبانة')}<table><thead><tr><th style="width:30px">م</th><th>اسم الطالبة</th><th>اسم ولية الأمر</th></tr></thead><tbody>${P.slice(i, i + per).map((p, j) => `<tr><td>${ar(i + j + 1)}</td><td>${esc(p[0])}</td><td>${esc(p[1])}</td></tr>`).join('')}</tbody></table>${i + per >= P.length && !R.out.some(x => x.texts && x.texts.length) ? repSigs() : ''}</div>`; }
+  const T = R.out.filter(x => x.texts && x.texts.length);
+  if (T.length) h += `<div class="a4">${repHead('نتائج استبانة: الإجابات المكتوبة')}${T.map(x => `<div class="box full"><h4>${esc(x.qq.q)} <span style="font-weight:500">(${ar(x.texts.length)})</span></h4><ul>${x.texts.slice(0, 30).map(t => `<li>${esc(t)}</li>`).join('')}</ul></div>`).join('')}${repSigs()}</div>`;
+  return h;
+}
+async function svResults(id) {
+  const f = (S.svList || []).find(x => x.id === id); if (!f) return;
+  let A; try { A = await SV.answers(id); } catch (e) { toast(errT(e)); return; }
+  if (!A.length) { toast('ما فيه استجابات بعد'); return; }
+  const R = svAnalyze(f.data, A);
+  await openReport(svReport(f.data, R), 'نتائج-' + f.data.title, SEC_COL.family);
+  const bar = document.querySelector('#repbg .rep-bar'); if (!bar) return;
+  const b = document.createElement('button'); b.className = 'btn'; b.textContent = 'حفظ في سجل الاستبانات'; bar.prepend(b);
+  b.addEventListener('click', async () => { b.disabled = true;
+    const lines = [R.best && R.best.agree != null ? 'أعلى موافقة: ' + R.best.qq.q + ' (' + Math.round(R.best.agree) + '٪)' : '', R.low && R.low !== R.best && R.low.agree != null ? 'تحتاج اهتماماً: ' + R.low.qq.q + ' (' + Math.round(R.low.agree) + '٪)' : ''].filter(Boolean).join('\n');
+    try { await saveDoc('survey-' + id, 'survey', { title: f.data.title, date: todayH(), target: f.data.target === 'الأمهات الحاضرات' ? 'الأمهات' : 'أولياء الأمور', respondents: R.n, satisfaction: R.sat == null ? '' : Math.round(R.sat), link: svURL(id), summary: lines, recs: '', guardian: '', studentName: '' }); toast('حُفظت في سجل الاستبانات والرضا'); b.textContent = '✓ محفوظة'; }
+    catch (e) { toast(errT(e)); b.disabled = false; } });
+}
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-sv]'); if (!b || b.closest('#sheetbg')) return; e.preventDefault();
+  const [a, id] = b.dataset.sv.split(':'); const f = id && (S.svList || []).find(x => x.id === id);
+  if (a === 'new') svPick();
+  else if (a === 'edit' && f) svEdit(id, f.data);
+  else if (a === 'res') svResults(id);
+  else if (a === 'copy') { try { await navigator.clipboard.writeText(svURL(id)); toast('نُسخ رابط الاستبانة'); } catch (er) { prompt('انسخي الرابط:', svURL(id)); } }
+  else if (a === 'send' && f) waPick('إرسال استبانة: ' + f.data.title, { title: '«' + f.data.title + '»', link: svURL(id) }, 'i_srv');
+  else if (a === 'toggle' && f) { try { await SV.save(id, f.data, !f.active); toast(f.active ? 'أُغلقت الاستبانة' : 'فُتحت الاستبانة'); await svLoad(); } catch (er) { toast(errT(er)); } }
+  else if (a === 'del' && f) { if (!b.dataset.sure) { b.dataset.sure = 1; b.textContent = f.n ? `تأكيد: تنحذف ${ar(f.n)} استجابة` : 'تأكيد الحذف'; return; } try { await SV.del(id); toast('حُذفت'); await svLoad(); } catch (er) { toast(errT(er)); } }
+});
 
 /* ═════════ Claude helper ═════════ */
 function aiAbsence(id) {

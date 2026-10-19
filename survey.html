@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>استبانة · ابتدائية الخنساء برغدان</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Readex+Pro:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F3F6F5;--surface:#fff;--ink:#16201E;--muted:#5E6B68;--line:#DCE3E1;--brand:#1F5E58;--brand2:#2E7A72;--accent:#C2416B;--soft:#E4EFED;--gold:#B07A12;--bad:#B3363B}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1716;--surface:#18211F;--ink:#E8EFED;--muted:#9AA8A5;--line:#2A3633;--brand:#5FC9C1;--brand2:#7AD3CC;--soft:#163230;--accent:#EE7FA2}}
+:root[data-theme="dark"]{--bg:#0F1716;--surface:#18211F;--ink:#E8EFED;--muted:#9AA8A5;--line:#2A3633;--brand:#5FC9C1;--brand2:#7AD3CC;--soft:#163230;--accent:#EE7FA2}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Arabic",Tahoma,sans-serif;font-size:16px;line-height:1.7;-webkit-text-size-adjust:100%}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px}
+header{background:linear-gradient(135deg,#1F5E58,#2E7A72 60%,#3B8F86);color:#fff;padding:22px 0 26px}
+header small{opacity:.85;font-weight:600}header h1{font-family:"Readex Pro",sans-serif;font-size:1.45rem;margin:4px 0 6px;line-height:1.4}header p{margin:0;opacity:.92}
+main{padding:18px 0 40px;display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card.err{border-color:var(--bad);box-shadow:0 0 0 2px color-mix(in srgb,var(--bad) 25%,transparent)}
+.qh{display:flex;gap:10px;align-items:flex-start}.qn{flex:none;width:28px;height:28px;border-radius:50%;background:var(--soft);color:var(--brand);display:grid;place-items:center;font-weight:700;font-size:.9rem}
+.qh b{font-weight:600;font-size:1.02rem}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:10px 14px;font:inherit;font-size:.95rem;cursor:pointer;min-height:44px;text-align:start}
+.opt[aria-pressed="true"]{border-color:var(--brand);background:var(--soft);color:var(--brand);font-weight:700}
+.opts.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.opts.scale .opt{text-align:center;padding:10px 4px;font-size:.85rem;line-height:1.35}
+@media(max-width:520px){.opts.scale{grid-template-columns:1fr}.opts.scale .opt{text-align:start;padding:10px 14px;font-size:.95rem}}
+textarea,input[type=text]{width:100%;font:inherit;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface);color:var(--ink);min-height:48px}
+textarea{min-height:90px;resize:vertical}
+.btn{border:0;background:var(--brand);color:#fff;font:inherit;font-weight:700;border-radius:14px;padding:14px;font-size:1.05rem;cursor:pointer;width:100%}.btn:disabled{opacity:.6}
+.muted{color:var(--muted)}.small{font-size:.88rem}.msg{color:var(--bad);font-weight:600;min-height:1.4em}
+.done{text-align:center;padding:40px 16px}.done .ok{width:72px;height:72px;border-radius:50%;background:var(--soft);color:var(--brand);display:grid;place-items:center;margin:0 auto 12px;font-size:2rem}
+.prog{height:6px;border-radius:9px;background:var(--line);overflow:hidden}.prog i{display:block;height:100%;background:var(--brand);transition:width .2s}
+footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 0 24px}
+</style>
+</head>
+<body>
+<div id="app"><header><div class="wrap"><small>ابتدائية الخنساء برغدان · التوجيه الطلابي</small><h1>جارٍ تحميل الاستبانة…</h1></div></header></div>
+<script src="config.js"></script>
+<script src="masar.js"></script>
+<script>
+(function () {
+  'use strict';
+  var SCALE = [[5, 'موافق بشدة'], [4, 'موافق'], [3, 'محايد'], [2, 'غير موافق'], [1, 'غير موافق بشدة']];
+  var app = document.getElementById('app');
+  var id = new URLSearchParams(location.search).get('s') || '';
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var ar = function (n) { return String(n).replace(/\d/g, function (d) { return '٠١٢٣٤٥٦٧٨٩'[d]; }); };
+  var DEMO = 'tawjeeh.sv.demo';
+  var sb = null, F = null, ans = {};
+  var head = function (t, sub) { return '<header><div class="wrap"><small>ابتدائية الخنساء برغدان · التوجيه الطلابي</small><h1>' + esc(t) + '</h1>' + (sub ? '<p>' + esc(sub) + '</p>' : '') + '</div></header>'; };
+  function msgPage(t, sub, icon) { app.innerHTML = head(t) + '<main class="wrap"><div class="card done"><div class="ok">' + (icon || '✓') + '</div><b>' + esc(sub) + '</b></div></main>'; }
+  var doneKey = function () { return 'sv.done.' + id; };
+  function isDone() { try { return !!localStorage.getItem(doneKey()); } catch (e) { return false; } }
+  function markDone() { try { localStorage.setItem(doneKey(), '1'); } catch (e) {} }
+  async function load() {
+    if (!id) return msgPage('استبانة', 'الرابط غير مكتمل. تأكدي من نسخ الرابط كاملاً.', '!');
+    try {
+      if (window.Masar && Masar.demo) { var d = JSON.parse(localStorage.getItem(DEMO) || 'null') || { forms: {} }; var f = d.forms[id]; F = f && f.active ? f.data : null; }
+      else { sb = window.Masar ? await Masar.client() : null; if (!sb) throw new Error('nc'); var r = await sb.from('survey_forms').select('data,active').eq('id', id).maybeSingle(); if (r.error) throw r.error; F = r.data && r.data.active ? r.data.data : null; }
+    } catch (e) { return msgPage('استبانة', 'تعذّر تحميل الاستبانة. تأكدي من الإنترنت وحاولي مرة ثانية.', '!'); }
+    if (!F) return msgPage('استبانة', 'هذه الاستبانة مغلقة أو غير موجودة. شكراً لاهتمامك.', 'i');
+    document.title = F.title + ' · ابتدائية الخنساء برغدان';
+    if (isDone()) return msgPage(F.title, 'شاركتِ في هذه الاستبانة من قبل. شكراً لك.');
+    render();
+  }
+  function qHTML(q, i) {
+    var v = ans[q.id], body = '';
+    if (q.t === 'scale') body = '<div class="opts scale">' + SCALE.map(function (s) { return '<button type="button" class="opt" data-q="' + q.id + '" data-v="' + s[0] + '" aria-pressed="' + (v === s[0]) + '">' + s[1] + '</button>'; }).join('') + '</div>';
+    else if (q.t === 'yesno') body = '<div class="opts">' + ['نعم', 'لا'].map(function (s) { return '<button type="button" class="opt" data-q="' + q.id + '" data-v="' + s + '" aria-pressed="' + (v === s) + '" style="min-width:110px">' + s + '</button>'; }).join('') + '</div>';
+    else if (q.t === 'choice' || q.t === 'multi') body = (q.t === 'multi' ? '<span class="muted small">تقدرين تختارين أكثر من إجابة</span>' : '') + '<div class="opts">' + (q.opts || []).map(function (s) { var on = q.t === 'multi' ? (v || []).indexOf(s) > -1 : v === s; return '<button type="button" class="opt" data-q="' + q.id + '" data-v="' + esc(s) + '" data-m="' + (q.t === 'multi' ? 1 : '') + '" aria-pressed="' + on + '">' + esc(s) + '</button>'; }).join('') + '</div>';
+    else body = '<textarea data-t="' + q.id + '" maxlength="600" placeholder="اكتبي هنا (اختياري)">' + esc(v || '') + '</textarea>';
+    return '<div class="card" id="c-' + q.id + '"><div class="qh"><span class="qn">' + ar(i + 1) + '</span><b>' + esc(q.q) + '</b></div>' + body + '</div>';
+  }
+  function req() { return F.qs.filter(function (q) { return q.t !== 'text'; }); }
+  function filled() { return req().filter(function (q) { var v = ans[q.id]; return v != null && v !== '' && !(Array.isArray(v) && !v.length); }).length; }
+  function prog() { var p = document.getElementById('pg'); if (p) p.style.width = (req().length ? 100 * filled() / req().length : 100) + '%'; }
+  function render() {
+    app.innerHTML = head(F.title, F.intro) + '<main class="wrap"><div class="prog"><i id="pg" style="width:0"></i></div>' +
+      (F.askName ? '<div class="card" id="c-_who"><div class="qh"><span class="qn">✎</span><b>بياناتك</b></div><input type="text" id="sn" maxlength="80" placeholder="اسم الطالبة" autocomplete="off"><input type="text" id="mn" maxlength="80" placeholder="اسم الأم / ولية الأمر" autocomplete="off"></div>' : '') +
+      F.qs.map(qHTML).join('') + '<p class="msg" id="msg" role="alert"></p><button class="btn" id="go">إرسال الإجابات</button><p class="muted small" style="text-align:center">إجاباتك تصل للموجهة الطلابية فقط' + (F.askName ? '' : '، بدون اسم') + '.</p></main><footer>ابتدائية الخنساء برغدان · التوجيه الطلابي</footer>';
+    prog();
+  }
+  app.addEventListener('click', async function (e) {
+    var b = e.target.closest('[data-q]');
+    if (b) { var q = b.dataset.q, v = b.dataset.v; var qq = F.qs.find(function (x) { return x.id === q; }); if (qq.t === 'scale') v = +v;
+      if (b.dataset.m) { var L = ans[q] || []; L = L.indexOf(v) > -1 ? L.filter(function (x) { return x !== v; }) : L.concat(v); ans[q] = L; b.setAttribute('aria-pressed', String(L.indexOf(v) > -1)); }
+      else { ans[q] = v; b.parentNode.querySelectorAll('[data-q]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); }
+      var c = document.getElementById('c-' + q); if (c) c.classList.remove('err'); prog(); return; }
+    if (e.target.id === 'go') {
+      var miss = req().filter(function (q) { var v = ans[q.id]; return v == null || v === '' || (Array.isArray(v) && !v.length); });
+      document.querySelectorAll('.card.err').forEach(function (x) { x.classList.remove('err'); });
+      if (F.askName) { var s1 = document.getElementById('sn').value.trim(), s2 = document.getElementById('mn').value.trim(); if (s1.length < 2 || s2.length < 2) { var w = document.getElementById('c-_who'); w.classList.add('err'); document.getElementById('msg').textContent = 'اكتبي اسم الطالبة واسم الأم.'; w.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; } }
+      if (miss.length) { miss.forEach(function (q) { document.getElementById('c-' + q.id).classList.add('err'); }); document.getElementById('msg').textContent = 'باقي ' + ar(miss.length) + ' سؤال ما أجبتي عليه.'; document.getElementById('c-' + miss[0].id).scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+      var out = {}; Object.keys(ans).forEach(function (k) { out[k] = ans[k]; });
+      var sn = document.getElementById('sn'), mn = document.getElementById('mn'); if (sn && sn.value.trim()) out._name = sn.value.trim().slice(0, 80); if (mn && mn.value.trim()) out._mother = mn.value.trim().slice(0, 80);
+      var btn = e.target; btn.disabled = true; btn.textContent = 'جارٍ الإرسال…';
+      try {
+        if (window.Masar && Masar.demo) { var d = JSON.parse(localStorage.getItem(DEMO) || 'null') || { forms: {}, resp: {} }; d.resp = d.resp || {}; (d.resp[id] = d.resp[id] || []).push(out); localStorage.setItem(DEMO, JSON.stringify(d)); }
+        else { var r = await sb.rpc('survey_submit', { p_form: id, p_answers: out }); if (r.error) throw r.error; if (r.data && r.data.error) throw new Error(r.data.error); }
+        markDone(); msgPage(F.title, 'وصلت إجاباتك، شكراً لك على وقتك ومشاركتك.');
+      } catch (er) { btn.disabled = false; btn.textContent = 'إرسال الإجابات'; document.getElementById('msg').textContent = /closed/.test(er.message) ? 'الاستبانة أُغلقت.' : 'تعذّر الإرسال. تأكدي من الإنترنت وحاولي مرة ثانية.'; }
+    }
+  });
+  app.addEventListener('input', function (e) { var t = e.target.dataset && e.target.dataset.t; if (t) ans[t] = e.target.value.slice(0, 600); });
+  load();
+})();
+</script>
+</body>
+</html>

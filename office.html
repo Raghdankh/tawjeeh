@@ -621,7 +621,7 @@ async function getImage(id) {
   return DB.imgs[id];
 }
 const list = kind => Object.entries(DB.docs).filter(([, v]) => v.kind === kind).map(([id, v]) => ({ id, ...v.data }));
-function errT(e) { const m = (e && (e.message || e)) + ''; if (/fetch|Load failed|network/i.test(m)) return 'تعذّر الاتصال. تأكدي من الإنترنت.'; if (/row-level|permission|42501/.test(m)) return 'انتهت جلسة الدخول. ادخلي من جديد.'; return m; }
+function errT(e) { const m = (e && (e.message || e)) + ''; if (/kind_check|23514/.test(m)) return 'قاعدة البيانات تحتاج تحديث بسيط. شغّلي كود التحديث في Supabase مرة وحدة.'; if (/fetch|Load failed|network/i.test(m)) return 'تعذّر الاتصال. تأكدي من الإنترنت.'; if (/row-level|permission|42501/.test(m)) return 'انتهت جلسة الدخول. ادخلي من جديد.'; return m; }
 
 /* ═════════ students ═════════ */
 const students = () => list('student').sort((a, b) => GRADES.indexOf(a.grade) - GRADES.indexOf(b.grade) || String(a.section).localeCompare(b.section, 'ar') || a.name.localeCompare(b.name, 'ar'));
@@ -2742,7 +2742,7 @@ document.addEventListener('click', async e => {
   const a = d.fx;
   if (a === 'planNew') planForm(false);
   else if (a === 'planEdit') planForm(true);
-  else if (a === 'planSeed') { b.disabled = true; await planSeed(); }
+  else if (a === 'planSeed') { b.disabled = true; try { await planSeed(); } catch (er) { b.disabled = false; toast(errT(er)); } }
   else if (a === 'wkAdd') planSave(x => { x.slots.push({ k: 'w', title: '', items: [], value: '', goals: [], days: blankDays() }); }, 'أُضيف أسبوع');
   else if (a === 'brAdd') breakForm();
   else if (a === 'wkEdit') weekForm();

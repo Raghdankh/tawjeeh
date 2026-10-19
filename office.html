@@ -238,6 +238,7 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .dayf textarea,.dayf input:not([type=checkbox]){width:100%}.dayrow{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}@media(max-width:600px){.dayrow{grid-template-columns:1fr}}
 .fx-rows{display:flex;flex-direction:column}.fx-rows>div{display:grid;grid-template-columns:150px minmax(0,1fr) minmax(0,1.4fr);gap:10px;align-items:baseline;padding:8px 4px;border-bottom:1px solid var(--line)}.fx-rows>div:last-child{border-bottom:0}.fx-rows small{color:var(--muted)}.fx-rows b{font-weight:700}.fx-rows span{color:var(--muted);font-size:.88rem}@media(max-width:600px){.fx-rows>div{grid-template-columns:1fr}}
 .wk-ev{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border:1px dashed var(--line);border-radius:12px;background:var(--surface);font-size:.9rem;color:var(--muted)}.wk-ev span{flex:1}.wk-ev b{color:var(--ink,#16201e)}
+.waprev{white-space:pre-wrap;background:var(--sunk);border-radius:10px;padding:10px 12px;font-size:.88rem;color:var(--ink,#16201e)}
 .fx-parts{display:flex;flex-direction:column}.fx-parts>div{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid var(--line)}.fx-parts>div:last-child{border-bottom:0}.fx-parts span{flex:1;font-weight:600}.fx-parts .sub span{padding-inline-start:16px;font-weight:500;color:var(--muted)}
 .a4 .sp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .a4 .sp{border:1px solid #c9d3d0;border-radius:7px;overflow:hidden;display:flex;flex-direction:column;break-inside:avoid}
@@ -2284,13 +2285,15 @@ const WA_T = [
   { k: 'thanks', t: 'شكر وتكريم', reason: 'تعزيز وتكريم', body: 'السلام عليكم ورحمة الله وبركاته\nولي أمر الطالبة {الاسم} ({الصف})\nيسعدنا إبلاغكم بتميز ابنتكم وانضباطها، ونشكر لكم حسن متابعتكم. بارك الله فيها.\n{المدرسة}' },
   { k: 'free', t: 'رسالة خاصة', reason: 'أخرى', body: 'السلام عليكم ورحمة الله وبركاته\nولي أمر الطالبة {الاسم} ({الصف})\n\n{المدرسة}' }
 ];
-function waFill(body, it) { return body.replace(/\{الاسم\}/g, it.name).replace(/\{الصف\}/g, ((it.grade || '') + ' ' + (it.section || '')).trim()).replace(/\{بدون_عذر\}/g, ar(it.u || 0)).replace(/\{بعذر\}/g, ar(it.x || 0)).replace(/\{السبب\}/g, it.why || '').replace(/\{المدرسة\}/g, S.school); }
+function waFill(body, it) { const gs = ((it.grade || '') + ' ' + (it.section || '')).trim(); return body.replace(/\s*\(\{الصف\}\)/g, gs ? ' (' + gs + ')' : '').replace(/\{الاسم\}/g, it.name).replace(/\{الصف\}/g, ((it.grade || '') + ' ' + (it.section || '')).trim()).replace(/\{بدون_عذر\}/g, ar(it.u || 0)).replace(/\{بعذر\}/g, ar(it.x || 0)).replace(/\{السبب\}/g, it.why || '').replace(/\{المدرسة\}/g, S.school); }
 function stuOf(it) { if (it.studentId && DB.docs[it.studentId]) return { id: it.studentId, ...DB.docs[it.studentId].data }; return findStu({ name: it.name, grade: it.grade }); }
 function waQueue(items, tk, title, tpls) {
   const TT = tpls || WA_T; tk = tk || TT[0].k;
   const W = { tk, body: (TT.find(t => t.k === tk) || TT[0]).body, sent: {} };
   items = items.map(it => { const s = stuOf(it); return { ...it, studentId: (s && s.id) || it.studentId || '', phone: (s && s.phone) || it.phone || '' }; });
-  const draw = () => {
+  const one = items.length === 1; const show = t => one ? waFill(t, items[0]) : t; W.body = show(W.body);
+  const prev = () => { const pv = $('#waPrev'); if (pv && !one && items[0]) pv.textContent = waFill(W.body, items[0]); };
+  const draw = () => { prev();
     const box = $('#waList'); if (!box) return; const withP = items.filter(i => waNum(i.phone)).length;
     $('#waSum').textContent = `${ar(items.length)} طالبة · ${ar(withP)} لها رقم · أُرسل ${ar(Object.keys(W.sent).length)}`;
     box.innerHTML = items.map((it, i) => { const n = waNum(it.phone); const done = W.sent[i];
@@ -2300,11 +2303,12 @@ function waQueue(items, tk, title, tpls) {
   };
   const bg = openSheet(title || 'رسائل واتساب لأولياء الأمور', `<div class="waguide">تضغطين «إرسال واتساب» عند كل طالبة: يفتح الواتساب على رقم ولي أمرها والرسالة مكتوبة، تضغطين إرسال وترجعين للي بعدها. وكل رسالة تنحفظ في سجل التواصل مع أولياء الأمور.</div>
     <div class="f"><span>نوع الرسالة</span><div class="presets">${TT.map(t => `<button type="button" data-watpl="${t.k}" aria-pressed="${t.k === W.tk}">${t.t}</button>`).join('')}</div></div>
-    <label class="f"><span>نص الرسالة <small class="muted" style="font-weight:500">({الاسم} و{الصف} تتبدل لكل طالبة)</small></span><textarea id="waBody" style="min-height:150px">${esc(W.body)}</textarea></label>
+    <label class="f"><span>نص الرسالة${one ? '' : ' <small class="muted" style="font-weight:500">(اسم كل طالبة وصفها ينكتب تلقائياً مكان {الاسم} و{الصف})</small>'}</span><textarea id="waBody" style="min-height:150px">${esc(W.body)}</textarea></label>
+    ${one ? '' : '<div class="f"><span class="tiny muted">كذا توصل لأول طالبة:</span><div id="waPrev" class="waprev"></div></div>'}
     <div class="head" style="margin-top:6px"><b id="waSum" class="small"></b></div><div id="waList" class="walist"></div>`, async () => false, `--c:var(--good);--cs:var(--good-soft)`);
   bg.querySelector('#waBody').addEventListener('input', e => { W.body = e.target.value; draw(); });
   bg.addEventListener('click', async e => {
-    const tp = e.target.closest('[data-watpl]'); if (tp) { W.tk = tp.dataset.watpl; W.body = TT.find(t => t.k === W.tk).body; bg.querySelector('#waBody').value = W.body; bg.querySelectorAll('[data-watpl]').forEach(b => b.setAttribute('aria-pressed', String(b === tp))); draw(); return; }
+    const tp = e.target.closest('[data-watpl]'); if (tp) { W.tk = tp.dataset.watpl; W.body = show(TT.find(t => t.k === W.tk).body); bg.querySelector('#waBody').value = W.body; bg.querySelectorAll('[data-watpl]').forEach(b => b.setAttribute('aria-pressed', String(b === tp))); draw(); return; }
     const sd = e.target.closest('[data-wasend]'); if (sd) { const i = +sd.dataset.wasend; const it = items[i]; const first = !W.sent[i]; W.sent[i] = 1; setTimeout(draw, 300);
       if (first) { const tpl = TT.find(t => t.k === W.tk) || TT[0]; const s = stuOf(it); const ab = it.absId || (findFile({ name: it.name, grade: it.grade }) || {}).id || '';
         try { await saveDoc(uid('contact'), 'contact', { studentId: it.studentId || '', studentName: (s && s.name) || it.name, grade: it.grade || '', section: it.section || '', guardian: (s && s.guardian) || 'ولي الأمر', type: 'رسالة', date: todayH(), reason: tpl.reason, summary: 'رسالة واتساب: ' + waFill(W.body, it).replace(/\n+/g, ' '), outcome: '', follow: '', absId: tpl.reason === 'غياب' ? ab : '', ...(it.log || {}) }); } catch (er) { toast(errT(er)); } }

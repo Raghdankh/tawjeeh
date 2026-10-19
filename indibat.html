@@ -498,7 +498,7 @@ function honor(){
     '<ol class="steps" aria-label="طريقة الاستخدام"><li><b>١</b><span>ابحثي عن اسم ابنتك</span></li><li><b>٢</b><span>اضغطي على الشهادة</span></li><li><b>٣</b><span>احفظيها أو شاركيها</span></li></ol>'+
     '<div class="search"><label for="q" class="search-l">ابحثي عن اسم ابنتك</label><div class="search-box"><span aria-hidden="true">⌕</span><input id="q" type="search" autocomplete="off" placeholder="مثال: لورا عادل" value="'+esc(ui.q||'')+'"></div><div id="results" aria-live="polite">'+searchHtml(ui.q||'')+'</div></div>'+
     '<div class="or"><span>أو تصفّحي لوحة الشرف</span></div>'+
-    '<div class="mrow"><span class="mlabel">الشهر:</span><div class="months" role="group" aria-label="الأشهر">'+S.months.map(function(x,i){return i;}).reverse().map(function(i){return '<button class="chip" data-month="'+i+'" aria-pressed="'+(i===ui.month)+'">'+esc(mLabel(S.months[i]))+'</button>';}).join('')+'</div></div>'+
+    '<div class="mrow"><span class="mlabel">الشهر:</span><div class="months" role="group" aria-label="الأشهر">'+S.months.map(function(x,i){return i;}).map(function(i){return '<button class="chip" data-month="'+i+'" aria-pressed="'+(i===ui.month)+'">'+esc(mLabel(S.months[i]))+'</button>';}).join('')+'</div></div>'+
     '<div class="seg" role="tablist" aria-label="القائمة"><button role="tab" data-sec="regular" aria-selected="'+(sec==='regular')+'">🏅 المواظبات <span>'+ar(m.regular.length)+'</span></button><button role="tab" data-sec="excellent" aria-selected="'+(sec==='excellent')+'">🎖️ المتميزات سلوكياً <span>'+ar(m.excellent.length)+'</span></button></div>'+
     '<div class="board" data-sec="'+sec+'">'+col('regular')+col('excellent')+'</div>'+criteria(false);
 }
@@ -558,7 +558,7 @@ function monthForm(){
   return '<form id="monthForm" class="row"><label>الشهر الهجري<select id="fM">'+HM.map(function(h,i){return '<option value="'+i+'"'+(i===cur.m?' selected':'')+'>'+h+'</option>';}).join('')+'</select></label>'+
     '<label>السنة<input id="fY" type="number" inputmode="numeric" value="'+cur.y+'" min="1440" max="1500"></label>'+
     '<button class="btn ghost" type="submit">إضافة الشهر</button>'+
-    (S.months.length>1?'<button class="btn ghost" type="button" id="delMonth" style="color:var(--danger);border-color:var(--danger)">'+(ui.confirmDel?'تأكيد حذف '+esc(mLabel(S.months[ui.month])):'حذف هذا الشهر')+'</button>':'')+
+    (S.months.length?'<button class="btn ghost" type="button" id="delMonth" style="color:var(--danger);border-color:var(--danger)">'+(ui.confirmDel?'تأكيد حذف '+esc(mLabel(S.months[ui.month])):'حذف هذا الشهر')+'</button>':'')+
     '</form>';
 }
 function panel(){
@@ -596,7 +596,7 @@ function render(){
       '<div class="scores">'+ringSvg('درجة السلوك','#ffa48f')+ringSvg('درجة المواظبة','#ffd66b')+'</div></div><div class="band"></div></header>'+
     '<nav class="nav" aria-label="أقسام الصفحة"><div class="wrap" role="tablist">'+tabs.map(function(t){return '<button class="tab" role="tab" data-tab="'+t[0]+'" aria-selected="'+(ui.tab===t[0])+'">'+t[1]+'</button>';}).join('')+'</div></nav>'+
     '<main class="wrap t-'+ui.tab+'">'+(S.note&&ui.tab==='honor'?'<div class="note"><b>رسالة</b><p>'+esc(S.note)+'</p></div>':'')+bar+panel()+body+'</main>'+
-    '<footer><div class="wrap"><span>انضباط وتميّز · '+esc(S.school)+'</span><span>مديرة المدرسة: <b>أ. هند علي هياس</b></span><span>الموجهة الطلابية: <b>أ. أمل علي محمد</b></span><span>المرجع: قواعد السلوك والمواظبة للمرحلة الابتدائية ١٤٤٧هـ</span>'+(ui.canEdit?'':'<button class="footlink" id="openLogin">دخول الموجهة</button>')+'</div></footer>';
+    '<footer><div class="wrap"><span>انضباط وتميّز · '+esc(S.school)+'</span><span>مديرة المدرسة: <b>أ. هند علي هياس</b></span><span>الموجهة الطلابية: <b>أ. أمل علي الغامدي</b></span><span>المرجع: قواعد السلوك والمواظبة للمرحلة الابتدائية ١٤٤٧هـ</span>'+(ui.canEdit?'':'<button class="footlink" id="openLogin">دخول الموجهة</button>')+'</div></footer>';
   window.scrollTo(0,y);
 }
 
@@ -712,7 +712,7 @@ function drawCert(p,key,m){
     function sig(xx,role,name){x.textAlign='center';x.fillStyle=T.muted;x.font='700 36px '+NS;x.fillText(role,xx,1118);
       x.fillStyle=T.ink;x.font='400 44px '+NS;x.fillText(name,xx,1176);
       x.strokeStyle=T.accent;x.globalAlpha=.6;x.lineWidth=2;x.beginPath();x.moveTo(xx-190,1206);x.lineTo(xx+190,1206);x.stroke();x.globalAlpha=1;}
-    sig(W-560,'مديرة المدرسة','أ. هند علي هياس');sig(560,'الموجهة الطلابية','أ. أمل علي محمد');
+    sig(W-560,'مديرة المدرسة','أ. هند علي هياس');sig(560,'الموجهة الطلابية','أ. أمل علي الغامدي');
     c.toBlob(function(b){b?res(b):rej();},'image/png');
   });});
 }

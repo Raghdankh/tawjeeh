@@ -121,6 +121,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--route);box-shadow:0 0
 
 /* ── chips ── */
 .chips{display:flex;flex-wrap:wrap;gap:8px}
+.descbox{display:flex;flex-direction:column;gap:12px;margin-bottom:12px}.dgrp{display:flex;flex-direction:column;gap:6px}.dlbl{font-weight:700;font-size:14px;color:var(--c)}.chip.dchip{font-size:14px;min-height:36px;padding:5px 12px}.chip.dchip[aria-pressed="true"]::before{content:'✓';color:var(--c);font-weight:800}
 .chip{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--line);background:var(--paper);border-radius:999px;padding:6px 13px;font-weight:500;font-size:15px;min-height:40px;transition:all .12s}
 .chip .dot{width:10px;height:10px;border-radius:50%;background:var(--c)}
 .chip[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb,var(--c) 14%,var(--paper));color:var(--ink);font-weight:700}
@@ -263,7 +264,16 @@ const KINDS = {
   behavior: { t: 'سلوك', c: '#d9822b' },
   withdrawn: { t: 'انطواء', c: '#7c67ef' },
   anxiety: { t: 'قلق', c: '#9b4fd1' },
-  fear: { t: 'خوف', c: '#d6456b' }
+  fear: { t: 'خوف', c: '#d6456b' },
+  economic: { t: 'حالة اقتصادية', c: '#2e8b57' }
+};
+const DESC = {
+  study: ['درجاتها منخفضة في أكثر من مادة', 'لا تسلّم الواجبات', 'ضعف في القراءة والكتابة', 'ضعف في الرياضيات والعمليات الأساسية', 'تشتت وقلة تركيز داخل الحصة', 'تراجع مستواها عن الفترة السابقة', 'بطء في إنجاز المهام الصفية', 'تنسى أدواتها وكتبها باستمرار'],
+  behavior: ['تضرب زميلاتها أو تدفعهن', 'تستخدم ألفاظاً غير لائقة', 'كثرة الحركة والكلام أثناء الحصة', 'لا تلتزم بتعليمات المعلمة', 'تأخذ أغراض زميلاتها دون إذن', 'تعبث بممتلكات الفصل', 'عناد ورفض للمشاركة', 'تتنمر على زميلاتها'],
+  withdrawn: ['تجلس وحدها في الفسحة', 'لا تشارك في الحصة ولا تجيب', 'قليلة الكلام مع زميلاتها', 'تتجنب الأنشطة الجماعية', 'تبدو حزينة أغلب الوقت', 'تخجل بشكل واضح عند الحديث أمام الفصل'],
+  anxiety: ['تتوتر وتبكي قبل الاختبارات', 'تقضم أظافرها أو تفرك يديها كثيراً', 'تشتكي من ألم في البطن أو الرأس بدون سبب واضح', 'تخاف من الخطأ وتعيد العمل كثيراً', 'تسأل كثيراً هل إجابتها صحيحة', 'تتوتر عند أي تغيير مفاجئ'],
+  fear: ['تبكي عند دخول الفصل', 'ترفض البقاء بعيداً عن أختها أو أمها', 'تخاف من أماكن معينة في المدرسة', 'تخاف من معلمة أو زميلة معينة', 'تطلب الاتصال بأهلها كثيراً', 'ترفض الحضور للمدرسة'],
+  economic: ['لا تحضر فطوراً أو مصروفاً بشكل متكرر', 'أدواتها المدرسية ناقصة أو قديمة', 'زيها المدرسي غير مناسب أو متهالك', 'ذكرت ظروفاً مادية صعبة في البيت']
 };
 const STATUS = { new: { c: 'var(--new)', st: 'استُلمت' }, progress: { c: 'var(--prog)', st: 'تحت المتابعة' }, closed: { c: 'var(--done)', st: 'أُغلقت' } };
 const GRADES = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس', 'السادس'];
@@ -370,8 +380,16 @@ function viewRefer() {
   const grade = h('select', { id: 'sg' }, h('option', { value: '' }, 'الصف'), GRADES.map(g => h('option', { value: g }, g)));
   const sec = h('input', { type: 'text', id: 'ss', placeholder: 'الشعبة', maxlength: '20' });
   const chips = h('div', { class: 'chips', role: 'group', 'aria-label': 'سبب الإحالة' }, Object.entries(KINDS).map(([k, v]) =>
-    h('button', { type: 'button', class: 'chip', style: `--c:${v.c}`, 'aria-pressed': 'false', onClick: e => { kinds.has(k) ? kinds.delete(k) : kinds.add(k); e.currentTarget.setAttribute('aria-pressed', kinds.has(k)); } }, h('span', { class: 'dot' }), v.t)));
-  const details = h('textarea', { id: 'det', maxlength: '2000', placeholder: 'ماذا لاحظتِ؟ متى بدأ؟ هل تكرر؟ مثال: لا تشارك وتجلس وحدها في الفسحة منذ أسبوعين.' });
+    h('button', { type: 'button', class: 'chip', style: `--c:${v.c}`, 'aria-pressed': 'false', onClick: e => { kinds.has(k) ? kinds.delete(k) : kinds.add(k); e.currentTarget.setAttribute('aria-pressed', kinds.has(k)); renderDesc(); } }, h('span', { class: 'dot' }), v.t)));
+  const details = h('textarea', { id: 'det', maxlength: '2000', placeholder: 'اختاري من الوصف فوق، أو اكتبي: ماذا لاحظتِ؟ متى بدأ؟ هل تكرر؟' });
+  const descBox = h('div', { class: 'descbox', hidden: true });
+  const lines = () => details.value.split('\n').map(x => x.trim()).filter(Boolean);
+  const renderDesc = () => {
+    const ks = Object.keys(KINDS).filter(k => kinds.has(k)); descBox.hidden = !ks.length; descBox.innerHTML = '';
+    ks.forEach(k => descBox.append(h('div', { class: 'dgrp' }, h('span', { class: 'dlbl', style: `--c:${KINDS[k].c}` }, KINDS[k].t),
+      h('div', { class: 'chips' }, DESC[k].map(t => h('button', { type: 'button', class: 'chip dchip', style: `--c:${KINDS[k].c}`, 'aria-pressed': String(lines().includes(t)), onClick: e => {
+        let L = lines(); L = L.includes(t) ? L.filter(x => x !== t) : L.concat(t); details.value = L.join('\n'); e.currentTarget.setAttribute('aria-pressed', String(L.includes(t))); } }, t))))));
+  };
   const urgent = h('input', { type: 'checkbox', id: 'urg' });
   const errBox = h('div', { class: 'err', hidden: true });
   const btn = h('button', { class: 'btn primary block', type: 'submit', style: 'min-height:52px;font-size:17px' }, li('plus', 20), 'إرسال الإحالة');
@@ -388,7 +406,7 @@ function viewRefer() {
   } },
     step(1, 'من الطالبة؟', h('div', { class: 'stack', style: 'gap:10px' }, name, h('div', { class: 'row' }, h('div', { style: 'flex:2 1 140px' }, grade), h('div', { style: 'flex:1 1 90px' }, sec)))),
     step(2, 'سبب الإحالة', h('p', { class: 'muted small', style: 'margin:-6px 0 10px' }, 'اختاري سببًا أو أكثر.'), chips),
-    step(3, 'ماذا لاحظتِ؟', details, h('label', { class: 'switch', style: 'margin-top:10px' }, urgent, h('span', null, h('b', null, 'حالة عاجلة'), h('span', { class: 'muted small', style: 'display:block' }, 'تحتاج الطالبة تدخلًا اليوم.')))),
+    step(3, 'ماذا لاحظتِ؟', h('p', { class: 'muted small', style: 'margin:-6px 0 10px' }, 'اضغطي على الوصف المناسب وينضاف، أو اكتبي بنفسك.'), descBox, details, h('label', { class: 'switch', style: 'margin-top:10px' }, urgent, h('span', null, h('b', null, 'حالة عاجلة'), h('span', { class: 'muted small', style: 'display:block' }, 'تحتاج الطالبة تدخلًا اليوم.')))),
     h('div', { class: 'stack', style: 'gap:10px' }, errBox, btn,
       h('p', { class: 'tiny muted', style: 'text-align:center' }, 'ما تكتبينه يصل للموجهة وحدها. ستحصلين على رقم لتتبّع الإحالة.')));
   return [topBar(null), h('main', { class: 'wrap narrow page' }, backBtn(() => go('home')),

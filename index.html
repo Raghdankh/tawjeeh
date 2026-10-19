@@ -102,7 +102,7 @@ a.sc:hover{transform:translateY(-2px);border-color:var(--c);box-shadow:0 10px 24
 .sc.masar{--c:var(--masar);--cs:var(--masar-soft)}
 .sc.honor{--c:var(--honor);--cs:var(--honor-soft)}
 .sc.values{--c:var(--values);--cs:var(--values-soft)}
-.sc.stu{--c:#1F6FB2;--cs:#E1EEFA}.sc.fam{--c:#C2416B;--cs:#FBE4EC}.sc.abs{--c:#C9532A;--cs:#FCE9E1}.sc.hon{--c:#8F6410;--cs:#FBF0D6}.sc.day{--c:#6A4BC4;--cs:#ECE6FB}.sc.prg{--c:#0A8197;--cs:#DDF2F5}
+.sc.stu{--c:#1F6FB2;--cs:#E1EEFA}.sc.fam{--c:#C2416B;--cs:#FBE4EC}.sc.abs{--c:#C9532A;--cs:#FCE9E1}.sc.hon{--c:#8F6410;--cs:#FBF0D6}.sc.day{--c:#6A4BC4;--cs:#ECE6FB}.sc.prg{--c:#0A8197;--cs:#DDF2F5}.sc.fil{--c:#0E7F7B;--cs:#DCF1EF}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .sc.stu{--c:#7DB6EC;--cs:#162B3E}:root:not([data-theme="light"]) .sc.fam{--c:#EE7FA2;--cs:#3A1C27}:root:not([data-theme="light"]) .sc.abs{--c:#F08E66;--cs:#3A2219}:root:not([data-theme="light"]) .sc.hon{--c:#E7B85A;--cs:#3A2F15}:root:not([data-theme="light"]) .sc.day{--c:#B7A3F5;--cs:#251D3D}:root:not([data-theme="light"]) .sc.prg{--c:#5CC8DB;--cs:#13303A}}
 :root[data-theme="dark"] .sc.stu{--c:#7DB6EC;--cs:#162B3E}:root[data-theme="dark"] .sc.fam{--c:#EE7FA2;--cs:#3A1C27}:root[data-theme="dark"] .sc.abs{--c:#F08E66;--cs:#3A2219}:root[data-theme="dark"] .sc.hon{--c:#E7B85A;--cs:#3A2F15}:root[data-theme="dark"] .sc.day{--c:#B7A3F5;--cs:#251D3D}:root[data-theme="dark"] .sc.prg{--c:#5CC8DB;--cs:#13303A}
 .sc .hd{display:flex;align-items:center;gap:12px;padding-bottom:14px;margin-bottom:2px;border-bottom:1.5px solid color-mix(in srgb,var(--c) 22%,var(--line))}
@@ -185,6 +185,7 @@ function errT(e) { const m = (e && (e.message || e.error_description || e)) + ''
 async function q(p) { const r = await p; if (r.error) throw r.error; return r.data; }
 
 const IC = {
+  files: '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#0E7F7B" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5A2 2 0 0 1 5.5 5.5h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/><path d="M3.5 10.5h17"/></svg>',
   masar: '<svg width="30" height="30" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 38c10 0 6-14 16-14s6-14 16-14" fill="none" stroke="var(--masar)" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="1 8"/><circle cx="8" cy="38" r="5" fill="var(--new)"/><circle cx="24" cy="24" r="5" fill="var(--masar)"/><circle cx="40" cy="10" r="5" fill="var(--values)"/></svg>',
   honor: '<svg width="30" height="30" viewBox="0 0 48 48" aria-hidden="true"><path d="M16 4h16l-4 14h-8z" fill="var(--masar)" opacity=".75"/><circle cx="24" cy="30" r="13" fill="var(--honor)"/><path d="M24 22l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" fill="#fff"/></svg>',
   stu: '<svg width="30" height="30" viewBox="0 0 48 48" aria-hidden="true"><circle cx="18" cy="17" r="7" fill="var(--c)"/><path d="M5 38c0-7 6-12 13-12s13 5 13 12z" fill="var(--c)"/><circle cx="34" cy="19" r="5.5" fill="var(--c)" opacity=".55"/><path d="M27 28c2-1.5 4.5-2.4 7-2.4 6 0 10 4.4 10 10.4H31" fill="var(--c)" opacity=".55"/></svg>',
@@ -200,7 +201,7 @@ const IC = {
 
 const S = { sb: null, info: null, admin: false, mode: 'login', msg: '', msgOk: false, busy: false, stats: null, view: 'home' };
 
-const COUNSELOR = 'أ. أمل علي محمد';
+const COUNSELOR = 'أ. أمل علي الغامدي';
 function header(end) {
   return `<div class="bar"><div class="t"><b>منصة التوجيه الطلابي</b><span class="who">${esc(COUNSELOR)}<i>الموجهة الطلابية</i></span><small>${esc(S.info ? S.info.school : 'ابتدائية الخنساء برغدان')}</small></div><div class="end">${end || ''}</div></div>`;
 }
@@ -256,6 +257,8 @@ function viewDesk() {
           <ul><li>إحالة طالبة وتتبّع مسار الإحالة</li><li>استقبال إحالات المعلمات ومتابعتها</li><li>الحالات والجلسات والخطط العلاجية</li><li>التقارير وحصاد مسار</li><li>أسماء المعلمات وأرقام دخولهن</li></ul><span class="go">فتح مسار</span></a>
         <a class="sc honor" href="indibat.html"><div class="hd"><span class="ic">${IC.honor}</span><div><h3>انضباط وتميّز</h3><p class="sub">لوحة الشرف الشهرية لأولياء الأمور</p></div></div>
           <ul><li>إضافة المواظبات والمتميزات سلوكياً كل شهر</li><li>شهادات شكر تلقائية لكل طالبة</li><li>قواعد السلوك والمواظبة</li></ul><span class="go">فتح لوحة الشرف</span></a>
+        <a class="sc fil" href="office.html#files"><div class="hd"><span class="ic">${IC.files}</span><div><h3>ملفاتي</h3><p class="sub">سجلاتك الرسمية جاهزة للطباعة</p></div></div>
+          <ul><li>سجل خطط التوجيه الطلابي: الفصلية والأسبوعية</li><li>سجل الانضباط المدرسي وسجل التحصيل الدراسي</li><li>سجل جلسات التوجيه الفردي والجمعي</li></ul><span class="go">فتح ملفاتي</span></a>
         <a class="sc prg" href="office.html#programs"><div class="hd"><span class="ic">${IC.prg}</span><div><h3>برامج التوجيه الطلابي</h3><p class="sub">البرامج وخططها وشواهدها وتقاريرها</p></div></div>
           <ul><li>١٠ برامج جاهزة تبدئين منها أو برنامجك الخاص</li><li>خطة تنفيذ بخطوات ومواعيد ومسؤولات</li><li>الشواهد بالصور، وتقرير جاهز للطباعة</li><li>التوجيه الجمعي وتغطية الفصول</li></ul><span class="go">فتح البرامج</span></a>
         <a class="sc stu" href="office.html#students"><div class="hd"><span class="ic">${IC.stu}</span><div><h3>الطالبات</h3><p class="sub">قائمة المدرسة الموحدة</p></div></div>

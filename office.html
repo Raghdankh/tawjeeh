@@ -23,6 +23,7 @@
   --hon:#B07A12; --hon-soft:#FBF0D6;
   --day:#6A4BC4; --day-soft:#ECE6FB;
   --prg:#0A8197; --prg-soft:#DDF2F5;
+  --fil:#0E7F7B; --fil-soft:#DCF1EF;
   --val:#2E7D4F; --val-soft:#DFF2E6;
   --z1:#1F6FC4; --z1s:#DCEBFF; --z2:#C77700; --z2s:#FFF0C7; --z3:#B8263A; --z3s:#FDE0E4;
   --good:#2E7D4F; --good-soft:#DFF2E6; --bad:#B3363B; --bad-soft:#FBE3E4;
@@ -33,7 +34,7 @@
   color-scheme:dark;
   --bg:#111615; --surface:#19201F; --sunk:#141A19; --ink:#E6EDEB; --muted:#9FAEAA; --line:#2A3432;
   --brand:#174843; --brand-2:#8FCBBF; --brand-ink:#F2FAF8; --brand-soft:#1C302D; --focus:#7FA8F0;
-  --stu:#7DB6EC; --stu-soft:#162B3E; --fam:#EE7FA2; --fam-soft:#3A1C27; --abs:#F08E66; --abs-soft:#3A2219; --hon:#E7B85A; --hon-soft:#3A2F15; --day:#B7A3F5; --day-soft:#251D3D; --prg:#5CC8DB; --prg-soft:#13303A; --val:#74C994; --val-soft:#173323;
+  --stu:#7DB6EC; --stu-soft:#162B3E; --fam:#EE7FA2; --fam-soft:#3A1C27; --abs:#F08E66; --abs-soft:#3A2219; --hon:#E7B85A; --hon-soft:#3A2F15; --day:#B7A3F5; --day-soft:#251D3D; --prg:#5CC8DB; --prg-soft:#13303A; --fil:#5FC9C1; --fil-soft:#123432; --val:#74C994; --val-soft:#173323;
   --z1:#7CB6FF; --z1s:#172C45; --z2:#FFCB57; --z2s:#3A2F12; --z3:#FF7A8C; --z3s:#3F1A21;
   --good:#74C994; --good-soft:#173323; --bad:#EE7C80; --bad-soft:#3E1D20;
 }}
@@ -41,7 +42,7 @@
   color-scheme:dark;
   --bg:#111615; --surface:#19201F; --sunk:#141A19; --ink:#E6EDEB; --muted:#9FAEAA; --line:#2A3432;
   --brand:#174843; --brand-2:#8FCBBF; --brand-ink:#F2FAF8; --brand-soft:#1C302D; --focus:#7FA8F0;
-  --stu:#7DB6EC; --stu-soft:#162B3E; --fam:#EE7FA2; --fam-soft:#3A1C27; --abs:#F08E66; --abs-soft:#3A2219; --hon:#E7B85A; --hon-soft:#3A2F15; --day:#B7A3F5; --day-soft:#251D3D; --prg:#5CC8DB; --prg-soft:#13303A; --val:#74C994; --val-soft:#173323;
+  --stu:#7DB6EC; --stu-soft:#162B3E; --fam:#EE7FA2; --fam-soft:#3A1C27; --abs:#F08E66; --abs-soft:#3A2219; --hon:#E7B85A; --hon-soft:#3A2F15; --day:#B7A3F5; --day-soft:#251D3D; --prg:#5CC8DB; --prg-soft:#13303A; --fil:#5FC9C1; --fil-soft:#123432; --val:#74C994; --val-soft:#173323;
   --z1:#7CB6FF; --z1s:#172C45; --z2:#FFCB57; --z2s:#3A2F12; --z3:#FF7A8C; --z3s:#3F1A21;
   --good:#74C994; --good-soft:#173323; --bad:#EE7C80; --bad-soft:#3E1D20;
 }
@@ -207,6 +208,49 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .prg-head .btn.primary{background:color-mix(in srgb,var(--c) 88%,#101816);border-color:transparent}
 .panel.prep .rep-btn b{color:color-mix(in srgb,var(--c) 82%,#101816)}
 .myprg{border-style:solid!important}
+.fx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px}
+.fx-card{position:relative;display:flex;gap:14px;align-items:flex-start;padding:18px;border-radius:16px;background:var(--surface);border:1px solid var(--line);color:inherit;text-decoration:none;overflow:hidden;box-shadow:0 1px 2px rgba(16,24,22,.04),0 4px 14px -6px rgba(16,24,22,.10);transition:transform .2s,box-shadow .2s,border-color .2s}
+.fx-card::before{content:'';position:absolute;inset-block:0;inset-inline-start:0;width:4px;background:var(--c)}
+.fx-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--c) 35%,var(--line));box-shadow:0 12px 28px -12px color-mix(in srgb,var(--c) 45%,transparent)}
+.fx-ic{width:46px;height:46px;flex:none;border-radius:13px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 12%,var(--surface));color:var(--c)}.fx-ic svg{width:25px;height:25px}
+.fx-card b{font-family:var(--f-display);font-size:1.06rem;color:color-mix(in srgb,var(--c) 70%,var(--ink,#16201e))}.fx-card p{margin:4px 0 6px;font-size:.88rem;color:var(--muted)}.fx-card small{font-size:.8rem;font-weight:700;color:var(--c)}
+.fx-now{display:flex;flex-direction:column;gap:2px;padding:14px 18px;border-radius:16px;text-decoration:none;color:#fff;background:linear-gradient(120deg,var(--c),color-mix(in srgb,var(--c) 70%,#0b2a28))}.fx-now span{font-size:.78rem;opacity:.85;font-weight:700}.fx-now b{font-family:var(--f-display);font-size:1.08rem}.fx-now small{opacity:.9}
+.wk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,210px),1fr));gap:10px}
+.wk{position:relative;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface);color:inherit;text-decoration:none;transition:transform .15s,box-shadow .15s}
+.wk:hover{transform:translateY(-2px);box-shadow:0 10px 22px -12px rgba(14,127,123,.5)}
+.wk-h{background:var(--fil);color:#fff;padding:8px 12px;display:flex;justify-content:space-between;align-items:baseline;gap:6px}.wk-h b{font-family:var(--f-display);font-size:.95rem}.wk-h small{opacity:.85;font-size:.76rem}
+.wk-b{padding:10px 12px;display:flex;flex-direction:column;gap:4px;flex:1;font-size:.86rem}.wk-b em{font-style:normal;color:var(--bad);font-size:.8rem;font-weight:700}
+.wk-f{display:flex;justify-content:space-between;padding:7px 12px;background:var(--hon-soft);font-size:.8rem;color:var(--muted)}.wk-f b{color:var(--hon)}
+.wk.now{border-color:var(--fil);box-shadow:0 0 0 2px var(--fil)}.wk.now .wk-h::after{content:'هذا الأسبوع';font-size:.7rem;background:#fff;color:var(--fil);border-radius:99px;padding:1px 8px;font-weight:800}
+.wk.br .wk-h{background:var(--hon)}.wk.br .wk-b{align-items:center;justify-content:center;color:var(--hon);font-weight:700;background:var(--hon-soft)}
+.wk-x{position:absolute;top:6px;inset-inline-end:6px;border:0;background:rgba(255,255,255,.25);color:#fff;border-radius:8px;width:26px;height:26px;cursor:pointer}
+.wk-head{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:16px 18px;border-radius:16px;background:linear-gradient(120deg,var(--c),color-mix(in srgb,var(--c) 70%,#0b2a28));color:#fff}
+.wk-head>div:first-child{flex:1;min-width:220px}.wk-head small{opacity:.85}.wk-head h1{font-size:1.3rem;margin:2px 0 0;color:#fff}
+.wk-val{background:#fff;color:var(--hon);border-radius:14px;padding:8px 18px;text-align:center;display:flex;flex-direction:column}.wk-val small{color:var(--muted);font-size:.72rem}.wk-val b{font-family:var(--f-display);font-size:1.25rem}
+.wk-two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px}
+.days{display:flex;flex-direction:column;gap:8px}
+.day{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.day.done{background:color-mix(in srgb,var(--good) 6%,var(--surface));border-color:color-mix(in srgb,var(--good) 30%,var(--line))}
+.day.off{background:var(--bad-soft);border-color:color-mix(in srgb,var(--bad) 25%,var(--line))}
+.dn{width:78px;flex:none;display:flex;flex-direction:column}.dn b{color:var(--fil);font-family:var(--f-display)}.dn small{color:var(--muted);font-size:.78rem}
+.da{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}.da p{margin:0}.offt{color:var(--bad)}.dchk{flex:none}
+.dayf{border:1px solid var(--line);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:6px}.dayf legend{font-weight:800;color:var(--fil);padding:0 6px}
+.dayf textarea,.dayf input:not([type=checkbox]){width:100%}.dayrow{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}@media(max-width:600px){.dayrow{grid-template-columns:1fr}}
+.fx-rows{display:flex;flex-direction:column}.fx-rows>div{display:grid;grid-template-columns:150px minmax(0,1fr) minmax(0,1.4fr);gap:10px;align-items:baseline;padding:8px 4px;border-bottom:1px solid var(--line)}.fx-rows>div:last-child{border-bottom:0}.fx-rows small{color:var(--muted)}.fx-rows b{font-weight:700}.fx-rows span{color:var(--muted);font-size:.88rem}@media(max-width:600px){.fx-rows>div{grid-template-columns:1fr}}
+.fx-parts{display:flex;flex-direction:column}.fx-parts>div{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid var(--line)}.fx-parts>div:last-child{border-bottom:0}.fx-parts span{flex:1;font-weight:600}.fx-parts .sub span{padding-inline-start:16px;font-weight:500;color:var(--muted)}
+.a4 .sp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.a4 .sp{border:1px solid #c9d3d0;border-radius:7px;overflow:hidden;display:flex;flex-direction:column;break-inside:avoid}
+.a4 .sp-h{background:var(--rc);color:#fff;padding:3px 6px;display:flex;flex-direction:column;align-items:center;line-height:1.35}.a4 .sp-h b{font-size:12px}.a4 .sp-h small{font-size:10px;opacity:.85}
+.a4 .sp-b{padding:5px 6px;font-size:11px;line-height:1.5;display:flex;flex-direction:column;gap:2px;flex:1;text-align:center}.a4 .sp-b em{font-style:normal;color:#A23B4E;font-size:10px}
+.a4 .sp-f{background:#FBF1DC;color:#5E6B68;font-size:10px;text-align:center;padding:2px}.a4 .sp-f b{color:#9A6A12}
+.a4 .sp.br .sp-h{background:#9A6A12}.a4 .sp.br .sp-b{background:#FBF1DC;color:#9A6A12;justify-content:center;font-weight:700}
+.a4 .sp-note{font-size:11px;color:#5E6B68;margin:0}.a4 .sp-note b{color:var(--rc)}
+.a4 .wkr-band{display:flex;align-items:center;gap:10px;background:var(--rc);color:#fff;border-radius:8px;padding:8px 12px}.a4 .wkr-band>div{flex:1;display:flex;flex-direction:column}.a4 .wkr-band b{font-size:16px}.a4 .wkr-band small{opacity:.85;font-size:11px}.a4 .wkr-band>span{background:#fff;color:var(--rc);border-radius:6px;padding:3px 10px;font-weight:700;font-size:12px}
+.a4 .wkr-top{display:grid;grid-template-columns:1fr 130px;gap:8px}.a4 .wkr-val{border:1px solid #EBD3A0;background:#FBF1DC;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.a4 .wkr-val small{font-size:10.5px;color:#5E6B68}.a4 .wkr-val b{font-size:20px;color:#9A6A12}
+.a4 td.offc{text-align:center;color:#A23B4E;font-weight:700;background:#FBE9EC}
+.a4 .wkr-notes{border:1px solid #c9d3d0;border-radius:8px;min-height:50px;padding:6px 10px;font-size:12px}.a4 .wkr-notes b{color:var(--rc)}
+.a4 .att{display:flex;flex-direction:column;gap:10px;align-items:center}.a4 .att figure{margin:0;border:1px solid #c9d3d0;border-radius:8px;overflow:hidden}.a4 .att img{display:block;max-width:100%;max-height:118mm;object-fit:contain}
+.presets.sgrow{margin-top:-4px;grid-column:1/-1}.presets.sgrow button[aria-pressed=true]{background:var(--cs,#e4efed);border-color:var(--c,#1F5E58);color:var(--c,#1F5E58);font-weight:700}.presets.sgrow button[aria-pressed=true]::before{content:'✓ '}
 .pcolrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .pcolrow .sw{width:26px;height:26px;border-radius:50%;background:var(--k);border:3px solid var(--surface);box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0}
 .pcolrow .sw[aria-pressed=true]{box-shadow:0 0 0 2px var(--k)}
@@ -288,7 +332,7 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .goals{list-style-type:arabic-indic;margin:0;padding-inline-start:22px;display:flex;flex-direction:column;gap:4px}
 .steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 .steps li{display:flex;gap:6px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:6px 10px}
-.steps li .chk{flex:1}.steps li.done{background:color-mix(in srgb,var(--good) 7%,var(--surface))}.steps li.done .chk>span{color:var(--muted)}
+.steps li .chk{flex:1}.steps li.done{background:color-mix(in srgb,var(--good) 7%,var(--surface))}.steps li:not(.done) .chk>span{color:var(--muted)}
 .sbtn{display:flex;gap:2px}.sbtn .btn{min-height:34px;padding:4px 8px}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(46%,180px),1fr));gap:10px}
 .pgrid figure{margin:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface);position:relative;display:flex;flex-direction:column}
@@ -505,7 +549,7 @@ const uid = p => p + '-' + Date.now().toString(36) + Math.random().toString(36).
 function toast(t) { document.querySelectorAll('.toast').forEach(x => x.remove()); const el = document.createElement('div'); el.className = 'toast'; el.setAttribute('role', 'status'); el.textContent = t; document.body.append(el); setTimeout(() => el.remove(), 2600); }
 function loadScript(src) { return new Promise((res, rej) => { if ([...document.scripts].some(s => s.src === src)) return res(); const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('تعذّر تحميل أداة PDF. تأكدي من الإنترنت.')); document.head.append(s); }); }
 const GRADES = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس', 'السادس'];
-const SIGS = [['الموجهة الطلابية', 'أ. أمل علي محمد'], ['مديرة المدرسة', 'أ. هند علي هياس']];
+const SIGS = [['الموجهة الطلابية', 'أ. أمل علي الغامدي'], ['مديرة المدرسة', 'أ. هند علي هياس']];
 const MOE = '<svg viewBox="0 0 100 100" width="80" height="80" aria-hidden="true"><g fill="#18a39a">' + Array.from({ length: 30 }, (_, i) => { const c = i % 10, r = Math.floor(i / 10); return `<circle cx="${12 + c * 8.5}" cy="${30 + r * 9 + Math.abs(4.5 - c) * 1.2}" r="${3 - r * .6}"/>`; }).join('') + '</g><text x="50" y="78" text-anchor="middle" font-size="13" font-weight="700" fill="#18a39a" font-family="IBM Plex Sans Arabic">وزارة التعليم</text></svg>';
 
 /* ═════════ data layer ═════════ */
@@ -682,9 +726,10 @@ const CTYPES = ['اتصال هاتفي', 'رسالة', 'لقاء حضوري', '�
 
 /* ═════════ state & routing ═════════ */
 const S = { school: 'ابتدائية الخنساء برغدان', route: 'students', sub: {}, filter: {}, busy: false };
-function route() { const h = (location.hash || '#students').slice(1).split('/'); S.route = ['programs', 'values', 'students', 'family', 'absence', 'daily', 'honors'].includes(h[0]) ? h[0] : 'students'; S.param = h[1] || ''; render(); }
+function route() { const h = (location.hash || '#students').slice(1).split('/'); S.route = ['files', 'programs', 'values', 'students', 'family', 'absence', 'daily', 'honors'].includes(h[0]) ? h[0] : 'students'; S.param = h[1] || ''; S.param2 = h[2] || ''; render(); }
 window.addEventListener('hashchange', route);
 const SEC_IC = {
+  files: '<path d="M3.5 7.5A2 2 0 0 1 5.5 5.5h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/><path d="M3.5 10.5h17"/>',
   programs: '<rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4.5V3h6v1.5M8.5 11h7M8.5 15h4"/><path d="m14 16.5 1.6 1.6 3-3"/>',
   values: '<path d="M12 21v-8"/><path d="M12 13C12 8.6 8.8 6 4.5 6c0 4 3 7 7.5 7z"/><path d="M12 15c0-3.8 3-6 7.5-6 0 3.8-3 6-7.5 6z"/>',
   students: '<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.6 2.7-6 6-6s6 2.4 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.2c3 .2 5.5 2.3 5.5 5.8"/>',
@@ -693,7 +738,7 @@ const SEC_IC = {
   daily: '<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/>',
   honors: '<circle cx="12" cy="14" r="5.5"/><path d="M8.5 9.5 6 3h4l2 4.5L14 3h4l-2.5 6.5"/><path d="m12 11.8.9 1.8 2 .3-1.4 1.4.3 2-1.8-1-1.8 1 .3-2-1.4-1.4 2-.3z"/>'
 };
-const SEC = { programs: ['البرامج', '--prg'], values: ['القيم', '--val'], students: ['الطالبات', '--stu'], family: ['علاقة الأسرة بالمدرسة', '--fam'], absence: ['الغياب', '--abs'], daily: ['الحالات الطارئة', '--day'], honors: ['التكريم والشهادات', '--hon'] };
+const SEC = { files: ['ملفاتي', '--fil'], programs: ['البرامج', '--prg'], values: ['القيم', '--val'], students: ['الطالبات', '--stu'], family: ['علاقة الأسرة بالمدرسة', '--fam'], absence: ['الغياب', '--abs'], daily: ['الحالات الطارئة', '--day'], honors: ['التكريم والشهادات', '--hon'] };
 
 function shell(body) {
   const [, v] = SEC[S.route];
@@ -706,8 +751,9 @@ function shell(body) {
 function render() {
   const app = $('#app');
   const y = window.scrollY;
-  const views = { students: vStudents, family: vFamily, absence: S.param ? vAbsenceOne : vAbsence, daily: vDaily, honors: vHonors, programs: vPrograms, values: vValues };
+  const views = { files: vFiles, students: vStudents, family: vFamily, absence: S.param ? vAbsenceOne : vAbsence, daily: vDaily, honors: vHonors, programs: vPrograms, values: vValues };
   app.innerHTML = shell(views[S.route]());
+  if (S.route === 'honors' || S.route === 'files') syncIndibat();
   if (S.after) { const f = S.after; S.after = null; f(); }
   if (S.keepScroll) { window.scrollTo(0, y); S.keepScroll = false; }
   hydratePhotos(app);
@@ -837,8 +883,8 @@ async function fitPages(root) {
 }
 function repZoom(bg) { const w = bg.querySelector('.rep-pages'); if (w) w.style.zoom = Math.min(1, (bg.clientWidth - 16) / (210 * MMPX)); }
 const repSigs = () => `<div class="sigs">${SIGS.map(s => `<div>${s[0]}<span></span><i>${s[1]}</i></div>`).join('')}</div>`;
-async function openReport(pagesHTML, fileName) {
-  const bg = document.createElement('div'); bg.className = 'rep-bg'; bg.id = 'repbg'; bg.style.setProperty('--rc', (typeof SEC_COL !== 'undefined' && SEC_COL[S.route]) || '#1F5E58');
+async function openReport(pagesHTML, fileName, color) {
+  const bg = document.createElement('div'); bg.className = 'rep-bg'; bg.id = 'repbg'; bg.style.setProperty('--rc', color || (typeof SEC_COL !== 'undefined' && SEC_COL[S.route]) || '#1F5E58');
   bg.innerHTML = `<div class="rep-bar"><button class="btn" data-rp="print">طباعة</button><button class="btn" data-rp="pdf">تنزيل PDF</button><button class="btn" data-rp="close">إغلاق</button></div><div class="rep-pages">${pagesHTML}</div>`;
   document.body.append(bg);
   const pgs = [...bg.querySelectorAll('.a4')]; const many = pgs.length > 1;
@@ -1215,7 +1261,11 @@ const MY_PROGS = [
     steps: [['إذاعة مدرسية عن الاستخدام الآمن للإنترنت', 'الموجهة الطلابية'], ['لقاءات توجيه جمعي في الفصول عن قواعد الأمان الرقمي', 'الموجهة الطلابية'], ['نشاط «إشارة المرور الرقمية»: الأخضر آمن، الأصفر أستشير، الأحمر أتوقف وأبلغ', 'الموجهة الطلابية'], ['توعية الطالبات بعدم مشاركة المعلومات الشخصية والصور والتعامل مع الغرباء', 'الموجهة الطلابية'], ['تعريف الطالبات بالتنمر الإلكتروني وطريقة التصرف والإبلاغ عنه', 'الموجهة الطلابية'], ['نشرة لأولياء الأمور عن الرقابة الأبوية وتنظيم وقت الشاشة', 'الموجهة الطلابية']],
     tools: 'إذاعة مدرسية، عرض تقديمي، بطاقات إشارة المرور الرقمية، مطويات', evalm: 'أسئلة تقويمية للطالبات، ملاحظة التفاعل، مواقف تمثيلية قصيرة',
     results: 'معرفة الطالبات بقواعد الاستخدام الآمن للإنترنت\nوعي الطالبات بأهمية حماية معلوماتهن الشخصية وعدم التواصل مع الغرباء\nمعرفة الطالبات بطرق التصرف والإبلاغ عند التعرض لمحتوى أو تواصل مزعج\nوصول الرسالة التوعوية لأولياء الأمور عن الرقابة وتنظيم وقت الشاشة',
-    recs: 'تكرار التوعية بالأمان الرقمي خلال العام\nتفعيل دور الأسرة في متابعة استخدام بناتهن للأجهزة\nالتعامل مع حالات التنمر الإلكتروني فوراً بالتنسيق مع الأسرة' }
+    recs: 'تكرار التوعية بالأمان الرقمي خلال العام\nتفعيل دور الأسرة في متابعة استخدام بناتهن للأجهزة\nالتعامل مع حالات التنمر الإلكتروني فوراً بالتنسيق مع الأسرة' },
+  { title: 'شركاء في التعلم والمستقبل', color: '#D24E7E', status: 'مخطط', domain: 'اجتماعي وأسري', svc: 'نمائي', form: 'برنامج', target: 'الطالبات وأولياء الأمور', term: 'الفصل الثاني', place: 'المدرسة',
+    goals: 'إشراك الأسرة في متابعة تعلم بناتها\nتزويد الأمهات بمهارات دعم المذاكرة في البيت\nتعريف الطالبات بالمهن وربط التعلم بالمستقبل\nتعزيز الشراكة بين الأسرة والمدرسة والمعلمات',
+    steps: [['إعداد نشرة أسبوعية للأمهات بما ستتعلمه الطالبات خلال الأسبوع، مع سؤالين للحوار في البيت', 'الموجهة الطلابية ومعلمات الفصول'], ['إرسال النشرة لأولياء الأمور أسبوعياً عبر الواتساب', 'الموجهة الطلابية'], ['ورشة للأمهات «كيف أذاكر مع بنتي؟»: تنظيم وقت المذاكرة، والتعامل مع الواجبات، والتشجيع بدل المقارنة', 'الموجهة الطلابية والإدارة'], ['نشاط «مهنة أمي ومهنة أبوي»: تسأل الطالبة أهلها عن مهنتهم وترسمها وتعرضها في الفصل', 'معلمات الفصول'], ['معرض رسومات «مهنة أمي ومهنة أبوي»', 'رائدة النشاط'], ['استبانة لأولياء الأمور عن أثر البرنامج', 'الموجهة الطلابية']],
+    tools: 'نشرات أسبوعية، عرض تقديمي للورشة، أوراق رسم، لوحة عرض، استبانة', evalm: 'عدد الأمهات الحاضرات للورشة، تفاعل الأسر مع النشرة الأسبوعية، رسومات الطالبات، نتائج الاستبانة', results: '', recs: '' }
 ];
 
 const SUG_RES = ['تفاعل الطالبات مع أنشطة البرنامج بشكل إيجابي', 'تحقق أهداف البرنامج بدرجة عالية', 'زيادة وعي الطالبات بموضوع البرنامج', 'مشاركة فاعلة من المعلمات في تنفيذ البرنامج', 'تفاعل أولياء الأمور مع الرسائل التوعوية', 'تحسن ملحوظ في سلوك الطالبات المرتبط بموضوع البرنامج', 'رصد الطالبات المحتاجات لمتابعة فردية والبدء في متابعتهن', 'رضا الطالبات والمعلمات عن البرنامج وأنشطته'];
@@ -1226,6 +1276,7 @@ const SUG_X = {
   'برنامج رفق': { r: ['انتشار عبارات اللطف والاحترام بين الطالبات', 'لجوء الطالبات للموجهة عند التعرض لموقف مزعج'], c: ['استمرار شجرة الرفق طوال العام', 'تكريم شهري للطالبات المتميزات في الرفق'] },
   'المصالح الفضلى للطفل': { r: ['معرفة الطالبات بالأشخاص الموثوقين الذين يلجأن لهم', 'وعي المعلمات بآلية التعامل مع حالات الاشتباه بالإيذاء'], c: ['تعليق دائرة الأمان في الفصول', 'تدريب المعلمات على آلية الإبلاغ عن حالات الإيذاء'] },
   'الصحة النفسية': { r: ['استفادة الطالبات من ركن الهدوء', 'قدرة الطالبات على استخدام تمارين التنفس عند القلق'], c: ['تدريب المعلمات على ملاحظة علامات الضغط النفسي لدى الطالبات', 'تخصيص لقاء شهري للتعبير عن المشاعر'] },
+  'شركاء في التعلم والمستقبل': { r: ['تفاعل الأمهات مع النشرة الأسبوعية', 'حضور جيد للأمهات في ورشة «كيف أذاكر مع بنتي»', 'زيادة متابعة الأسر لتعلم بناتهن في البيت', 'تعرّف الطالبات على مهن متنوعة وربطها بالمستقبل', 'تعزيز الشراكة بين الأسرة والمدرسة'], c: ['الاستمرار في النشرة الأسبوعية طوال العام', 'تكرار الورشة قبل الاختبارات', 'إشراك الأمهات صاحبات المهن في لقاءات مع الطالبات', 'تطبيق استبانة رضا الأسر كل فصل'] },
   'الاستخدام الآمن للإنترنت': { r: ['قدرة الطالبات على التمييز بين المواقف الآمنة وغير الآمنة على الإنترنت', 'تفاعل الأسر مع نصائح تنظيم وقت الشاشة'], c: ['تعليق إشارة المرور الرقمية في الفصول ومعمل الحاسب', 'التنسيق مع معلمة المهارات الرقمية لدمج الأمان الرقمي في الدروس'] } };
 function progSug(p) {
   const m = MY_PROGS.find(t => norm(t.title) === norm(p.title)) || {}; const x = SUG_X[(MY_PROGS.find(t => norm(t.title) === norm(p.title)) || {}).title] || {};
@@ -1240,9 +1291,9 @@ function sugBind(bg) {
 }
 async function addMyProgs() {
   const have = new Set(list('program').map(p => norm(p.title)));
-  const rows = MY_PROGS.filter(t => !have.has(norm(t.title))).map(t => ({ id: uid('prog'), kind: 'program', data: { ...t, steps: t.steps.map(([x, who]) => ({ t: x, who, date: '', done: true })), status: 'منفذ', lead: 'الموجهة الطلابية', partners: '', count: '', start: '', end: '', photos: [], caps: {} } }));
+  const rows = MY_PROGS.filter(t => !have.has(norm(t.title))).map(t => ({ id: uid('prog'), kind: 'program', data: { ...t, steps: t.steps.map(([x, who]) => ({ t: x, who, date: '', done: t.status !== 'مخطط' })), status: t.status || 'منفذ', lead: 'الموجهة الطلابية', partners: '', count: '', start: '', end: '', photos: [], caps: {} } }));
   if (!rows.length) { toast('برامجك مضافة من قبل'); return; }
-  await saveMany(rows); toast(`أُضيف ${ar(rows.length)} برامج، أكملي التاريخ والشواهد`); rerender();
+  await saveMany(rows); toast(rows.length === 1 ? 'أُضيف البرنامج' : `أُضيف ${ar(rows.length)} برامج، أكملي التاريخ والشواهد`); rerender();
 }
 
 const lines = t => String(t || '').split(/\n+/).map(x => x.replace(/^[\s\-•*–\d.)(]+/, '').trim()).filter(Boolean);
@@ -1323,7 +1374,7 @@ function vPrograms() {
     <div class="subtabs">${[['all', 'الكل'], ['مخطط', 'مخططة'], ['قيد التنفيذ', 'قيد التنفيذ'], ['منفذ', 'منفذة']].map(([k, t]) => `<button data-pst="${k}" aria-selected="${sf === k}">${t}<span class="n">${ar(k === 'all' ? all.length : all.filter(p => p.status === k).length)}</span></button>`).join('')}</div>
     <div class="toolbar"><label class="search"><span aria-hidden="true">⌕</span><input id="pQ" type="search" placeholder="ابحثي باسم البرنامج أو المجال" value="${esc(S.filter.pq || '')}" aria-label="بحث"></label>
       <div class="subtabs">${[['all', 'السنة كاملة']].concat(PTERM.map(t => [t, t])).map(([k, t]) => `<button data-pterm="${k}" aria-selected="${tf === k}">${t}</button>`).join('')}</div></div>
-    ${MY_PROGS.some(t => !all.some(p => norm(p.title) === norm(t.title))) ? `<div class="myprg"><div><b>برامجك المنفذة هذا العام جاهزة</b><span>${MY_PROGS.filter(t => !all.some(p => norm(p.title) === norm(t.title))).map(t => esc(t.title)).join(' · ')}</span><small>تنضاف بأهدافها وخطواتها ونتائجها وتوصياتها، وأنتِ تضيفين التاريخ والشواهد بس.</small></div><button class="btn primary" data-act="pMine">＋ أضيفيها</button></div>` : ''}
+    ${MY_PROGS.some(t => !all.some(p => norm(p.title) === norm(t.title))) ? `${(() => { const miss = MY_PROGS.filter(t => !all.some(p => norm(p.title) === norm(t.title))); const plan = miss.every(t => t.status === 'مخطط'); return `<div class="myprg"><div><b>${plan ? 'برنامج جديد جاهز للفصل الثاني' : 'برامجك الجاهزة'}</b><span>${miss.map(t => esc(t.title)).join(' · ')}</span><small>${plan ? 'ينضاف بأهدافه وخطواته والمسؤولة عن كل خطوة، وحالته «مخطط». بعد التنفيذ علّمي على الخطوات وسجّلي النتائج.' : 'تنضاف بأهدافها وخطواتها والمسؤولة عن كل خطوة، وأنتِ تضيفين التاريخ والشواهد.'}</small></div>`; })()}<button class="btn primary" data-act="pMine">＋ أضيفيها</button></div>` : ''}
     ${shown.length ? `<div class="list">${shown.map(progCard).join('')}</div>` : all.length ? '<div class="empty"><b>لا توجد برامج بهذا التصفية</b></div>'
       : `<div class="empty"><b>ابدئي بأول برنامج</b><span>اختاري من البرامج الجاهزة وعدّليها، أو اكتبي برنامجك من البداية.</span><button class="btn primary" data-act="pAdd">＋ برنامج</button></div>`}`;
 }
@@ -1336,7 +1387,7 @@ function progCard(p) {
       <h3 class="pc-t">${esc(p.title)}</h3>
       <p class="pc-sub">${sub.map(esc).join('<i>•</i>')}</p>
       ${p.target ? `<p class="pc-tg">${esc(p.target)}</p>` : ''}
-      ${st.length ? `<div class="pc-prog"><div class="pc-bar"><i style="width:${pct}%"></i></div><span>${ar(st.filter(x => x.done).length)}/${ar(st.length)} خطوات${ph ? ` · ${ar(ph)} شاهد` : ''}${p.count ? ` · ${ar(p.count)} مستفيدة` : ''}</span></div>` : ''}
+      ${ph || p.count ? `<p class="pc-sub" style="font-size:.78rem">${[ph ? ar(ph) + ' شاهد' : '', p.count ? ar(p.count) + ' مستفيدة' : ''].filter(Boolean).join(' · ')}</p>` : ''}
       ${miss.length ? `<p class="pc-miss">ناقص: ${miss.join(' و')}</p>` : ''}</a>
     <div class="pc-acts"><button class="pc-btn" data-prep="${p.id}">التقرير</button><a class="pc-open" href="#programs/${p.id}" aria-label="فتح البرنامج">فتح</a></div></article>`;
 }
@@ -1388,8 +1439,8 @@ function vProgramOne() {
       <button class="rep-btn" data-act="pRepPlan"><b>خطة البرنامج</b><small>قبل التنفيذ: الأهداف والخطوات</small></button></div></section>
     <section class="panel"><div class="head"><h3>بيانات البرنامج</h3></div><dl class="pinfo">${info.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></section>
     <section class="panel"><div class="head"><h3>الأهداف</h3><span class="sp"></span><button class="btn sm ghost" data-act="pEdit">تعديل</button></div>${g.length ? `<ol class="goals">${g.map(x => `<li>${esc(x)}</li>`).join('')}</ol>` : '<p class="small muted">لم تُكتب الأهداف بعد.</p>'}</section>
-    <section class="panel"><div class="head"><h3>خطة التنفيذ</h3><span class="tiny muted">${ar(st.filter(x => x.done).length)} من ${ar(st.length)}</span><span class="sp"></span><button class="btn primary sm" data-act="pStep">＋ خطوة</button></div>
-      ${st.length ? `<div class="pbar"><i style="width:${pct}%;background:${c}"></i></div><ol class="steps">${st.map((s, i) => `<li class="${s.done ? 'done' : ''}"><label class="chk" style="--sc:${c}"><input type="checkbox" data-pdone="${i}" ${s.done ? 'checked' : ''}><span>${esc(s.t)}${stepDate(s) || s.who ? `<small>${[stepDate(s), s.who].filter(Boolean).map(esc).join(' · ')}</small>` : ''}${s.done && s.doneAt ? `<small>نُفّذت: ${esc(hij(s.doneAt))}</small>` : ''}</span></label>
+    <section class="panel"><div class="head"><h3>خطة التنفيذ</h3><span class="tiny muted">علّمي على الخطوات اللي نفذتيها، وهي اللي تطلع في التقرير</span><span class="sp"></span><button class="btn primary sm" data-act="pStep">＋ خطوة</button></div>
+      ${st.length ? `<ol class="steps">${st.map((s, i) => `<li class="${s.done ? 'done' : ''}"><label class="chk" style="--sc:${c}"><input type="checkbox" data-pdone="${i}" ${s.done ? 'checked' : ''}><span>${esc(s.t)}${stepDate(s) || s.who ? `<small>${[stepDate(s), s.who].filter(Boolean).map(esc).join(' · ')}</small>` : ''}${s.done && s.doneAt ? `<small>نُفّذت: ${esc(hij(s.doneAt))}</small>` : ''}</span></label>
         <span class="sbtn"><button class="btn sm ghost" data-pmv="${i}:-1" aria-label="لأعلى" ${i ? '' : 'disabled'}>↑</button><button class="btn sm ghost" data-pstep="${i}" aria-label="تعديل">✎</button><button class="btn sm ghost" data-pdel="${i}" aria-label="حذف">✕</button></span></li>`).join('')}</ol>` : '<p class="small muted">أضيفي خطوات التنفيذ: الأنشطة والفعاليات ومواعيدها والمسؤولة عنها.</p>'}</section>
     ${ideasHTML(id)}
     <section class="panel"><div class="head"><h3>الشواهد</h3><span class="tiny muted">${ar((p.photos || []).length)} صورة</span><span class="sp"></span><label class="btn primary sm" style="cursor:pointer">＋ صور<input type="file" accept="image/*" multiple data-pph hidden></label></div>
@@ -1433,7 +1484,7 @@ function pInfoTable(p) {
 }
 const pList = (t, tag = 'ol') => { const l = lines(t); return l.length ? `<${tag}>${l.map(x => `<li>${esc(x)}</li>`).join('')}</${tag}>` : '<p>—</p>'; };
 function progReport(p, full) {
-  const st = p.steps || []; const gs = p.id ? progGroups(p.id) : []; const photos = (p.photos || []).concat(...gs.map(g => g.photos || []));
+  const st0 = p.steps || []; const st = st0.some(x => x.done) ? st0.filter(x => x.done) : st0; const gs = p.id ? progGroups(p.id) : []; const photos = (p.photos || []).concat(...gs.map(g => g.photos || []));
   const page1 = `<div class="a4 prep-a4">${repHead('تقرير تنفيذ برنامج', p.end || p.start)}<div class="pband"><small>${esc([p.form, p.domain].filter(Boolean).join(' · '))}</small><b>${esc(p.title)}</b></div>${pInfoTable(p)}
     <div class="boxes"><div class="box${p.tools || p.evalm ? '' : ' full'}"><h4>الأهداف</h4>${pList(p.goals)}</div>${p.tools || p.evalm ? `<div class="box">${p.tools ? `<h4>الوسائل والأدوات</h4><p>${esc(p.tools)}</p>` : ''}${p.evalm ? `<h4${p.tools ? ' style="margin-top:6px"' : ''}>أساليب التقويم</h4><p>${esc(p.evalm)}</p>` : ''}</div>` : ''}
     <div class="box full"><h4>آلية التنفيذ</h4>${st.length ? `<table><thead><tr><th style="width:28px">م</th><th>النشاط / الإجراء</th><th style="width:130px">المسؤولة</th><th style="width:44px">التنفيذ</th></tr></thead><tbody>${st.map((s, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(s.t)}</td><td>${esc(s.who || '')}</td><td style="text-align:center">${s.done ? '✔' : ''}</td></tr>`).join('')}</tbody></table>` : '<p>—</p>'}</div>
@@ -2323,6 +2374,7 @@ function coverPage(sec, o) {
 function dividerPage(t, sub, sec) { return `<div class="a4 divider" style="--cc:${SEC_COL[sec] || '#1F5E58'}"><div class="dv"><span>${esc(sub || '')}</span><h2>${esc(t)}</h2></div></div>`; }
 function emptyPage(t) { return `<div class="a4">${repHead(t)}<div class="empty-rep">لا توجد بيانات مسجلة بعد في هذا الجزء.</div>${repSigs()}</div>`; }
 function binderParts(sec) {
+  if (typeof FX !== 'undefined' && FX[sec]) return fxParts(sec);
   const P = [];
   if (sec === 'programs') {
     const progs = list('program').sort((a, b) => PTERM.indexOf(a.term) - PTERM.indexOf(b.term) || String(a.start || '').localeCompare(String(b.start || '')));
@@ -2371,6 +2423,425 @@ function binderForm(sec) {
     <p class="tiny muted">${ar(binderParts(sec).filter(p => !p.div).length)} تقرير في هذا القسم.</p>
     <div class="toolbar"><button class="btn primary" type="submit">إعداد الملف</button></div>`,
     async f => { const o = { year: f.querySelector('#bf_y').value.trim(), term: f.querySelector('#bf_t').value }; S.after = null; setTimeout(() => openReport(buildBinder(sec, o), 'ملف-' + SEC_FILE[sec]), 50); }, `--c:${SEC_COL[sec]};--cs:#f4f7f6`);
+}
+
+/* ═════════ ملفاتي: الخطط + ملفات الانضباط والتحصيل وسجلات الجلسات ═════════ */
+const PLAN_SEED = [{"k":"w","title":"الأسبوع التمهيدي والتهيئة الإرشادية","items":["الأسبوع التمهيدي","التهيئة الإرشادية","التعريف بقواعد السلوك والمواظبة","توثيق علاقة الأسرة بالمدرسة: اللقاء الأول بأولياء الأمور"],"value":"الانضباط","goals":["تهيئة الطالبات للعام الدراسي ومساعدة المستجدات على التكيف","تعريف الطالبات بقواعد السلوك والمواظبة","بناء شراكة مبكرة مع أولياء الأمور"],"days":[{"a":"استقبال الطالبات وتهيئة المستجدات بأجواء ترحيبية، وإطلاق قيمة الأسبوع (الانضباط)","t":"جميع الطالبات","w":"الموجهة الطلابية والإدارة","e":"صور"},{"a":"جولة تعريفية للمستجدات بمرافق المدرسة، وأنشطة لتخفيف قلق الانفصال","t":"طالبات الصف الأول","w":"الموجهة الطلابية ومعلمات الصف الأول","e":"صور"},{"a":"التعريف بقواعد السلوك والمواظبة في الفصول","t":"جميع الطالبات","w":"الموجهة الطلابية ومعلمات الفصول","e":"صور، نشرة"},{"a":"اللقاء الأول بأولياء الأمور: التعريف بأنظمة المدرسة وخدمات التوجيه الطلابي","t":"أولياء الأمور","w":"الموجهة الطلابية والإدارة","e":"كشف حضور، صور"},{"a":"حصر الطالبات المحتاجات لرعاية خاصة (صحية، اجتماعية، تحصيلية)","t":"الطالبات","w":"الموجهة الطلابية","e":"سجل الحصر"}]},{"k":"w","title":"برنامج الزي المدرسي «هوية وانتماء»","items":["برنامج الزي المدرسي «هوية وانتماء» للتوعية بالزي المدرسي والرياضي"],"value":"الانضباط","goals":["توعية الطالبات بأهمية الالتزام بالزي المدرسي والرياضي","تعزيز الهوية والانتماء للمدرسة","ترسيخ قيمة الانضباط"],"days":[{"a":"إطلاق البرنامج وقيمة الأسبوع (الانضباط) في الطابور الصباحي","t":"جميع الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"إذاعة مدرسية عن الزي المدرسي والهوية","t":"جميع الطالبات","w":"الموجهة الطلابية ورائدة النشاط","e":"صور"},{"a":"لقاء توجيه جمعي في الفصول عن الالتزام بالزي المدرسي والرياضي","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"رسالة توعوية لأولياء الأمور عن الزي المدرسي والرياضي","t":"أولياء الأمور","w":"الموجهة الطلابية","e":"نسخة الرسالة"},{"a":"متابعة الالتزام بالزي وتكريم الطالبات الملتزمات","t":"الطالبات","w":"الموجهة الطلابية والإدارة","e":"شهادات، صور"}]},{"k":"w","title":"الاستخدام الآمن للإنترنت والمجلس الطلابي الأول","items":["برنامج الاستخدام الآمن للإنترنت والألعاب الإلكترونية","المجلس الطلابي الأول"],"value":"العزيمة","goals":["توعية الطالبات بالاستخدام الآمن للإنترنت والألعاب الإلكترونية","تشكيل المجلس الطلابي وتفعيل مشاركة الطالبات","ترسيخ قيمة العزيمة"],"days":[{"a":"إطلاق قيمة الأسبوع (العزيمة)، وإذاعة عن الاستخدام الآمن للإنترنت","t":"جميع الطالبات","w":"الموجهة الطلابية ورائدة النشاط","e":"صور"},{"a":"توجيه جمعي: نشاط «إشارة المرور الرقمية» (آمن، أستشير، أتوقف وأبلغ)","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"توعية بمخاطر الألعاب الإلكترونية والتواصل مع الغرباء وحماية المعلومات الشخصية","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"المجلس الطلابي الأول: تشكيل المجلس وتوزيع المهام","t":"عضوات المجلس","w":"الموجهة الطلابية والإدارة","e":"محضر الاجتماع"},{"a":"نشرة لأولياء الأمور عن الرقابة الأبوية وتنظيم وقت الشاشة","t":"أولياء الأمور","w":"الموجهة الطلابية","e":"نسخة النشرة"}]},{"k":"w","title":"برنامج رفق وحماية الطفل من الإيذاء","items":["برنامج رفق لمناهضة العنف","برنامج حماية الطفل من الإيذاء"],"value":"الانضباط","goals":["نشر ثقافة الرفق ونبذ العنف في البيئة المدرسية","توعية الطالبات بحقوقهن وطرق طلب المساعدة","تعريف المعلمات بمؤشرات الإيذاء وآلية الإبلاغ"],"days":[{"a":"إطلاق قيمة الأسبوع (الانضباط)، وإذاعة مدرسية عن الرفق","t":"جميع الطالبات","w":"الموجهة الطلابية ورائدة النشاط","e":"صور"},{"a":"نشاط «شجرة الرفق» في الفصول","t":"الطالبات","w":"الموجهة الطلابية ورائدة النشاط","e":"صور"},{"a":"برنامج حماية الطفل من الإيذاء: نشاط «دائرة الأمان»","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"لقاء توعوي للمعلمات عن مؤشرات الإيذاء وآلية الإبلاغ","t":"المعلمات","w":"الموجهة الطلابية","e":"كشف حضور"},{"a":"نشرة لأولياء الأمور عن التربية بالرفق والحوار","t":"أولياء الأمور","w":"الموجهة الطلابية","e":"نسخة النشرة"}]},{"k":"w","title":"الاحتفاء باليوم الوطني","items":["المشاركة في الاحتفاء باليوم الوطني"],"value":"الانتماء","goals":["تعزيز الانتماء والولاء للوطن","إشراك الطالبات في فعاليات اليوم الوطني"],"days":[{"a":"إطلاق قيمة الأسبوع (الانتماء)، وإذاعة مدرسية عن اليوم الوطني","t":"جميع الطالبات","w":"الموجهة الطلابية ورائدة النشاط","e":"صور"},{"a":"المشاركة في فعالية الاحتفاء باليوم الوطني","t":"جميع الطالبات","w":"الإدارة ورائدة النشاط والموجهة الطلابية","e":"صور"},{"a":"نشاط «أحب وطني» في الفصول: رسم وكتابة عبارات انتماء","t":"الطالبات","w":"الموجهة الطلابية ومعلمات الفصول","e":"صور"},{"off":"إجازة اليوم الوطني"},{"off":"إجازة اليوم الوطني"}]},{"k":"w","title":"يوم الطفل العربي وخط مساندة الطفل","items":["الاحتفاء بيوم الطفل العربي للتوعية بحقوق الطفل","التعريف بخط مساندة الطفل"],"value":"الانضباط","goals":["توعية الطالبات بحقوق الطفل وواجباته","التعريف بخط مساندة الطفل (١١٦١١١) وطرق طلب المساعدة","ترسيخ قيمة الانضباط"],"days":[{"a":"إطلاق قيمة الأسبوع (الانضباط)، وإذاعة عن يوم الطفل العربي","t":"جميع الطالبات","w":"الموجهة الطلابية ورائدة النشاط","e":"صور"},{"a":"توجيه جمعي بقصة مصورة عن حقوق الطفل وواجباته","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"التعريف بخط مساندة الطفل (١١٦١١١) ومتى تطلب الطالبة المساعدة","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"نشرة لأولياء الأمور عن حقوق الطفل وخط المساندة","t":"أولياء الأمور","w":"الموجهة الطلابية","e":"نسخة النشرة"},{"a":"مسابقة ثقافية قصيرة عن حقوق الطفل","t":"الطالبات","w":"الموجهة الطلابية ورائدة النشاط","e":"صور"}]},{"k":"w","title":"التهيئة للاختبارات واليوم العالمي للمعلم","items":["برنامج التهيئة الإرشادية والنفسية للاختبارات","المشاركة في الاحتفاء باليوم العالمي للمعلم"],"value":"المثابرة","goals":["خفض قلق الاختبارات لدى الطالبات","تدريب الطالبات على مهارات الاستذكار وتنظيم الوقت","تقدير دور المعلمة"],"days":[{"a":"إطلاق قيمة الأسبوع (المثابرة)، وإذاعة عن الاستعداد للاختبارات","t":"جميع الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"توجيه جمعي: مهارات الاستذكار وتنظيم الوقت","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"تمارين التنفس والاسترخاء للتعامل مع قلق الاختبار","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"المشاركة في الاحتفاء باليوم العالمي للمعلم: بطاقات شكر من الطالبات","t":"الطالبات والمعلمات","w":"الموجهة الطلابية ورائدة النشاط","e":"صور"},{"a":"رسالة لأولياء الأمور عن تهيئة بناتهن للاختبارات","t":"أولياء الأمور","w":"الموجهة الطلابية","e":"نسخة الرسالة"}]},{"k":"w","title":"المهارات النفسية والاجتماعية واليوم العالمي للصحة النفسية","items":["برنامج تعزيز المهارات النفسية والاجتماعية للطالبات احتفاءً باليوم العالمي للصحة النفسية"],"value":"الوسطية","goals":["تعزيز وعي الطالبات بالصحة النفسية","تنمية مهارات التعبير عن المشاعر والتواصل","ترسيخ قيمة الوسطية"],"days":[{"a":"إطلاق قيمة الأسبوع (الوسطية)، وإذاعة عن اليوم العالمي للصحة النفسية","t":"جميع الطالبات","w":"الموجهة الطلابية ورائدة النشاط","e":"صور"},{"a":"توجيه جمعي: نشاط «ميزان المشاعر»","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"نشاط «زجاجة الهدوء» وتمارين الاسترخاء","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"تفعيل ركن الهدوء وتعريف الطالبات به","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"نشرة لأولياء الأمور عن الصحة النفسية للأطفال","t":"أولياء الأمور","w":"الموجهة الطلابية","e":"نسخة النشرة"}]},{"k":"w","title":"الإيجابية واليوم العالمي للمدير","items":["المشاركة في الاحتفاء باليوم العالمي للمدير"],"value":"الإيجابية","goals":["ترسيخ قيمة الإيجابية في البيئة المدرسية","تقدير دور قائدة المدرسة"],"days":[{"a":"إطلاق قيمة الأسبوع (الإيجابية)، وإذاعة عن الإيجابية","t":"جميع الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"توجيه جمعي: «كلماتي الإيجابية» وتحويل العبارات السلبية إلى إيجابية","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"المشاركة في الاحتفاء باليوم العالمي للمدير: بطاقات تقدير","t":"الطالبات","w":"الموجهة الطلابية ورائدة النشاط","e":"صور"},{"a":"لوحة «أنا إيجابية» في ممر المدرسة","t":"الطالبات","w":"الموجهة الطلابية ورائدة النشاط","e":"صور"},{"a":"متابعة الحالات الفردية وتحديث سجلاتها","t":"الطالبات المحالات","w":"الموجهة الطلابية","e":"سجل الجلسات"}]},{"k":"w","title":"برنامج «مدرستي مسؤوليتي»","items":["برنامج «مدرستي مسؤوليتي» لتوعية الطالبات بالمحافظة على الممتلكات العامة"],"value":"الانضباط","goals":["توعية الطالبات بالمحافظة على الممتلكات العامة","تعزيز المسؤولية والانضباط"],"days":[{"a":"إطلاق قيمة الأسبوع (الانضباط)، وإذاعة عن المحافظة على الممتلكات","t":"جميع الطالبات","w":"الموجهة الطلابية ورائدة النشاط","e":"صور"},{"a":"توجيه جمعي: «مدرستي بيتي الثاني»","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"حملة «فصلي أجمل» لترتيب الفصول والعناية بها","t":"الطالبات","w":"الموجهة الطلابية ومعلمات الفصول","e":"صور"},{"a":"اختيار «سفيرة النظافة» في كل فصل","t":"الطالبات","w":"الموجهة الطلابية ومعلمات الفصول","e":"كشف الأسماء"},{"a":"تكريم الفصل الأكثر محافظة على ممتلكاته","t":"الطالبات","w":"الموجهة الطلابية والإدارة","e":"شهادات، صور"}]},{"k":"w","title":"اليوم العالمي لمكافحة العنف والتنمر","items":["تعريف الطالبات باليوم العالمي لمكافحة أشكال العنف والتنمر"],"value":"الإتقان","goals":["تعريف الطالبات بأشكال العنف والتنمر","تدريب الطالبات على التصرف الصحيح وطلب المساعدة","ترسيخ قيمة الإتقان"],"days":[{"a":"إطلاق قيمة الأسبوع (الإتقان)، وإذاعة عن مكافحة العنف والتنمر","t":"جميع الطالبات","w":"الموجهة الطلابية ورائدة النشاط","e":"صور"},{"a":"توجيه جمعي: أشكال التنمر وكيف أتصرف","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"مواقف تمثيلية قصيرة «أقول لا وأطلب المساعدة»","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"صندوق «أخبريني» لاستقبال ملاحظات الطالبات بسرية","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"نشرة لأولياء الأمور عن علامات تعرض الطفلة للتنمر","t":"أولياء الأمور","w":"الموجهة الطلابية","e":"نسخة النشرة"}]},{"k":"w","title":"تنمية الدافعية ورفع المستوى التحصيلي","items":["تنفيذ برنامج تنمية الدافعية ورفع المستوى التحصيلي للطالبات"],"value":"الانضباط","goals":["تنمية دافعية الطالبات للتعلم","متابعة الطالبات المتأخرات دراسياً ووضع خطط علاجية","تحفيز المتفوقات والمتحسنات"],"days":[{"a":"إطلاق قيمة الأسبوع (الانضباط)، وإذاعة عن الطموح والتفوق","t":"جميع الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"حصر الطالبات المتأخرات دراسياً بالتنسيق مع المعلمات","t":"المعلمات","w":"الموجهة الطلابية","e":"كشف الحصر"},{"a":"توجيه جمعي: «أهدافي الدراسية» وجدول المذاكرة","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"جلسات فردية للطالبات المتأخرات دراسياً ووضع خطط علاجية","t":"الطالبات المتأخرات دراسياً","w":"الموجهة الطلابية والمعلمات","e":"سجل الجلسات"},{"a":"تكريم الطالبات المتفوقات والمتحسنات","t":"الطالبات","w":"الموجهة الطلابية والإدارة","e":"شهادات، صور"}]},{"k":"w","title":"برنامج «قيمنا تسامح» والمجلس الطلابي الثاني","items":["المجلس الطلابي الثاني","برنامج «قيمنا تسامح» لتعريف الطالبات باليوم العالمي للتسامح"],"value":"التسامح","goals":["نشر قيمة التسامح بين الطالبات","تفعيل المجلس الطلابي ومتابعة مقترحاته"],"days":[{"a":"إطلاق قيمة الأسبوع (التسامح)، وإذاعة عن اليوم العالمي للتسامح","t":"جميع الطالبات","w":"الموجهة الطلابية ورائدة النشاط","e":"صور"},{"a":"توجيه جمعي «قيمنا تسامح»: قصص ومواقف","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"نشاط «جسر التسامح»: بطاقات تسامح بين الطالبات","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"المجلس الطلابي الثاني: متابعة المقترحات وتقييم الفصل","t":"عضوات المجلس","w":"الموجهة الطلابية والإدارة","e":"محضر الاجتماع"},{"a":"متابعة الحالات الفردية وإعداد تقرير منتصف الفصل","t":"الطالبات المحالات","w":"الموجهة الطلابية","e":"التقرير"}]},{"k":"b","t":"إجازة الخريف"},{"k":"w","title":"برنامج التوجيه المهني","items":["تنفيذ برنامج التوجيه المهني لتوعية الطالبات واستكشاف الميول والمسارات المستقبلية"],"value":"المرونة","goals":["تعريف الطالبات بالمهن ودورها في المجتمع","مساعدة الطالبات على استكشاف ميولهن","ترسيخ قيمة المرونة"],"days":[{"a":"إطلاق قيمة الأسبوع (المرونة)، وإذاعة عن المهن","t":"جميع الطالبات","w":"الموجهة الطلابية ورائدة النشاط","e":"صور"},{"a":"توجيه جمعي: «ماذا أريد أن أكون؟»","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"نشاط «مهنتي المستقبلية»: ترسم الطالبة المهنة التي تحبها","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"استضافة أمهات من مهن مختلفة للتعريف بمهنهن","t":"الطالبات","w":"الموجهة الطلابية والإدارة","e":"صور"},{"a":"معرض رسومات «مهنتي المستقبلية»","t":"الطالبات","w":"الموجهة الطلابية ورائدة النشاط","e":"صور"}]},{"k":"w","title":"تعزيز الانضباط المدرسي","items":["توعية الطالبات بأهمية الانضباط لتعزيز الانضباط المدرسي"],"value":"الانضباط","goals":["توعية الطالبات بأهمية الانضباط والحضور المبكر","متابعة حالات الغياب والتأخر","تحفيز الطالبات الملتزمات"],"days":[{"a":"إطلاق قيمة الأسبوع (الانضباط)، وإذاعة عن الانضباط","t":"جميع الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"توجيه جمعي: «الانضباط طريق التميز»","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"متابعة الطالبات كثيرات الغياب والتأخر والتواصل مع أسرهن","t":"الطالبات المتغيبات","w":"الموجهة الطلابية","e":"سجل التواصل"},{"a":"تفعيل بطاقة «الحضور المبكر» لتحفيز الطالبات","t":"الطالبات","w":"الموجهة الطلابية ومعلمات الفصول","e":"صور"},{"a":"إعلان لوحة الشرف للمواظبات وتكريمهن","t":"الطالبات","w":"الموجهة الطلابية والإدارة","e":"شهادات"}]},{"k":"w","title":"اليوم العالمي للغة العربية","items":["المشاركة في الاحتفاء باليوم العالمي للغة العربية"],"value":"الانتماء","goals":["تعزيز اعتزاز الطالبات باللغة العربية","ترسيخ قيمة الانتماء"],"days":[{"a":"إطلاق قيمة الأسبوع (الانتماء)، وإذاعة عن اليوم العالمي للغة العربية","t":"جميع الطالبات","w":"الموجهة الطلابية ورائدة النشاط","e":"صور"},{"a":"نشاط «تحدثي بالفصحى» في الفصول","t":"الطالبات","w":"الموجهة الطلابية ومعلمات اللغة العربية","e":"صور"},{"a":"المشاركة في فعالية الاحتفاء باليوم العالمي للغة العربية","t":"جميع الطالبات","w":"رائدة النشاط والموجهة الطلابية","e":"صور"},{"a":"مسابقة «أجمل عبارة» عن اللغة العربية","t":"الطالبات","w":"رائدة النشاط ومعلمات اللغة العربية","e":"صور"},{"a":"تكريم الفائزات في المسابقة","t":"الطالبات","w":"الموجهة الطلابية والإدارة","e":"شهادات"}]},{"k":"w","title":"التهيئة الإرشادية والنفسية للاختبارات النهائية","items":["التهيئة الإرشادية والنفسية للاختبارات"],"value":"العزيمة","goals":["خفض قلق الاختبارات لدى الطالبات","تهيئة الطالبات وأسرهن للاختبارات النهائية"],"days":[{"a":"إطلاق قيمة الأسبوع (العزيمة)، وإذاعة عن الاستعداد للاختبارات","t":"جميع الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"توجيه جمعي: مهارات الاستذكار والمراجعة","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"تمارين الاسترخاء والتعامل مع قلق الاختبار","t":"الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"نشرة لأولياء الأمور: تهيئة البيئة المنزلية للاختبارات","t":"أولياء الأمور","w":"الموجهة الطلابية","e":"نسخة النشرة"},{"a":"جلسات فردية للطالبات القلقات من الاختبارات","t":"الطالبات المحتاجات","w":"الموجهة الطلابية","e":"سجل الجلسات"}]},{"k":"w","title":"لقاء أولياء الأمور الثاني","items":["توثيق علاقة الأسرة بالمدرسة: لقاء أولياء الأمور الثاني"],"value":"الانضباط","goals":["تعزيز الشراكة بين الأسرة والمدرسة","إطلاع أولياء الأمور على مستوى بناتهن"],"days":[{"a":"إطلاق قيمة الأسبوع (الانضباط)، وإذاعة عن الشراكة مع الأسرة","t":"جميع الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"إعداد دعوات اللقاء وإرسالها لأولياء الأمور","t":"أولياء الأمور","w":"الموجهة الطلابية","e":"نسخة الدعوة"},{"a":"إعداد ملخص مستوى الطالبات بالتنسيق مع المعلمات","t":"المعلمات","w":"الموجهة الطلابية","e":"الملخص"},{"a":"لقاء أولياء الأمور الثاني","t":"أولياء الأمور","w":"الموجهة الطلابية والإدارة والمعلمات","e":"كشف حضور، صور"},{"a":"توثيق اللقاء ومتابعة توصياته","t":"أولياء الأمور","w":"الموجهة الطلابية","e":"التقرير"}]},{"k":"w","title":"الاختبارات النهائية","items":["الاختبارات النهائية"],"value":"المثابرة","goals":["دعم الطالبات نفسياً خلال فترة الاختبارات","متابعة الحضور في فترة الاختبارات","إعداد التقرير الختامي لأعمال التوجيه الطلابي"],"days":[{"a":"إطلاق قيمة الأسبوع (المثابرة)، واستقبال الطالبات وتهيئتهن قبل الاختبار","t":"جميع الطالبات","w":"الموجهة الطلابية","e":"صور"},{"a":"متابعة الحضور والتواصل مع أسر الغائبات","t":"الطالبات الغائبات","w":"الموجهة الطلابية","e":"سجل التواصل"},{"a":"دعم الطالبات القلقات أثناء الاختبارات","t":"الطالبات المحتاجات","w":"الموجهة الطلابية","e":"سجل الجلسات"},{"a":"متابعة الحضور والتواصل مع أسر الغائبات","t":"الطالبات الغائبات","w":"الموجهة الطلابية","e":"سجل التواصل"},{"a":"إعداد التقرير الختامي لأعمال التوجيه الطلابي في الفصل الأول","t":"—","w":"الموجهة الطلابية","e":"التقرير الختامي"}]},{"k":"b","t":"إجازة منتصف العام"}];
+const FX = {
+  plans: { t: 'سجل خطط التوجيه الطلابي', d: 'الخطة الفصلية والخطط الأسبوعية، وتنسخين منها خطة الفصل الجديد.', c: '#0E7F7B', ic: '<rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M4 10h16M8 14h3M13 14h3M8 17h3"/>' },
+  disc: { t: 'سجل الانضباط المدرسي', d: 'الغياب والتقارير الشهرية، والحالات السلوكية، والتكريم ولوحة الشرف.', c: '#C9532A', ic: '<path d="M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6z"/><path d="m8.5 12 2.5 2.5 4.5-5"/>' },
+  ach: { t: 'سجل التحصيل الدراسي', d: 'حالات التأخر الدراسي والمتفوقات والموهوبات، وبرامج رفع التحصيل.', c: '#1F6FB2', ic: '<path d="M3 9.5 12 5l9 4.5-9 4.5z"/><path d="M7 11.5V16c1.5 1.3 3.2 2 5 2s3.5-.7 5-2v-4.5M21 9.5V15"/>' },
+  ind: { t: 'سجل جلسات التوجيه الفردي', d: 'كل الجلسات الفردية المسجلة في حالات مسار، مرتبة بالتاريخ.', c: '#6A4BC4', ic: '<circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7"/>' },
+  grp: { t: 'سجل جلسات التوجيه الجمعي', d: 'لقاءات التوجيه الجمعي في البرامج، والجلسات الجماعية في مسار.', c: '#2E7D4F', ic: '<circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2.5 19c0-3.2 2.5-5.5 5.5-5.5s5.5 2.3 5.5 5.5M10.5 19c0-3.2 2.5-5.5 5.5-5.5s5.5 2.3 5.5 5.5"/>' }
+};
+Object.entries(FX).forEach(([k, v]) => { SEC_COL[k] = v.c; });
+Object.assign(SEC_FILE, { plans: 'سجل خطط التوجيه الطلابي', disc: 'سجل الانضباط المدرسي', ach: 'سجل التحصيل الدراسي', ind: 'سجل جلسات التوجيه الفردي', grp: 'سجل جلسات التوجيه الجمعي' });
+const MCATS = { separation: 'انفصال الوالدين', orphan: 'اليتيمات', economic: 'الظروف الاقتصادية', health: 'الظروف الصحية', delayed: 'التأخر الدراسي', psych: 'الملاحظات النفسية', behavior: 'الملاحظات السلوكية', excellent: 'المتفوقات', gifted: 'الموهوبات' };
+const MSTAT = { active: 'قيد المتابعة', open: 'قيد المتابعة', closed: 'مغلقة', done: 'مغلقة' };
+const MPROG = { up: 'تحسن', same: 'ثابت', down: 'تراجع' };
+const ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس', 'السادس', 'السابع', 'الثامن', 'التاسع', 'العاشر', 'الحادي عشر', 'الثاني عشر', 'الثالث عشر', 'الرابع عشر', 'الخامس عشر', 'السادس عشر', 'السابع عشر', 'الثامن عشر', 'التاسع عشر', 'العشرون', 'الحادي والعشرون', 'الثاني والعشرون'];
+const WDAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'];
+const PVALS = ['الانضباط', 'العزيمة', 'الانتماء', 'المثابرة', 'الوسطية', 'الإيجابية', 'الإتقان', 'التسامح', 'المرونة', 'الصدق', 'الأمانة', 'الاحترام', 'التعاون', 'المسؤولية'];
+
+/* ── تحويل التاريخ ── */
+const HFMT = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', { day: 'numeric', month: 'numeric', year: 'numeric', timeZone: 'UTC' });
+const DAYMS = 864e5;
+function g2h(t) { const p = HFMT.formatToParts(new Date(t)); const g = k => +p.find(x => x.type === k).value; return g('year') + '-' + pad2(g('month')) + '-' + pad2(g('day')); }
+function h2g(h) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(h || ''); if (!m) return null; const [y, mo, d] = [+m[1], +m[2], +m[3]];
+  let t = Math.round((Date.UTC(622, 6, 19) + ((y - 1) * 354.36667 + (mo - 1) * 29.5306 + (d - 1)) * DAYMS) / DAYMS) * DAYMS;
+  for (let i = 0; i < 40; i++) for (const s of [1, -1]) { const tt = t + s * i * DAYMS; if (g2h(tt) === h) return tt; }
+  return null;
+}
+const hShort = t => { const [, m, d] = g2h(t).split('-').map(Number); return ar(d) + ' ' + HM[m - 1]; };
+const hNum = t => { const [, m, d] = g2h(t).split('-').map(Number); return ar(d) + '/' + ar(m); };
+const todayG = () => { const n = new Date(); return Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()); };
+
+/* ── الخطط ── */
+function planWeeks(p) {
+  let t = h2g(p.start); if (t == null) return [];
+  const wd = new Date(t).getUTCDay(); t -= wd * DAYMS;
+  const out = []; let n = 0;
+  (p.slots || []).forEach((s, i) => {
+    if (s.k === 'b') out.push({ i, br: true, s, from: t - 2 * DAYMS, to: t + 6 * DAYMS });
+    else out.push({ i, s, n: n++, from: t, to: t + 4 * DAYMS });
+    t += 7 * DAYMS;
+  });
+  return out;
+}
+const plans = () => list('plan').sort((a, b) => String(b.year || '').localeCompare(String(a.year || '')) || PTERM.indexOf(b.term) - PTERM.indexOf(a.term));
+const wkDone = s => (s.days || []).filter(d => !d.off && d.done).length;
+const wkTotal = s => (s.days || []).filter(d => !d.off).length;
+function curWeek(p) { const td = todayG(); return planWeeks(p).find(w => !w.br && td >= w.from && td <= w.from + 6 * DAYMS); }
+const blankDays = () => WDAYS.map(() => ({ a: '', t: '', w: 'الموجهة الطلابية', e: '' }));
+const offNote = s => { const o = (s.days || []).map((d, i) => d.off ? WDAYS[i] : '').filter(Boolean); return o.length ? '(' + o.join(' و') + ' إجازة)' : ''; };
+
+function vFiles() {
+  if (!S.mcases && !S.mloading) loadMasar();
+  const p = S.param;
+  if (p === 'plans') return vPlans();
+  if (/^plan-/.test(p)) return S.param2 !== '' && S.param2 != null ? vWeek() : vPlan();
+  if (FX[p]) return vFile(p);
+  const pl = plans(); const cur = pl.map(x => ({ p: x, w: curWeek(x) })).find(x => x.w);
+  const cs = S.mcases || []; const ind = mSessions('جلسة فردية').length;
+  const stat = { plans: pl.length ? ar(pl.length) + ' خطة' : 'لا توجد خطط بعد', disc: ar(list('absence').length) + ' ملف غياب · ' + ar(list('daily').filter(r => /سلوك/.test(r.type)).length) + ' حالة سلوكية',
+    ach: ar(cs.filter(c => (c.cats || []).some(k => ['delayed', 'excellent', 'gifted'].includes(k))).length) + ' حالة', ind: ar(ind) + ' جلسة', grp: ar(list('group').length + mSessions('جلسة جماعية').length) + ' لقاء' };
+  return `<div class="head"><h1><span class="dot"></span>ملفاتي</h1></div>
+    <p class="lede">سجلاتك الرسمية في مكان واحد. كل سجل يتجمع لحاله من بيانات المنصة ومسار، وتقدرين تضيفين له صور أوراقك، وتطبعينه بغلاف وفهرس.</p>
+    ${cur ? `<a class="fx-now" href="#files/${cur.p.id}/${cur.w.i}" style="--c:${FX.plans.c}"><span>هذا الأسبوع</span><b>الأسبوع ${ORD[cur.w.n]}: ${esc(cur.w.s.title || (cur.w.s.items || [])[0] || '')}</b><small>${ar(wkDone(cur.w.s))} من ${ar(wkTotal(cur.w.s))} منفذ · فتح الخطة الأسبوعية ←</small></a>` : ''}
+    <div class="fx-grid">${Object.entries(FX).map(([k, v]) => `<a class="fx-card" href="#files/${k}" style="--c:${v.c}"><span class="fx-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${v.ic}</svg></span>
+      <div><b>${esc(v.t)}</b><p>${esc(v.d)}</p><small>${S.mloading && k !== 'plans' && k !== 'disc' ? 'جارٍ التحميل…' : esc(stat[k])}</small></div></a>`).join('')}</div>`;
+}
+
+function vPlans() {
+  const pl = plans(); const seeded = pl.some(p => p.seed === '1448-1');
+  return `<a class="btn ghost" href="#files" style="align-self:flex-start">→ ملفاتي</a>
+    <div class="head"><h1><span class="dot" style="background:${FX.plans.c}"></span>خطط التوجيه الطلابي</h1><span class="sp"></span><button class="btn" data-fxbin="plans">طباعة السجل كامل</button><button class="btn primary" data-fx="planNew" style="background:${FX.plans.c};border-color:${FX.plans.c}">＋ خطة فصل جديد</button></div>
+    <p class="lede">لكل فصل خطة: أسابيعها بتواريخها، وبرامج كل أسبوع وقيمته، وأنشطة الأيام. الخطة الأسبوعية تطلع منها جاهزة، وخطة الفصل الجديد تنسخينها من القديمة وتعدلين اللي يختلف.</p>
+    ${seeded ? '' : `<div class="myprg" style="--prg:${FX.plans.c}"><div><b>خطة الفصل الأول ١٤٤٨هـ جاهزة</b><span>١٩ أسبوع بالبرامج والقيم والأنشطة اليومية، مثل الملف اللي سويناه.</span><small>تنضاف بضغطة، وبعدها تعدلين عليها براحتك.</small></div><button class="btn primary" data-fx="planSeed">＋ أضيفيها</button></div>`}
+    ${pl.length ? `<div class="list">${pl.map(p => { const ws = planWeeks(p).filter(w => !w.br); const tot = ws.reduce((s, w) => s + wkTotal(w.s), 0), dn = ws.reduce((s, w) => s + wkDone(w.s), 0); const pct = tot ? Math.round(100 * dn / tot) : 0; const cw = curWeek(p);
+      return `<article class="pcard" style="--c:${FX.plans.c}"><a class="pc-main" href="#files/${p.id}"><div class="pc-top"><span class="pc-dom">${esc(p.term || '')} ${p.year ? ar(p.year) + 'هـ' : ''}</span>${cw ? `<span class="pill" style="--pc:${FX.plans.c};--ps:#DDF2F0">الأسبوع ${ORD[cw.n]}</span>` : ''}</div>
+        <h3 class="pc-t">${esc(p.title)}</h3><p class="pc-sub">${ar(ws.length)} أسبوع${ws.length ? `<i>•</i>${hShort(ws[0].from)} — ${hShort(ws[ws.length - 1].to)}` : ''}</p>
+        <div class="pc-prog"><div class="pc-bar"><i style="width:${pct}%"></i></div><span>${ar(dn)}/${ar(tot)} نشاط منفذ</span></div></a>
+        <div class="pc-acts"><button class="pc-btn" data-fxsem="${p.id}">الخطة الفصلية</button><button class="pc-btn" data-fxweeks="${p.id}">الخطط الأسبوعية</button><a class="pc-open" href="#files/${p.id}">فتح</a></div></article>`; }).join('')}</div>`
+      : '<div class="empty"><b>ما فيه خطط بعد</b><span>أضيفي خطة الفصل الأول الجاهزة، أو ابدئي خطة جديدة.</span></div>'}`;
+}
+
+function vPlan() {
+  const doc = DB.docs[S.param]; if (!doc) return `<div class="empty"><b>الخطة غير موجودة</b><a class="btn" href="#files/plans">رجوع</a></div>`;
+  const p = doc.data; const ws = planWeeks(p); const td = todayG(); const c = FX.plans.c;
+  return `<a class="btn ghost" href="#files/plans" style="align-self:flex-start">→ كل الخطط</a>
+    <div class="head"><h1><span class="dot" style="background:${c}"></span>${esc(p.title)}</h1><span class="sp"></span>
+      <button class="btn primary" data-fxsem="${S.param}" style="background:${c};border-color:${c}">الخطة الفصلية</button><button class="btn" data-fxweeks="${S.param}">الخطط الأسبوعية</button><button class="btn" data-fx="planEdit">بيانات الخطة</button><button class="btn danger" data-del="${S.param}" data-back="#files/plans">حذف</button></div>
+    <p class="lede">${esc(p.term || '')} ${p.year ? '· ' + ar(p.year) + 'هـ' : ''} · اضغطي على أي أسبوع تفتحين خطته الأسبوعية وتعدلين أنشطته.</p>
+    <div class="toolbar" style="justify-content:flex-start"><button class="btn sm" data-fx="wkAdd">＋ أسبوع في النهاية</button><button class="btn sm" data-fx="brAdd">＋ إجازة</button></div>
+    <div class="wk-grid">${ws.map(w => w.br ? `<div class="wk br"><div class="wk-h"><b>${esc(w.s.t)}</b><small>${hNum(w.from)} — ${hNum(w.to)}</small></div><div class="wk-b"><span>إجازة</span></div><button class="wk-x" data-fxbrdel="${w.i}" aria-label="حذف الإجازة">✕</button></div>`
+      : `<a class="wk${td >= w.from && td <= w.from + 6 * DAYMS ? ' now' : ''}" href="#files/${S.param}/${w.i}"><div class="wk-h"><b>الأسبوع ${ORD[w.n] || ar(w.n + 1)}</b><small>${hNum(w.from)} — ${hNum(w.to)}</small></div>
+        <div class="wk-b">${(w.s.items || []).length ? w.s.items.map(t => `<span>${esc(t)}</span>`).join('') : '<span class="muted">لم تُحدد برامج</span>'}${offNote(w.s) ? `<em>${offNote(w.s)}</em>` : ''}</div>
+        <div class="wk-f"><span>قيمة الأسبوع: <b>${esc(w.s.value || '—')}</b></span><span>${ar(wkDone(w.s))}/${ar(wkTotal(w.s))}</span></div></a>`).join('')}</div>`;
+}
+
+function vWeek() {
+  const doc = DB.docs[S.param]; if (!doc) return '<div class="empty"><b>الخطة غير موجودة</b></div>';
+  const p = doc.data; const ws = planWeeks(p); const w = ws.find(x => String(x.i) === String(S.param2) && !x.br); if (!w) return `<div class="empty"><b>الأسبوع غير موجود</b><a class="btn" href="#files/${S.param}">رجوع</a></div>`;
+  const s = w.s; const c = FX.plans.c; const wi = ws.filter(x => !x.br); const k = wi.indexOf(w); const prev = wi[k - 1], next = wi[k + 1];
+  const prog = s.progId && DB.docs[s.progId] ? DB.docs[s.progId].data : null;
+  return `<div class="toolbar" style="justify-content:space-between"><a class="btn ghost" href="#files/${S.param}">→ ${esc(p.title)}</a><span>${prev ? `<a class="btn sm" href="#files/${S.param}/${prev.i}">→ الأسبوع ${ORD[prev.n]}</a>` : ''} ${next ? `<a class="btn sm" href="#files/${S.param}/${next.i}">الأسبوع ${ORD[next.n]} ←</a>` : ''}</span></div>
+    <div class="wk-head" style="--c:${c}"><div><small>الخطة الأسبوعية · ${hShort(w.from)} — ${hShort(w.to)}</small><h1>الأسبوع ${ORD[w.n]}${s.title ? ': ' + esc(s.title) : ''}</h1></div>
+      <div class="wk-val"><small>قيمة الأسبوع</small><b>${esc(s.value || '—')}</b></div></div>
+    <div class="toolbar" style="justify-content:flex-start"><button class="btn primary" data-fx="wkEdit" style="background:${c};border-color:${c}">تعديل الأسبوع</button><button class="btn" data-fx="wkBank">من البنك الجاهز</button><button class="btn" data-fxwk="${S.param}:${w.i}">طباعة الأسبوع</button><button class="btn danger" data-fx="wkDel">حذف الأسبوع</button></div>
+    <div class="wk-two"><section class="panel"><div class="head"><h3>برامج الأسبوع</h3></div>${(s.items || []).length ? `<ul class="goals">${s.items.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : '<p class="small muted">لم تُحدد.</p>'}
+      <label class="f"><span class="tiny muted">ربط ببرنامج من قسم البرامج (اختياري)</span><select class="sel" data-fxprog="1"><option value="">بدون ربط</option>${list('program').map(x => `<option value="${x.id}"${x.id === s.progId ? ' selected' : ''}>${esc(x.title)}</option>`).join('')}</select></label>
+      ${prog ? `<a class="btn sm" href="#programs/${s.progId}" style="align-self:flex-start">فتح برنامج «${esc(prog.title)}» ←</a>` : ''}</section>
+      <section class="panel"><div class="head"><h3>أهداف الأسبوع</h3></div>${(s.goals || []).length ? `<ol class="goals">${s.goals.map(t => `<li>${esc(t)}</li>`).join('')}</ol>` : '<p class="small muted">لم تُكتب.</p>'}</section></div>
+    <section class="panel"><div class="head"><h3>أنشطة الأيام</h3><span class="tiny muted">${ar(wkDone(s))} من ${ar(wkTotal(s))} منفذ</span></div>
+      <div class="days">${(s.days || []).map((d, i) => `<div class="day${d.off ? ' off' : d.done ? ' done' : ''}"><div class="dn"><b>${WDAYS[i]}</b><small>${hShort(w.from + i * DAYMS)}</small></div>
+        ${d.off ? `<div class="da"><b class="offt">${esc(d.off)}</b></div>` : `<div class="da"><p>${esc(d.a || '—')}</p><div class="meta">${d.t ? `<span class="chip">${esc(d.t)}</span>` : ''}${d.w ? `<span class="chip">${esc(d.w)}</span>` : ''}${d.e ? `<span class="chip">الشاهد: ${esc(d.e)}</span>` : ''}</div></div>
+        <label class="chk dchk" style="--sc:${c}"><input type="checkbox" data-fxdone="${i}" ${d.done ? 'checked' : ''}><span>تم</span></label>`}</div>`).join('')}</div></section>`;
+}
+
+async function planSave(fn, msg) { const id = S.param; const d = JSON.parse(JSON.stringify(DB.docs[id].data)); fn(d); try { await saveDoc(id, 'plan', d); if (msg) toast(msg); } catch (e) { toast(errT(e)); } rerender(); }
+function planForm(edit) {
+  const p = edit ? DB.docs[S.param].data : null; const pl = plans();
+  const bg = openSheet(edit ? 'بيانات الخطة' : 'خطة فصل جديد', `<div class="form">
+    <label class="f full"><span>اسم الخطة</span><input id="pl_t" required value="${esc(p ? p.title : 'خطة التوجيه الطلابي الفصلية')}"></label>
+    <label class="f"><span>الفصل الدراسي</span><select id="pl_term">${PTERM.map(t => `<option${(p ? p.term : 'الفصل الثاني') === t ? ' selected' : ''}>${t}</option>`).join('')}</select></label>
+    <label class="f"><span>العام (هجري)</span><input id="pl_y" inputmode="numeric" value="${esc(p ? p.year : todayH().slice(0, 4))}"></label>
+    <div class="f full"><span>أول يوم دراسة (يوم أحد)</span>${hdInput('pl_s', p ? p.start : todayH())}</div>
+    ${edit ? '' : `<label class="f full"><span>محتوى الخطة</span><select id="pl_src"><option value="">خطة فاضية</option>${pl.map((x, i) => `<option value="${x.id}"${i ? '' : ' selected'}>نسخ من: ${esc(x.title)} (${esc(x.term || '')} ${ar(x.year || '')})</option>`).join('')}</select></label>
+      <label class="f"><span>عدد الأسابيع (للخطة الفاضية)</span><input id="pl_n" type="number" min="1" max="22" value="18"></label>
+      <p class="tiny muted full">النسخ يجيب كل الأسابيع ببرامجها وقيمها وأنشطتها والإجازات، ويرجع علامات «تم» فاضية. بعدها عدلي اللي يختلف في الفصل الجديد.</p>`}
+    </div><div class="toolbar"><button class="btn primary" type="submit">${edit ? 'حفظ' : 'إنشاء الخطة'}</button></div>`,
+    async f => {
+      const title = f.querySelector('#pl_t').value.trim() || 'خطة التوجيه الطلابي الفصلية'; let start = readHD(f, 'pl_s'); const g = h2g(start); if (g == null) throw new Error('التاريخ غير صحيح');
+      const wd = new Date(g).getUTCDay(); if (wd) { start = g2h(g - wd * DAYMS); toast('عدّلت البداية ليوم الأحد ' + hij(start)); }
+      const base = { title, term: f.querySelector('#pl_term').value, year: f.querySelector('#pl_y').value.trim(), start };
+      if (edit) { await planSave(d => Object.assign(d, base)); return; }
+      const src = f.querySelector('#pl_src').value; let slots;
+      if (src) slots = JSON.parse(JSON.stringify(DB.docs[src].data.slots || [])).map(s => { (s.days || []).forEach(d => { delete d.done; }); return s; });
+      else slots = Array.from({ length: Math.max(1, Math.min(22, +f.querySelector('#pl_n').value || 18)) }, () => ({ k: 'w', title: '', items: [], value: '', goals: [], days: blankDays() }));
+      const id = uid('plan'); await saveDoc(id, 'plan', { ...base, slots }); toast('أُنشئت الخطة'); S.after = null; setTimeout(() => { location.hash = '#files/' + id; }, 30);
+    }, `--c:${FX.plans.c};--cs:#DDF2F0`);
+  return bg;
+}
+async function planSeed() {
+  const id = uid('plan'); await saveDoc(id, 'plan', { title: 'خطة التوجيه الطلابي الفصلية', term: 'الفصل الأول', year: '1448', start: '1448-03-10', seed: '1448-1', slots: JSON.parse(JSON.stringify(PLAN_SEED)) });
+  toast('أُضيفت خطة الفصل الأول'); location.hash = '#files/' + id;
+}
+function weekForm() {
+  const p = DB.docs[S.param].data; const s = p.slots[+S.param2]; const days = s.days && s.days.length === 5 ? s.days : blankDays();
+  const bg = openSheet('تعديل الأسبوع', `<div class="form">
+    <label class="f full"><span>عنوان الأسبوع</span><input id="wk_t" value="${esc(s.title || '')}" placeholder="مثال: برنامج رفق وحماية الطفل"></label>
+    <label class="f full"><span>برامج الأسبوع في الخطة الفصلية (كل برنامج في سطر)</span><textarea id="wk_i" style="min-height:70px">${esc((s.items || []).join('\n'))}</textarea></label>
+    <label class="f"><span>قيمة الأسبوع</span><input id="wk_v" value="${esc(s.value || '')}"></label>
+    <div class="presets full">${PVALS.map(v => `<button type="button" data-wkv="${esc(v)}">${esc(v)}</button>`).join('')}</div>
+    <label class="f full"><span>أهداف الأسبوع (كل هدف في سطر)</span><textarea id="wk_g" style="min-height:70px">${esc((s.goals || []).join('\n'))}</textarea></label>
+    ${days.map((d, i) => `<fieldset class="dayf full"><legend>${WDAYS[i]}</legend><label class="chk tiny" style="--sc:#B3363B"><input type="checkbox" data-wkoff="${i}" ${d.off ? 'checked' : ''}><span>إجازة</span></label>
+      <input data-wko="${i}" placeholder="سبب الإجازة" value="${esc(d.off || '')}" ${d.off ? '' : 'hidden'}>
+      <div data-wkd="${i}" ${d.off ? 'hidden' : ''}><textarea data-wka="${i}" placeholder="النشاط / الإجراء" style="min-height:56px">${esc(d.a || '')}</textarea>
+      <div class="dayrow"><input data-wkt="${i}" placeholder="الفئة المستهدفة" value="${esc(d.t || '')}"><input data-wkw="${i}" placeholder="المنفذة" value="${esc(d.w || '')}"><input data-wke="${i}" placeholder="الشاهد" value="${esc(d.e || '')}"></div></div></fieldset>`).join('')}
+    </div><div class="toolbar"><button class="btn primary" type="submit">حفظ الأسبوع</button></div>`,
+    async f => {
+      const L = id => f.querySelector(id).value.split('\n').map(x => x.trim()).filter(Boolean);
+      const nd = days.map((d, i) => f.querySelector(`[data-wkoff="${i}"]`).checked ? { off: f.querySelector(`[data-wko="${i}"]`).value.trim() || 'إجازة' }
+        : { a: f.querySelector(`[data-wka="${i}"]`).value.trim(), t: f.querySelector(`[data-wkt="${i}"]`).value.trim(), w: f.querySelector(`[data-wkw="${i}"]`).value.trim(), e: f.querySelector(`[data-wke="${i}"]`).value.trim(), done: !!d.done });
+      await planSave(x => { Object.assign(x.slots[+S.param2], { title: f.querySelector('#wk_t').value.trim(), items: L('#wk_i'), value: f.querySelector('#wk_v').value.trim(), goals: L('#wk_g'), days: nd }); }, 'حُفظ الأسبوع');
+    }, `--c:${FX.plans.c};--cs:#DDF2F0`);
+  bg.addEventListener('click', e => { const v = e.target.closest('[data-wkv]'); if (v) { bg.querySelector('#wk_v').value = v.dataset.wkv; } });
+  bg.addEventListener('change', e => { const o = e.target.closest('[data-wkoff]'); if (!o) return; const i = o.dataset.wkoff; bg.querySelector(`[data-wko="${i}"]`).hidden = !o.checked; bg.querySelector(`[data-wkd="${i}"]`).hidden = o.checked; });
+}
+function bankForm() {
+  const bank = PLAN_SEED.filter(s => s.k === 'w');
+  const bg = openSheet('من البنك الجاهز', `<p class="small muted">اختاري برنامج أو مناسبة، وتنعبى برامج الأسبوع وأهدافه وقيمته وأنشطة الأيام. اللي كتبتيه في هذا الأسبوع ينستبدل.</p>
+    <div class="tpl">${bank.map((s, i) => `<button type="button" data-bk="${i}"><b>${esc(s.title)}</b><small>قيمة الأسبوع: ${esc(s.value)}</small></button>`).join('')}</div>`, async () => false, `--c:${FX.plans.c};--cs:#DDF2F0`);
+  bg.addEventListener('click', async e => { const b = e.target.closest('[data-bk]'); if (!b) return; const s = JSON.parse(JSON.stringify(bank[+b.dataset.bk])); closeSheet(); await planSave(x => { const cur = x.slots[+S.param2]; x.slots[+S.param2] = { ...s, progId: cur.progId }; }, 'تعبى الأسبوع من البنك'); });
+}
+function breakForm() {
+  const p = DB.docs[S.param].data; const ws = planWeeks(p).filter(w => !w.br);
+  openSheet('إضافة إجازة', `<div class="form"><label class="f full"><span>اسم الإجازة</span><input id="br_t" value="إجازة" list="brList"><datalist id="brList"><option>إجازة الخريف</option><option>إجازة منتصف العام</option><option>إجازة نهاية الفصل</option><option>إجازة اليوم الوطني</option></datalist></label>
+    <label class="f full"><span>بعد الأسبوع</span><select id="br_a">${ws.map(w => `<option value="${w.i}">الأسبوع ${ORD[w.n]} (${hNum(w.from)})</option>`).join('')}</select></label>
+    <p class="tiny muted full">الإجازة تاخذ أسبوع كامل، والأسابيع اللي بعدها تتأخر تواريخها تلقائياً. إذا الإجازة يوم أو يومين داخل الأسبوع، علّميها «إجازة» في تعديل الأسبوع.</p></div>
+    <div class="toolbar"><button class="btn primary" type="submit">إضافة</button></div>`,
+    async f => { const a = +f.querySelector('#br_a').value; const t = f.querySelector('#br_t').value.trim() || 'إجازة'; await planSave(x => { x.slots.splice(a + 1, 0, { k: 'b', t }); }, 'أُضيفت الإجازة'); }, `--c:${FX.plans.c};--cs:#DDF2F0`);
+}
+
+/* ── تقارير الخطط ── */
+function semPlanReport(p) {
+  const ws = planWeeks(p);
+  return `<div class="a4 sp-a4">${repHead('خطة التوجيه الطلابي الفصلية')}<div class="pband"><small>العام الدراسي ${ar(p.year || '')}هـ</small><b>${esc(p.term || p.title)}</b></div>
+    <div class="sp-grid">${ws.map(w => w.br ? `<div class="sp br"><div class="sp-h"><b>${esc(w.s.t)}</b><small>(${hNum(w.from)} – ${hNum(w.to)})</small></div><div class="sp-b">إجازة</div></div>`
+      : `<div class="sp"><div class="sp-h"><b>الأسبوع ${ORD[w.n]}</b><small>(${hNum(w.from)} – ${hNum(w.to)})</small></div><div class="sp-b">${(w.s.items || []).map(t => `<span>${esc(t)}</span>`).join('')}${offNote(w.s) ? `<em>${offNote(w.s)}</em>` : ''}</div><div class="sp-f">قيمة الأسبوع: <b>${esc(w.s.value || '—')}</b></div></div>`).join('')}</div>
+    <p class="sp-note"><b>قيمة الأسبوع:</b> ضمن برنامج تعزيز السلوك الإيجابي، وتُطلق صباح الأحد من كل أسبوع.</p>${repSigs()}</div>`;
+}
+function weekReport(p, w) {
+  const s = w.s;
+  return `<div class="a4 wk-a4">${repHead('الخطة الأسبوعية للتوجيه الطلابي')}
+    <div class="wkr-band"><div><b>الأسبوع ${ORD[w.n]}${s.title ? ' — ' + esc(s.title) : ''}</b><small>${esc(p.term || '')} ${ar(p.year || '')}هـ</small></div><span>${hShort(w.from)} — ${hShort(w.to)}</span></div>
+    <div class="wkr-top"><div class="box"><h4>أهداف الأسبوع</h4>${(s.goals || []).length ? `<ol>${s.goals.map(g => `<li>${esc(g)}</li>`).join('')}</ol>` : '<p>—</p>'}${(s.items || []).length ? `<h4 style="margin-top:6px">برامج الأسبوع</h4><p>${s.items.map(esc).join('، ')}</p>` : ''}</div><div class="wkr-val"><small>قيمة الأسبوع</small><b>${esc(s.value || '—')}</b><small>تعزيز السلوك الإيجابي</small></div></div>
+    <table class="wrapall"><thead><tr><th style="width:62px">اليوم</th><th style="width:78px">التاريخ</th><th>النشاط / الإجراء</th><th style="width:96px">الفئة المستهدفة</th><th style="width:108px">المنفذة</th><th style="width:74px">الشاهد</th><th style="width:40px">التنفيذ</th></tr></thead>
+    <tbody>${(s.days || []).map((d, i) => `<tr><td><b>${WDAYS[i]}</b></td><td>${hShort(w.from + i * DAYMS)}</td>${d.off ? `<td colspan="5" class="offc">${esc(d.off)}</td>` : `<td>${esc(d.a || '')}</td><td>${esc(d.t || '')}</td><td>${esc(d.w || '')}</td><td>${esc(d.e || '')}</td><td style="text-align:center">${d.done ? '✔' : '☐'}</td>`}</tr>`).join('')}</tbody></table>
+    <div class="wkr-notes"><b>ملاحظات المتابعة:</b></div>${repSigs()}</div>`;
+}
+const planPair = id => { const p = { id, ...DB.docs[id].data }; return { p, ws: planWeeks(p).filter(w => !w.br) }; };
+
+/* ── بيانات مسار ── */
+async function loadMasar() {
+  S.mloading = true; let rows = [];
+  try {
+    if (DB.demo) { const d = JSON.parse(localStorage.getItem('masar.demo.v4') || 'null'); rows = d ? (d.docs || []).map(x => x.data) : []; }
+    else rows = (await q(DB.sb.from('masar_docs').select('data'))).map(r => r.data);
+  } catch (e) { rows = []; }
+  S.mcases = rows.filter(c => c && c.name); S.mloading = false; if (S.route === 'files') rerender();
+}
+const anonN = (n, o) => !o || !o.anon ? n : String(n || '').replace(/^مثال:\s*/, '').split(/\s+/).slice(0, 2).map(x => x.charAt(0) + '.').join(' ');
+function mSessions(type) {
+  return (S.mcases || []).flatMap(c => (c.follow || []).filter(f => f.type === type).map(f => ({ date: f.date, name: c.name, grade: c.grade, section: c.section, cats: c.cats || [], topic: f.topic, goal: f.goal, prog: f.prog, note: f.note })))
+    .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+}
+const catT = cs => (cs || []).map(k => MCATS[k] || k).join('، ');
+function tablePages(title, tiles, head, rows, per, row) {
+  const pages = []; for (let i = 0; i < Math.max(rows.length, 1); i += per) pages.push(rows.slice(i, i + per));
+  return pages.map((ch, pi) => `<div class="a4">${repHead(title)}${pi ? '' : tiles}<table class="wrapall"><thead><tr><th style="width:26px">م</th>${head.map(h => `<th${h[1] ? ` style="width:${h[1]}px"` : ''}>${h[0]}</th>`).join('')}</tr></thead><tbody>${ch.map((r, i) => `<tr><td>${ar(pi * per + i + 1)}</td>${row(r).map(v => `<td>${v}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="${head.length + 1}" style="text-align:center">لا توجد بيانات مسجلة بعد</td></tr>`}</tbody></table>${pi === pages.length - 1 ? repSigs() : ''}</div>`).join('');
+}
+function indLog(o) {
+  const R = mSessions('جلسة فردية'); const st = new Set(R.map(r => norm(r.name))).size; const bc = {}; R.forEach(r => r.cats.forEach(k => { bc[k] = (bc[k] || 0) + 1; }));
+  const tiles = repTiles([[R.length, 'جلسة فردية'], [st, 'طالبة']].concat(Object.entries(bc).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k, v]) => [v, MCATS[k] || k])));
+  return tablePages('سجل جلسات التوجيه الفردي', tiles, [['التاريخ', 84], ['الطالبة', 110], ['الصف', 62], ['التصنيف', 92], ['موضوع الجلسة'], ['الهدف'], ['التقدم', 48]], R, 15,
+    r => [esc(hij(r.date)), esc(anonN(r.name, o)), esc((r.grade || '') + ' ' + (r.section || '')), esc(catT(r.cats)), esc(r.topic || ''), esc(r.goal || ''), esc(MPROG[r.prog] || '')]);
+}
+function grpLogAll() {
+  const gs = list('group').sort((a, b) => String(a.date).localeCompare(String(b.date))); const M = mSessions('جلسة جماعية');
+  let h = gs.length ? groupLog(gs, 'سجل لقاءات التوجيه الجمعي (البرامج)') : '';
+  if (M.length || !gs.length) h += tablePages('سجل الجلسات الجماعية (مسار)', repTiles([[M.length, 'جلسة جماعية']]), [['التاريخ', 90], ['الطالبات / الحالة', 130], ['التصنيف', 100], ['موضوع الجلسة'], ['الهدف']], M, 16,
+    r => [esc(hij(r.date)), esc(r.name), esc(catT(r.cats)), esc(r.topic || ''), esc(r.goal || '')]);
+  return h;
+}
+function caseTable(title, cs, o) {
+  return tablePages(title, repTiles([[cs.length, 'حالة'], [cs.filter(c => c.status === 'closed').length, 'مغلقة'], [cs.reduce((s, c) => s + (c.follow || []).length, 0), 'جلسة ومتابعة']]),
+    [['الطالبة', 120], ['الصف', 64], ['التصنيف', 96], ['الخطة العلاجية'], ['الجلسات', 54], ['الحالة', 70]], cs, 14,
+    c => [esc(anonN(c.name, o)), esc((c.grade || '') + ' ' + (c.section || '')), esc(catT(c.cats)), esc((c.plan || []).map(x => (x.done ? '✔ ' : '') + x.t).join('، ')), ar((c.follow || []).length), esc(MSTAT[c.status] || c.status || '')]);
+}
+function discStats() {
+  const ab = list('absence'); const dl = list('daily'); const beh = dl.filter(r => /سلوك/.test(r.type)); const ms = amMonths(); const mc = (S.mcases || []).filter(c => (c.cats || []).includes('behavior'));
+  return `<div class="a4">${repHead('إحصائية الانضباط المدرسي')}${repTiles([[ab.length, 'ملف غياب'], [ab.reduce((s, a) => s + unex(a), 0), 'يوم بدون عذر'], [beh.length, 'حالة سلوكية طارئة'], [mc.length, 'حالة سلوكية في مسار'], [list('honor').filter(h => /انضباط|مواظب/.test(h.reason || '')).length, 'شهادة انضباط']])}
+    ${ms.length ? `<table><thead><tr><th>الشهر</th><th>عدد الطالبات</th><th>أيام الدراسة</th><th>أيام الغياب</th><th>نسبة الغياب</th></tr></thead><tbody>${ms.slice().reverse().map(m => { const c = amCalc(m); return `<tr><td>${esc(amLabel(m))}</td><td>${ar(c.N)}</td><td>${ar(c.days)}</td><td>${ar(c.A)}</td><td>${pct(c.rate)}</td></tr>`; }).join('')}</tbody></table>` : '<p>لم تُسجل تقارير شهرية للغياب بعد.</p>'}
+    ${repSigs()}</div>`;
+}
+const myFile = k => DB.docs['myfile-' + k] ? DB.docs['myfile-' + k].data : { k, photos: [] };
+function attPages(k) {
+  const ph = myFile(k).photos || []; const out = []; for (let i = 0; i < ph.length; i += 2) out.push(ph.slice(i, i + 2));
+  return out.map(ch => `<div class="a4">${repHead('مرفقات ' + FX[k].t)}<div class="att">${ch.map(x => `<figure><img data-img="${esc(x)}" alt=""></figure>`).join('')}</div></div>`).join('');
+}
+function fxParts(sec) {
+  const P = []; const o = S.binOpt || {}; const att = () => { if ((myFile(sec).photos || []).length) { P.push({ t: 'المرفقات', div: 1 }); P.push({ t: 'صور الأوراق المرفقة', h: () => attPages(sec) }); } };
+  if (sec === 'plans') { plans().slice().reverse().forEach(p0 => { const { p, ws } = planPair(p0.id); P.push({ t: p.title + ' — ' + (p.term || ''), div: 1 }); P.push({ t: 'الخطة الفصلية', h: () => semPlanReport(p) }); ws.forEach(w => P.push({ t: 'الخطة الأسبوعية — الأسبوع ' + ORD[w.n], sub: 1, h: () => weekReport(p, w) })); }); att(); }
+  else if (sec === 'disc') {
+    P.push({ t: 'إحصائية الانضباط المدرسي', h: () => discStats() });
+    binderParts('absence').forEach(x => P.push(x));
+    const beh = list('daily').filter(r => /سلوك/.test(r.type)).sort((a, b) => String(a.date).localeCompare(String(b.date)));
+    P.push({ t: 'الحالات السلوكية', div: 1 }); P.push({ t: 'سجل الحالات السلوكية الطارئة', h: () => beh.length ? dayLogReport(beh, 'سجل الحالات السلوكية الطارئة') : emptyPage('سجل الحالات السلوكية الطارئة') });
+    const mc = (S.mcases || []).filter(c => (c.cats || []).includes('behavior')); P.push({ t: 'حالات الملاحظات السلوكية (مسار)', h: () => caseTable('حالات الملاحظات السلوكية', mc, o) });
+    P.push({ t: 'التعزيز والتكريم', div: 1 }); P.push({ t: 'سجل التكريم', h: () => honLogReport() }); att();
+  } else if (sec === 'ach') {
+    const cs = S.mcases || [];
+    [['delayed', 'حالات التأخر الدراسي'], ['excellent', 'المتفوقات'], ['gifted', 'الموهوبات']].forEach(([k, t]) => { const L = cs.filter(c => (c.cats || []).includes(k)); P.push({ t, h: () => caseTable(t, L, o) }); });
+    const pr = list('program').filter(p => /تربوي|تحصيل|دافعية|الاختبار/.test((p.domain || '') + ' ' + (p.title || '')));
+    if (pr.length) { P.push({ t: 'برامج رفع التحصيل', div: 1 }); pr.forEach(p => P.push({ t: p.title, sub: 1, h: () => p.status === 'منفذ' || p.status === 'قيد التنفيذ' ? progReport(p) : progPlanReport(p) })); }
+    att();
+  } else if (sec === 'ind') { P.push({ t: 'سجل جلسات التوجيه الفردي', h: () => indLog(o) }); att(); }
+  else if (sec === 'grp') { P.push({ t: 'سجل جلسات التوجيه الجمعي', h: () => grpLogAll() }); att(); }
+  return P;
+}
+
+function vFile(k) {
+  const v = FX[k]; if (k === 'plans') return vPlans();
+  const parts = fxParts(k).filter(p => !p.div); const ph = myFile(k).photos || [];
+  const needM = k !== 'disc';
+  return `<a class="btn ghost" href="#files" style="align-self:flex-start">→ ملفاتي</a>
+    <div class="head"><h1><span class="dot" style="background:${v.c}"></span>${esc(v.t)}</h1><span class="sp"></span><button class="btn primary" data-fxbin="${k}" style="background:${v.c};border-color:${v.c}">طباعة السجل كامل</button></div>
+    <p class="lede">${esc(v.d)} السجل كامل يطلع بغلاف وفهرس وأرقام صفحات.</p>
+    ${needM && S.mloading ? '<p class="small muted">جارٍ تحميل بيانات مسار…</p>' : ''}
+    ${needM && !S.mloading && !(S.mcases || []).length ? '<p class="small muted">ما لقيت حالات في مسار. إذا عندك حالات، افتحي مسار مرة وارجعي هنا.</p>' : ''}
+    ${fxPreview(k)}
+    <section class="panel" style="--c:${v.c}"><div class="head"><h3>محتوى السجل</h3><span class="tiny muted">${ar(parts.length)} جزء</span></div>
+      <div class="fx-parts">${parts.map((p, i) => `<div class="${p.sub ? 'sub' : ''}"><span>${esc(p.t)}</span><button class="btn sm" data-fxpart="${k}:${i}">عرض وطباعة</button></div>`).join('')}</div></section>
+    <section class="panel" style="--c:${v.c}"><div class="head"><h3>المرفقات</h3><span class="tiny muted">${ar(ph.length)} صورة</span><span class="sp"></span><label class="btn sm primary" style="cursor:pointer;background:${v.c};border-color:${v.c}">＋ صور<input type="file" accept="image/*" multiple data-fxph="${k}" hidden></label></div>
+      <p class="tiny muted" id="fxphMsg">صوري أوراقك (خطة معتمدة، تعميم، نموذج، محضر) وارفعيها هنا، وتطلع في آخر السجل. ملفات PDF و Word نضيفها لاحقاً.</p>
+      ${ph.length ? `<div class="pgrid">${ph.map((x, i) => `<figure><img alt="" data-img="${esc(x)}"><span class="pacts"><button class="btn sm ghost" data-fxphdel="${k}:${i}" aria-label="حذف الصورة">✕</button></span></figure>`).join('')}</div>` : ''}</section>`;
+}
+
+function fxPreview(k) {
+  let rows = [], head = '';
+  if (k === 'ind' || k === 'grp') { const R = mSessions(k === 'ind' ? 'جلسة فردية' : 'جلسة جماعية').slice().reverse(); const G = k === 'grp' ? list('group').sort((a, b) => String(b.date).localeCompare(String(a.date))) : [];
+    head = k === 'ind' ? `${ar(R.length)} جلسة فردية لـ ${ar(new Set(R.map(r => norm(r.name))).size)} طالبة` : `${ar(G.length)} لقاء توجيه جمعي · ${ar(R.length)} جلسة جماعية في مسار`;
+    rows = G.slice(0, 12).map(g => [hij(g.date), g.topic, (g.classes || []).join('، ')]).concat(R.slice(0, 15).map(r => [hij(r.date), r.name, [catT(r.cats), r.topic].filter(Boolean).join(' · ')])); }
+  else if (k === 'ach') { const cs = (S.mcases || []).filter(c => (c.cats || []).some(x => ['delayed', 'excellent', 'gifted'].includes(x)));
+    head = `${ar(cs.length)} حالة في مسار`; rows = cs.map(c => [catT((c.cats || []).filter(x => ['delayed', 'excellent', 'gifted'].includes(x))), c.name, (c.grade || '') + ' ' + (c.section || '') + ' · ' + (MSTAT[c.status] || '') + ' · ' + ar((c.follow || []).length) + ' متابعة']); }
+  else return '';
+  return `<section class="panel" style="--c:${FX[k].c}"><div class="head"><h3>${esc(head)}</h3></div>${rows.length ? `<div class="fx-rows">${rows.map(r => `<div><small>${esc(r[0])}</small><b>${esc(r[1] || '')}</b><span>${esc(r[2] || '')}</span></div>`).join('')}</div>` : '<p class="small muted">ما فيه شي مسجل بعد.</p>'}</section>`;
+}
+function fxBinder(sec) {
+  const anonOpt = sec === 'ind' || sec === 'ach' || sec === 'disc';
+  openSheet('طباعة: ' + FX[sec].t, `<p class="small muted">سجل واحد جاهز للطباعة: غلاف، ثم فهرس، ثم كل الأجزاء بالترتيب وأرقام الصفحات.</p>
+    <div class="form"><label class="f"><span>العام الدراسي</span><input id="bf_y" value="${esc(acadYear())}"></label><label class="f"><span>الفترة</span><select id="bf_t">${['العام كاملاً'].concat(PTERM).map(t => `<option>${t}</option>`).join('')}</select></label>
+    ${anonOpt ? '<label class="chk full" style="--sc:var(--good)"><input type="checkbox" id="bf_an"><span>إخفاء أسماء الطالبات (تطلع الحروف الأولى بس)</span></label>' : ''}</div>
+    <div class="toolbar"><button class="btn primary" type="submit">إعداد السجل</button></div>`,
+    async f => { const o = { year: f.querySelector('#bf_y').value.trim(), term: f.querySelector('#bf_t').value, anon: !!(f.querySelector('#bf_an') || {}).checked }; S.binOpt = o; S.after = null; setTimeout(() => openReport(buildBinder(sec, o), 'سجل-' + SEC_FILE[sec], FX[sec].c), 50); }, `--c:${FX[sec].c};--cs:#f4f7f6`);
+}
+
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-fx],[data-fxbin],[data-fxsem],[data-fxweeks],[data-fxwk],[data-fxpart],[data-fxphdel],[data-fxbrdel]'); if (!b || b.closest('#sheetbg')) return;
+  const d = b.dataset; e.preventDefault();
+  if (d.fxbin) return fxBinder(d.fxbin);
+  if (d.fxsem) { const { p } = planPair(d.fxsem); return openReport(semPlanReport(p), 'الخطة-الفصلية', FX.plans.c); }
+  if (d.fxweeks) { const { p, ws } = planPair(d.fxweeks); return openReport(ws.map(w => weekReport(p, w)).join(''), 'الخطط-الأسبوعية', FX.plans.c); }
+  if (d.fxwk) { const [id, i] = d.fxwk.split(':'); const { p } = planPair(id); const w = planWeeks(p).find(x => String(x.i) === i); return openReport(weekReport(p, w), 'الخطة-الأسبوعية', FX.plans.c); }
+  if (d.fxpart) { const [k, i] = d.fxpart.split(':'); S.binOpt = {}; const part = fxParts(k).filter(p => !p.div)[+i]; return openReport(part.h(), part.t, FX[k].c); }
+  if (d.fxphdel) { const [k, i] = d.fxphdel.split(':'); const f = JSON.parse(JSON.stringify(myFile(k))); f.photos.splice(+i, 1); await saveDoc('myfile-' + k, 'myfile', f); return rerender(); }
+  if (d.fxbrdel) return planSave(x => { x.slots.splice(+d.fxbrdel, 1); }, 'حُذفت الإجازة');
+  const a = d.fx;
+  if (a === 'planNew') planForm(false);
+  else if (a === 'planEdit') planForm(true);
+  else if (a === 'planSeed') { b.disabled = true; await planSeed(); }
+  else if (a === 'wkAdd') planSave(x => { x.slots.push({ k: 'w', title: '', items: [], value: '', goals: [], days: blankDays() }); }, 'أُضيف أسبوع');
+  else if (a === 'brAdd') breakForm();
+  else if (a === 'wkEdit') weekForm();
+  else if (a === 'wkBank') bankForm();
+  else if (a === 'wkDel') { if (!b.dataset.sure) { b.dataset.sure = 1; b.textContent = 'اضغطي مرة ثانية للتأكيد'; return; } const id = S.param; await planSave(x => { x.slots.splice(+S.param2, 1); }, 'حُذف الأسبوع'); location.hash = '#files/' + id; }
+});
+document.addEventListener('change', async e => {
+  const t = e.target;
+  if (t.dataset && t.dataset.fxdone != null) planSave(x => { const dd = x.slots[+S.param2].days[+t.dataset.fxdone]; dd.done = t.checked; }, t.checked ? 'تم ✓' : '');
+  else if (t.dataset && t.dataset.fxprog) planSave(x => { x.slots[+S.param2].progId = t.value || ''; }, 'حُفظ الربط');
+  else if (t.dataset && t.dataset.fxph && t.files && t.files.length) {
+    const k = t.dataset.fxph; const files = [...t.files]; t.value = ''; const msg = $('#fxphMsg'); const ids = [];
+    for (const file of files) { try { if (msg) msg.textContent = `جارٍ رفع الصور… (${ar(ids.length + 1)} من ${ar(files.length)})`; ids.push(await putImage(await shrink(file))); } catch (er) { toast(errT(er)); } }
+    if (ids.length) { const f = JSON.parse(JSON.stringify(myFile(k))); f.photos = (f.photos || []).concat(ids); await saveDoc('myfile-' + k, 'myfile', f); toast(`أُضيفت ${ar(ids.length)} صورة`); rerender(); }
+  }
+});
+
+/* ═════════ خيارات جاهزة لكل خانة كتابة ═════════ */
+const WHO_L = ['الموجهة الطلابية', 'رائدة النشاط', 'معلمات الصفوف الأولية', 'معلمات الفصول', 'المرشدة الصحية', 'وكيلة شؤون الطالبات', 'الإدارة'];
+const TGT_L = ['جميع الطالبات', 'طالبات الصفوف الأولية', 'طالبات الصفوف العليا', 'الطالبات المحتاجات', 'أولياء الأمور', 'المعلمات'];
+const GUARD_L = ['الأم', 'الأب', 'الأخ', 'الأخت', 'الجدة', 'ولي الأمر'];
+// m: 'lines' تضيف سطر وتشيله، 'list' تضيف بفاصلة، 'set' تستبدل القيمة
+const SUG = {
+  am_n: { m: 'lines', o: ['انخفاض الغياب مقارنة بالشهر السابق', 'ارتفاع الغياب مقارنة بالشهر السابق', 'تركّز الغياب في الصفوف الأولية', 'تركّز الغياب يومي الأحد والخميس', 'غياب جماعي قبل الإجازة', 'تم التواصل مع أسر الطالبات المتكرر غيابهن'] },
+  am_r: { m: 'lines', o: ['التواصل مع أولياء أمور الطالبات المتغيبات', 'تكريم الطالبات المنتظمات في الحضور', 'تفعيل بطاقة الحضور المبكر', 'إعداد خطط علاجية للطالبات كثيرات الغياب', 'توعية الطالبات بأهمية المواظبة في الإذاعة', 'رسالة توعوية لأولياء الأمور عن أثر الغياب'] },
+  ap_cn: { m: 'lines', o: ['ظرف صحي', 'ظروف أسرية', 'بُعد السكن عن المدرسة', 'عدم توفر مواصلات', 'السهر وصعوبة الاستيقاظ', 'ضعف الدافعية للمدرسة', 'مشكلة مع زميلات'] },
+  ap_g: { m: 'lines', o: ['انتظام الطالبة في الحضور اليومي', 'خفض أيام الغياب بدون عذر', 'الحضور المبكر للطابور الصباحي', 'تعويض ما فات الطالبة من دروس', 'تعزيز ارتباط الطالبة بالمدرسة'] },
+  ap_x: { m: 'lines', o: ['جلسة إرشادية فردية مع الطالبة', 'تكليف الطالبة بمهمة في الفصل', 'تعزيز الطالبة عند انتظامها', 'إشراك الطالبة في نشاط تحبه', 'التنسيق مع معلمة الفصل لمتابعتها'] },
+  ap_f: { m: 'lines', o: ['متابعة الحضور أسبوعياً لمدة شهر', 'مراجعة الخطة نهاية الشهر', 'تواصل أسبوعي مع ولي الأمر', 'ملاحظات معلمة الفصل عن الطالبة'] },
+  ap_who: { m: 'list', o: WHO_L },
+  d_desc: { m: 'lines', o: ['شعرت الطالبة بتعب ودوخة أثناء الحصة', 'ارتفاع في درجة الحرارة', 'ألم في البطن', 'صداع شديد', 'سقطت الطالبة أثناء الفسحة', 'جرح بسيط', 'مشاجرة بين طالبتين', 'بكاء مستمر ورفض الدخول للفصل', 'لم يحضر ولي الأمر وقت الانصراف'] },
+  d_cs: { m: 'lines', o: ['تم الاتصال بالأم وحضرت لاستلامها', 'تم إبلاغ ولي الأمر واطمأن على الطالبة', 'لم يرد ولي الأمر وأُرسلت له رسالة', 'تم الاتفاق على متابعة الطالبة في المنزل'] },
+  d_more: { m: 'lines', o: ['متابعة الطالبة في اليوم التالي', 'إبلاغ معلمة الفصل', 'تسجيل الحالة لدى المرشدة الصحية', 'جلسة إرشادية مع الطالبة', 'إحالة الحالة لمسار'] },
+  g_goal: { m: 'lines', o: ['تعزيز القيم الإيجابية لدى الطالبات', 'تنمية مهارات التواصل مع الزميلات', 'توعية الطالبات بالسلوك الصحيح', 'تنمية مهارة التعبير عن المشاعر'] },
+  g_sum: { m: 'lines', o: ['بدأت بقصة قصيرة ثم نقاش', 'نشاط بطاقات المواقف', 'عرض مرئي قصير', 'تمثيل أدوار', 'ختام بعبارة تحفيزية', 'تفاعل الطالبات بشكل إيجابي'] },
+  s_note: { m: 'lines', o: ['تم التنفيذ كما خُطط', 'تم بمشاركة رائدة النشاط', 'تفاعل كبير من الطالبات', 'تأجل لظرف طارئ'] },
+  v_g: { m: 'lines', o: ['تعزيز القيمة لدى الطالبات قولاً وعملاً', 'ربط القيمة بمواقف الحياة اليومية', 'تشجيع الطالبات على ممارسة القيمة في المدرسة والبيت', 'إشراك الأسرة في تعزيز القيمة'] },
+  vd_e: { m: 'lines', o: ['ملاحظة المعلمات', 'بطاقة رصد السلوك', 'استبانة مصورة للطالبات', 'أسئلة شفهية'] },
+  vd_i: { m: 'lines', o: ['زيادة المواقف الإيجابية بين الطالبات', 'التزام الطالبات بالقيمة في الفصل', 'تفاعل الطالبات مع الأنشطة', 'ملاحظة المعلمات تحسناً في السلوك'] },
+  vd_r: { m: 'lines', o: ['الاستمرار في تعزيز القيمة طوال العام', 'إشراك الأسرة في تعزيز القيمة', 'تكريم المتميزات في القيمة'] },
+  vs_t: { m: 'lines', o: ['إذاعة مدرسية عن القيمة', 'لوحة حائطية', 'قصة هادفة', 'مسابقة', 'بطاقات تعزيز', 'رسالة لأولياء الأمور'] },
+  vs_w: { m: 'list', o: WHO_L }, v_l: { m: 'list', o: WHO_L }, v_p: { m: 'list', o: WHO_L }, p_lead: { m: 'list', o: WHO_L }, p_partners: { m: 'list', o: WHO_L },
+  v_tg: { m: 'set', o: TGT_L }, p_target: { m: 'set', o: TGT_L },
+  p_place: { m: 'set', o: ['الساحة', 'الفصول', 'مصادر التعلم', 'المسرح', 'غرفة التوجيه الطلابي'] },
+  p_goals: { m: 'lines', o: ['توعية الطالبات بموضوع البرنامج', 'تنمية السلوك الإيجابي لدى الطالبات', 'إشراك الأسرة في دعم البرنامج', 'تعزيز الشراكة مع المعلمات'] },
+  p_tools: { m: 'list', o: ['إذاعة مدرسية', 'عرض تقديمي', 'مطويات', 'بطاقات نشاط', 'قصص مصورة', 'لوحات حائطية', 'شهادات تكريم'] },
+  p_evalm: { m: 'list', o: ['ملاحظة تفاعل الطالبات', 'استبانة', 'أسئلة تقويمية', 'بطاقة رصد', 'المقارنة قبل البرنامج وبعده'] },
+  i_d: { m: 'lines', o: ['تنفذ في الطابور الصباحي', 'تنفذ داخل الفصول', 'بمشاركة رائدة النشاط', 'تحتاج بطاقات مطبوعة', 'تحتاج جوائز رمزية'] },
+  wk_g: { m: 'lines', o: ['ترسيخ قيمة الأسبوع لدى الطالبات', 'توعية الطالبات بموضوع الأسبوع', 'إشراك الأسرة في برنامج الأسبوع', 'متابعة الحالات الفردية'] },
+  // علاقة الأسرة بالمدرسة (خانات مشتركة بين الأنواع)
+  f_guardian: { m: 'set', o: GUARD_L },
+  f_place: { m: 'set', o: ['مصادر التعلم', 'المسرح', 'قاعة الاجتماعات', 'عن بُعد'] },
+  f_goals: { m: 'lines', o: ['تعزيز الشراكة بين الأسرة والمدرسة', 'التعريف بخدمات التوجيه الطلابي', 'مناقشة قواعد السلوك والمواظبة', 'الاستماع لمقترحات الأمهات'] },
+  f_title: { m: 'set', o: r => r.querySelector('#f_attendees') ? ['مجلس الأمهات الأول', 'مجلس الأمهات الثاني', 'لقاء أمهات طالبات الصف الأول', 'لقاء أولياء الأمور'] : r.querySelector('#f_satisfaction') ? ['استبانة رضا أولياء الأمور عن خدمات التوجيه', 'استبانة التواصل بين الأسرة والمدرسة', 'استبانة رضا الطالبات'] : ['الاحتفال باليوم الوطني', 'يوم المعلم', 'معرض أعمال الطالبات', 'تطوع الأمهات في الفعاليات'] },
+  f_summary: { m: 'lines', o: r => r.querySelector('#f_attendees') ? ['الترحيب بالحاضرات والتعريف بالمدرسة', 'عرض قواعد السلوك والمواظبة', 'التعريف بخدمات التوجيه الطلابي', 'فتح باب الحوار والمقترحات', 'توزيع مطويات توعوية']
+    : r.querySelector('#f_satisfaction') ? ['رضا عالٍ عن خدمات التوجيه الطلابي', 'رضا عن التواصل مع المدرسة', 'مطالبة بزيادة اللقاءات مع الأسر', 'مقترحات لتطوير الأنشطة']
+    : ['تم إبلاغ ولي الأمر بغياب الطالبة', 'تم مناقشة مستوى الطالبة الدراسي', 'تم إبلاغ ولي الأمر بسلوك الطالبة', 'أفاد ولي الأمر بظرف صحي', 'تم شكر ولي الأمر على تعاونه'] },
+  f_outcome: { m: 'lines', o: ['تعهد ولي الأمر بمتابعة الطالبة', 'الاتفاق على حضور ولي الأمر للمدرسة', 'سيحضر ولي الأمر تقريراً طبياً', 'الاتفاق على متابعة أسبوعية'] },
+  f_follow: { m: 'lines', o: ['متابعة الحضور أسبوعياً', 'اتصال متابعة بعد أسبوع', 'جلسة إرشادية مع الطالبة', 'إبلاغ معلمة الفصل'] },
+  f_recs: { m: 'lines', o: ['استمرار التواصل مع الأسر', 'عقد لقاء دوري كل فصل', 'تفعيل مقترحات أولياء الأمور', 'زيادة قنوات التواصل مع الأسرة'] },
+  f_desc: { m: 'lines', o: ['مشاركة الأسر في الاحتفال', 'تطوع الأمهات في تنظيم الفعالية', 'حضور الأسر لمعرض الطالبات', 'مشاركة الأمهات في ورشة توعوية'] },
+  f_impact: { m: 'lines', o: ['تعزيز الشراكة مع الأسرة', 'تفاعل كبير من الأسر', 'سعادة الطالبات بمشاركة أسرهن'] },
+  f_details: { m: 'lines', o: ['طلب مقابلة الموجهة الطلابية', 'استفسار عن مستوى الطالبة', 'طلب نقل الطالبة لفصل آخر', 'شكوى من مشكلة مع زميلة', 'طلب إعادة اختبار'] },
+  f_reply: { m: 'lines', o: ['تم التواصل مع ولي الأمر والرد على الطلب', 'تم تحويل الطلب للإدارة', 'تمت المقابلة وحُل الموضوع', 'تعذر تنفيذ الطلب وأُبلغ ولي الأمر'] }
+};
+const sgVals = (el, m) => m === 'lines' ? el.value.split('\n').map(x => x.trim()).filter(Boolean) : m === 'list' ? el.value.split(/[،,]/).map(x => x.trim()).filter(Boolean) : [el.value.trim()];
+function addSug(root) {
+  Object.entries(SUG).forEach(([id, cfg]) => {
+    const el = root.querySelector('#' + id); if (!el || el.dataset.sgOn) return; el.dataset.sgOn = 1;
+    const box = document.createElement('div'); box.className = 'presets sgrow'; box.dataset.sgfor = id;
+    const cur = sgVals(el, cfg.m); const opts = typeof cfg.o === 'function' ? cfg.o(root) : cfg.o;
+    box.innerHTML = opts.map(t => `<button type="button" data-sg="${esc(t)}" aria-pressed="${cur.includes(t)}">${esc(t)}</button>`).join('');
+    const host = el.closest('label,.f,.field') || el; host.after(box);
+  });
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-sg]'); if (!b) return; const box = b.closest('[data-sgfor]'); if (!box) return; e.preventDefault();
+  const id = box.dataset.sgfor; const cfg = SUG[id]; const el = document.getElementById(id); if (!el || !cfg) return; const t = b.dataset.sg;
+  if (cfg.m === 'set') { el.value = t; box.querySelectorAll('[data-sg]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); }
+  else { let L = sgVals(el, cfg.m); L = L.includes(t) ? L.filter(x => x !== t) : L.concat(t); el.value = L.join(cfg.m === 'lines' ? '\n' : '، '); b.setAttribute('aria-pressed', String(L.includes(t))); }
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+}, true);
+new MutationObserver(() => { const s = document.getElementById('sheetbg'); if (s) addSug(s); }).observe(document.body, { childList: true });
+
+/* ═════════ شهادات لوحة الشرف (انضباط وتميّز) → ملف التكريم ═════════ */
+async function syncIndibat() {
+  if (DB.demo || S.ibSync) return; S.ibSync = true;
+  let rows; try { rows = await q(DB.sb.from('indibat_honors').select('id,hy,hm,list,name,cls')); } catch (e) { return; }
+  const want = {}; rows.forEach(r => { want['honor-ib-' + r.id] = r; });
+  const add = [];
+  Object.entries(want).forEach(([id, r]) => {
+    if (DB.docs[id]) return; const ex = r.list === 'excellent'; const parts = String(r.cls || '').trim().split(/\s+/); const g = GRADES.includes(parts[0]) ? parts[0] : '';
+    add.push({ id, kind: 'honor', data: { src: 'indibat', type: 'student', theme: ex ? 'gold' : 'green', name: r.name, grade: g, section: g ? parts.slice(1).join(' ') : '', label: '',
+      title: 'شهادة شكر وتقدير', occasion: 'لوحة الشرف — ' + HM[r.hm] + ' ' + ar(r.hy) + 'هـ', reason: ex ? 'لتميّزها السلوكي وأخلاقها الرفيعة' : 'لانضباطها ومواظبتها على الحضور',
+      bless: ex ? 'بارك الله فيكِ، وزادكِ خُلقًا وعلمًا وتميّزًا' : 'سائلين الله لها دوام التوفيق والنجاح', date: r.hy + '-' + pad2(r.hm + 1) + '-29', sealText: ex ? 'تميّز سلوكي' : 'انضباط', studentId: '' } });
+  });
+  const gone = list('honor').filter(h => h.src === 'indibat' && !want[h.id]);
+  try { if (add.length) await saveMany(add); for (const h of gone) await delDoc(h.id); } catch (e) { return; }
+  if ((add.length || gone.length) && ['honors', 'files'].includes(S.route)) rerender();
 }
 
 /* ═════════ Claude helper ═════════ */
@@ -2670,8 +3141,8 @@ function honFile() {
   return `<div class="toolbar"><label class="search"><span aria-hidden="true">⌕</span><input id="honQ" type="search" placeholder="ابحثي بالاسم أو المناسبة" value="${esc(S.filter.hon || '')}" aria-label="بحث"></label>
     <select class="sel" id="honT" aria-label="النوع"><option value="">الكل</option>${Object.entries(RT).map(([k, v]) => `<option value="${k}"${tf === k ? ' selected' : ''}>${v.t}</option>`).join('')}</select><button class="btn" data-act="honRep">طباعة السجل</button></div>
     ${shown.length ? `<div class="list">${shown.map(r => `<article class="rec" style="--c:${r.theme === 'gold' ? 'var(--hon)' : 'var(--good)'}"><div class="t"><b>${esc(r.name)}</b>${counts[norm(r.name)] > 1 ? `<span class="pill" style="--pc:var(--hon);--ps:var(--hon-soft)">كُرّمت ${ar(counts[norm(r.name)])} مرات</span>` : ''}</div>
-      <div class="meta"><span class="chip c">${esc(RT[r.type] ? RT[r.type].t : '')}</span><span class="chip">${esc(hij(r.date))}</span>${r.occasion ? `<span class="chip">${esc(r.occasion)}</span>` : ''}${r.grade ? `<span class="chip">${esc(r.grade)} ${esc(r.section || '')}</span>` : ''}</div>
-      <p class="sum">${esc(String(r.reason || '').replace(/\{م\}/g, r.occasion || ''))}</p><div class="acts"><button class="btn sm" data-hdl="${r.id}">الشهادة</button>${r.type === 'student' ? `<button class="btn sm wa" data-honwa="${r.id}">📲 تهنئة ولي الأمر</button>` : ''}<button class="btn sm danger" data-del="${r.id}">حذف</button></div></article>`).join('')}</div>`
+      <div class="meta"><span class="chip c">${esc(RT[r.type] ? RT[r.type].t : '')}</span>${r.src === 'indibat' ? '<span class="chip">من لوحة الشرف</span>' : ''}<span class="chip">${esc(hij(r.date))}</span>${r.occasion ? `<span class="chip">${esc(r.occasion)}</span>` : ''}${r.grade ? `<span class="chip">${esc(r.grade)} ${esc(r.section || '')}</span>` : ''}</div>
+      <p class="sum">${esc(String(r.reason || '').replace(/\{م\}/g, r.occasion || ''))}</p><div class="acts"><button class="btn sm" data-hdl="${r.id}">الشهادة</button>${r.type === 'student' ? `<button class="btn sm wa" data-honwa="${r.id}">📲 تهنئة ولي الأمر</button>` : ''}${r.src === 'indibat' ? '' : `<button class="btn sm danger" data-del="${r.id}">حذف</button>`}</div></article>`).join('')}</div>`
       : `<div class="empty"><b>ملف التكريم فاضي</b><span>كل شهادة تصدرينها وتحفظينها تظهر هنا.</span></div>`}`;
 }
 function honLogReport() {

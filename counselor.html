@@ -1395,7 +1395,7 @@ function refCard(r) {
       <div class="row" style="gap:6px">${r.urgent && r.status !== 'closed' ? '<span class="mpill bad">عاجلة</span>' : ''}<span class="mpill s-${r.status}">${REF_ST[r.status]}</span></div></div>
     <div class="row" style="gap:6px;margin-top:8px">${cats}</div>
     ${r.details ? `<p class="mref-d">${esc(r.details)}</p>` : ''}
-    <div class="row mref-a"><span class="small muted num" style="margin-inline-end:auto">رقم ${esc(r.code)}</span>
+    <div class="row mref-a"><span style="margin-inline-end:auto"></span>
       ${linked ? `<button class="btn sm primary" data-act="open" data-id="${esc(r.case_id)}">عرض الحالة</button>`
         : r.status === 'closed' ? `<button class="btn sm" data-act="m-reopen" data-id="${r.id}">إعادة فتح</button>`
         : `<button class="btn sm primary" data-act="m-accept" data-id="${r.id}">فتح حالة وبدء المتابعة</button><button class="btn sm" data-act="m-close" data-id="${r.id}">إغلاق دون حالة</button>`}
@@ -1456,7 +1456,7 @@ function acceptRef(id) {
   const kt = (r.kinds || []).map(k => KIND_T[k] || k).join('، ');
   const x = { id: uid(), name: r.student_name, grade: r.grade || '', section: r.section || '', cats: cats.length ? cats : ['psych'],
     priority: r.urgent ? 'high' : 'mid', date: todayISO(), source: 'ترشيح معلمة',
-    desc: `سبب الإحالة: ${kt}${r.details ? '\n' + r.details : ''}\nالمعلمة المحيلة: ${r.teacher_name || '—'} · رقم الإحالة ${r.code}`,
+    desc: `سبب الإحالة: ${kt}${r.details ? '\n' + r.details : ''}\nالمعلمة المحيلة: ${r.teacher_name || '—'}`,
     status: 'active', plan: [], follow: [], createdAt: Date.now(), refId: r.id, refCode: r.code };
   persist(x, { quiet: true }); TAB = 'cases'; renderMain(); openCase(x.id);
   toast('فُتحت الحالة، وأصبحت عند المعلمة «تحت المتابعة»');

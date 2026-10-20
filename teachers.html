@@ -387,13 +387,14 @@ function viewRefer() {
   const grade = h('select', { id: 'sg' }, h('option', { value: '' }, 'الصف'), GRADES.map(g => h('option', { value: g }, g)));
   const sec = h('input', { type: 'text', id: 'ss', placeholder: 'الشعبة', maxlength: '20' });
   const sugs = h('div', { class: 'sugs', hidden: true, role: 'listbox' }); const picked = h('span', { class: 'picked', hidden: true });
-  let sT = 0, sN = 0, sOff = false;
+  let sT = 0, sN = 0;
   const hideSugs = () => { sugs.hidden = true; sugs.innerHTML = ''; };
   const pick = r => { name.value = r.name; grade.value = GRADES.includes(r.grade) ? r.grade : ''; sec.value = r.section || ''; hideSugs(); picked.textContent = '✓ ' + [r.grade, r.section].filter(Boolean).join(' '); picked.hidden = !r.grade; };
-  name.addEventListener('input', () => { picked.hidden = true; clearTimeout(sT); const q = name.value.trim(); if (sOff || q.length < 2) { hideSugs(); return; }
+  name.addEventListener('input', () => { picked.hidden = true; clearTimeout(sT); const q = name.value.trim(); if (q.length < 2) { hideSugs(); return; }
     sT = setTimeout(async () => { const n = ++sN; let rows;
       try { const r = await call('masar_student_search', { ...cred(), p_q: q }); rows = (r && r.rows) || []; }
-      catch (er) { if (/function|schema cache|unknown rpc/i.test(errText(er) + (er && er.message || ''))) sOff = true; hideSugs(); return; }
+      catch (er) { if (wrongPw(er, 'refer')) return; const m = (er && er.message) || errText(er); const miss = /function|schema cache|unknown rpc/i.test(m);
+        sugs.innerHTML = ''; sugs.append(h('div', { class: 'none' }, miss ? 'اقتراح الأسماء ما تفعّل بعد (ملف students_search.sql ما انشغّل في Supabase). اكتبي الاسم كامل وحددي الصف.' : 'تعذّر البحث: ' + m)); sugs.hidden = false; return; }
       if (n !== sN || name.value.trim() !== q) return;
       sugs.innerHTML = '';
       if (!rows.length) sugs.append(h('div', { class: 'none' }, 'ما لقيت الاسم في القائمة، كمّلي كتابته وحددي الصف'));
@@ -430,7 +431,7 @@ function viewRefer() {
     step(2, 'سبب الإحالة', h('p', { class: 'muted small', style: 'margin:-6px 0 10px' }, 'اختاري سببًا أو أكثر.'), chips),
     step(3, 'ماذا لاحظتِ؟', h('p', { class: 'muted small', style: 'margin:-6px 0 10px' }, 'اضغطي على الوصف المناسب وينضاف، أو اكتبي بنفسك.'), descBox, details, h('label', { class: 'switch', style: 'margin-top:10px' }, urgent, h('span', null, h('b', null, 'حالة عاجلة'), h('span', { class: 'muted small', style: 'display:block' }, 'تحتاج الطالبة تدخلًا اليوم.')))),
     h('div', { class: 'stack', style: 'gap:10px' }, errBox, btn,
-      h('p', { class: 'tiny muted', style: 'text-align:center' }, 'ما تكتبينه يصل للموجهة وحدها. ستحصلين على رقم لتتبّع الإحالة.')));
+      h('p', { class: 'tiny muted', style: 'text-align:center' }, 'ما تكتبينه يصل للموجهة وحدها، وتتابعين الإحالة من «تتبّع إحالاتي».')));
   return [topBar(null), h('main', { class: 'wrap narrow page' }, backBtn(() => go('home')),
     h('h1', { style: 'font-family:var(--display);font-size:28px;margin-bottom:6px' }, 'إحالة طالبة'),
     h('p', { class: 'muted', style: 'margin-bottom:20px' }, `باسم ${S.t.name}`), form)];
@@ -441,11 +442,9 @@ function viewDone() {
     h('div', { class: 'card ticket' },
       h('div', { style: 'display:grid;place-items:center' }, ic('track', 72)),
       h('h1', { style: 'font-family:var(--display);font-size:26px;margin-top:8px' }, 'وصلت الإحالة للموجهة'),
-      h('p', { class: 'muted' }, `إحالة ${S.lastName}. رقم التتبّع:`),
-      h('div', { class: 'big code' }, S.lastCode),
+      h('p', { class: 'muted' }, `إحالة ${S.lastName}`),
       h('p', { class: 'muted small' }, 'تجدين الإحالة ومحطاتها في «إحالاتي» من أي جهاز.'),
       h('div', { class: 'row', style: 'justify-content:center;margin-top:16px' },
-        h('button', { class: 'btn', onClick: () => copyText(S.lastCode) }, li('copy', 18), 'نسخ الرقم'),
         h('button', { class: 'btn soft', onClick: () => go('track') }, 'تتبّع إحالاتي'),
         h('button', { class: 'btn primary', onClick: () => go('refer') }, li('plus', 18), 'إحالة أخرى'))))];
 }
@@ -476,7 +475,7 @@ function trackCard(r, reload) {
   }
   return h('article', { class: 'trk' },
     h('div', { class: 'trk-h' },
-      h('div', null, h('b', null, r.student_name), h('div', { class: 'meta' }, h('span', { class: 'code' }, r.code), h('span', null, 'أُرسلت ' + dd(r.created_at)))),
+      h('div', null, h('b', null, r.student_name), h('div', { class: 'meta' }, h('span', null, 'أُرسلت ' + dd(r.created_at)))),
       h('div', { class: 'chips' }, (r.kinds || []).map(kindTag))),
     h('div', { class: 'line', role: 'img', 'aria-label': 'الحالة: ' + STATUS[r.status].st },
       h('div', { class: 'rail' }, h('span', { style: `width:${idx * 50}%` })),

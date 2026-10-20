@@ -526,6 +526,7 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .toast{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom,0px));inset-inline:0;margin:auto;width:max-content;max-width:calc(100% - 32px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:12px;font-weight:600;z-index:70}
 .demo{background:#fff3dc;color:#8a5300;font-weight:600;font-size:.88rem;text-align:center;padding:6px 12px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.imdata .imok{background:var(--good-soft,#e6f4ea);color:var(--good,#1e7b3c);font-weight:700;border-radius:10px;padding:8px 10px;margin:6px 0;font-size:.9rem}.imdata input.autof,.imdata select.autof{border-color:var(--good,#1e7b3c)}
 </style>
 </head>
 <body>
@@ -2136,16 +2137,25 @@ async function docxToText(buf) {
   if (!lines.length) byTag(doc, 'w:p').forEach(p => { const t = byTag(p, 'w:t').map(t => t.textContent).join(''); if (t.trim()) lines.push(t); });
   return lines.join('\n');
 }
+let XLSX_META = null;
 async function xlsxToText(buf) {
   const get = await unzip(buf); const ss = await get('xl/sharedStrings.xml'); const strs = ss ? byTag(xmlDoc(ss), 'si').map(si => byTag(si, 't').map(t => t.textContent).join('')) : [];
-  const wb = await get('xl/workbook.xml'); let sheet = 'xl/worksheets/sheet1.xml';
-  if (wb) { const rels = await get('xl/_rels/workbook.xml.rels'); const first = byTag(xmlDoc(wb), 'sheet')[0]; if (first && rels) { const rid = first.getAttribute('r:id'); const rel = byTag(xmlDoc(rels), 'Relationship').find(r => r.getAttribute('Id') === rid); if (rel) sheet = 'xl/' + rel.getAttribute('Target').replace(/^\/?xl\//, ''); } }
+  const wb = await get('xl/workbook.xml'); let sheet = 'xl/worksheets/sheet1.xml'; const shs = [];
+  if (wb) { const rels = await get('xl/_rels/workbook.xml.rels'); const rl = rels ? byTag(xmlDoc(rels), 'Relationship') : [];
+    byTag(xmlDoc(wb), 'sheet').forEach(sh => { const rel = rl.find(r => r.getAttribute('Id') === sh.getAttribute('r:id')); if (rel) shs.push({ name: sh.getAttribute('name') || '', path: 'xl/' + rel.getAttribute('Target').replace(/^\/?xl\//, '') }); });
+    if (shs[0]) sheet = shs[0].path; }
+  const sheetText = async path => { const sx = await get(path); return sx ? rowsText(sx) : ''; };
+  XLSX_META = null; const ms = shs.find(x => /بيانات الشهر/.test(x.name));
+  if (ms) { const m = {}; (await sheetText(ms.path)).split('\n').forEach(l => { const [k, v] = l.split('\t'); if (k && v != null && v !== '') m[k.trim()] = AD(v).trim(); }); XLSX_META = m; }
   const sx = await get(sheet); if (!sx) throw new Error('ما لقيت ورقة في ملف Excel');
+  return rowsText(sx);
+  function rowsText(sx) {
   const col = r => { const m = /^([A-Z]+)/.exec(r || ''); let n = 0; if (m) for (const ch of m[1]) n = n * 26 + ch.charCodeAt(0) - 64; return n - 1; };
   return byTag(xmlDoc(sx), 'row').map(row => { const out = []; byTag(row, 'c').forEach((c, i) => { const t = c.getAttribute('t'); const v = byTag(c, 'v')[0]; let val = '';
       if (t === 's') val = strs[+(v ? v.textContent : 0)] || ''; else if (t === 'inlineStr') val = byTag(c, 't').map(x => x.textContent).join(''); else val = v ? v.textContent : '';
       const k = c.getAttribute('r') ? col(c.getAttribute('r')) : i; out[k] = String(val).trim(); });
     for (let i = 0; i < out.length; i++) if (out[i] == null) out[i] = ''; return out.join('\t'); }).filter(l => l.replace(/\t/g, '').trim()).join('\n');
+  }
 }
 async function fileToSheetText(file) {
   const n = file.name.toLowerCase();
@@ -2240,12 +2250,20 @@ function impForm() {
     }, `--c:var(--abs);--cs:var(--abs-soft)`);
   const t = $('#im_t'); const prevBox = $('#im_prev');
   $('#im_file').addEventListener('change', async e => { const file = e.target.files[0]; if (!file) return; const fn = $('#im_fn'); fn.textContent = 'جارٍ قراءة ' + file.name + '…';
-    try { t.value = await fileToSheetText(file); t.dispatchEvent(new Event('input')); fn.textContent = '✓ ' + file.name; } catch (er) { fn.textContent = ''; prevBox.innerHTML = `<div class="impv" style="color:var(--bad)">${esc(errT(er))}</div>`; } });
+    try { XLSX_META = null; t.value = await fileToSheetText(file); impMeta(); t.dispatchEvent(new Event('input')); fn.textContent = '✓ ' + file.name; } catch (er) { fn.textContent = ''; prevBox.innerHTML = `<div class="impv" style="color:var(--bad)">${esc(errT(er))}</div>`; } });
   t.addEventListener('input', () => { const { rows, bad } = parseAbsSheet(t.value); if (!t.value.trim()) { prevBox.innerHTML = ''; return; }
     const X = rows.reduce((s, r) => s + r.x, 0), U = rows.reduce((s, r) => s + r.u, 0); const many = rows.filter(r => r.x + r.u >= 3).length; const linked = rows.filter(r => findFile(r)).length;
     prevBox.innerHTML = `<div class="impv"><b>قرأت ${ar(rows.length)} طالبة</b> · ${ar(X + U)} يوم غياب (بعذر ${ar(X)}، بدون عذر ${ar(U)}) · ${ar(many)} كثيرة الغياب هذا الشهر · ${ar(linked)} لها ملف غياب مفتوح
       ${bad.length ? `<div class="tiny" style="color:var(--bad);margin-top:4px">ما قدرت أقرأ ${ar(bad.length)} سطر: ${bad.slice(0, 3).map(esc).join(' | ')}${bad.length > 3 ? '…' : ''}</div>` : ''}
       <div class="tscroll" style="max-height:220px;overflow:auto;margin-top:6px"><table class="amt"><thead><tr><th>الاسم</th><th>الصف</th><th>بعذر</th><th>بدون</th><th>السبب</th></tr></thead><tbody>${rows.map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.grade + ' ' + r.section)}</td><td>${ar(r.x)}</td><td>${ar(r.u)}</td><td class="tiny">${esc(r.reason)}</td></tr>`).join('')}</tbody></table></div></div>`; });
+}
+function impMeta() {
+  const m = XLSX_META; if (!m) return; const set = (sel, v) => { const el = $(sel); if (el && v) { el.value = v; el.classList.add('autof'); } };
+  const hm = HM.findIndex(n => n === m['الشهر'] || (m['الشهر'] || '').includes(n)) + 1; if (hm > 0) set('#im_m', String(hm));
+  if (m['السنة']) { const sel = $('#im_y'); if (sel && ![...sel.options].some(o => o.value === m['السنة'])) sel.add(new Option(m['السنة'] + 'هـ', m['السنة'])); set('#im_y', m['السنة']); }
+  set('#im_tot', m['عدد طالبات المدرسة']); set('#im_d', m['أيام الدراسة']);
+  GRADES.forEach(g => set(`[data-imn="${g}"]`, m['طالبات ' + g]));
+  const box = document.querySelector('.imdata'); if (box) { box.classList.remove('err'); const n = box.querySelector('.imok') || box.insertBefore(document.createElement('div'), box.children[1]); n.className = 'imok'; n.textContent = '✓ تعبّت بيانات الشهر كلها من الملف، ما تحتاجين تكتبين شي'; }
 }
 function reconcile(m) {
   const miss = [], behind = [];

@@ -207,6 +207,13 @@ input:focus,select:focus,textarea:focus{border-color:var(--route);box-shadow:0 0
   body{background:#fff}
   .card{box-shadow:none;border-color:#ccc;break-inside:avoid}
 }
+.sbox{position:relative}
+.sugs{position:absolute;inset-inline:0;top:calc(100% + 4px);z-index:20;background:var(--paper);border:1.5px solid var(--route);border-radius:12px;box-shadow:var(--shadow);overflow:hidden;max-height:320px;overflow-y:auto}
+.sugs button{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;text-align:start;background:none;border:0;border-bottom:1px solid var(--line2);padding:11px 14px;min-height:48px;font:inherit;color:var(--ink);cursor:pointer}
+.sugs button:last-child{border-bottom:0}.sugs button:hover,.sugs button:focus{background:var(--route-ll);outline:none}
+.sugs .sg{color:var(--muted);font-size:14px;white-space:nowrap}.sugs .sn{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.sugs .none{padding:10px 14px;color:var(--muted);font-size:14px}
+.picked{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;color:var(--done-ink);background:var(--done-l);border-radius:999px;padding:3px 11px;font-size:14px;font-weight:600}
 </style>
 </head>
 <body>
@@ -376,9 +383,24 @@ function viewGate() {
 /* ───────────────── refer ───────────────── */
 function viewRefer() {
   const kinds = new Set();
-  const name = h('input', { type: 'text', id: 'sn', placeholder: 'اسم الطالبة الثلاثي', autocomplete: 'off', maxlength: '120' });
+  const name = h('input', { type: 'text', id: 'sn', placeholder: 'اكتبي اسم الطالبة…', autocomplete: 'off', maxlength: '120' });
   const grade = h('select', { id: 'sg' }, h('option', { value: '' }, 'الصف'), GRADES.map(g => h('option', { value: g }, g)));
   const sec = h('input', { type: 'text', id: 'ss', placeholder: 'الشعبة', maxlength: '20' });
+  const sugs = h('div', { class: 'sugs', hidden: true, role: 'listbox' }); const picked = h('span', { class: 'picked', hidden: true });
+  let sT = 0, sN = 0, sOff = false;
+  const hideSugs = () => { sugs.hidden = true; sugs.innerHTML = ''; };
+  const pick = r => { name.value = r.name; grade.value = GRADES.includes(r.grade) ? r.grade : ''; sec.value = r.section || ''; hideSugs(); picked.textContent = '✓ ' + [r.grade, r.section].filter(Boolean).join(' '); picked.hidden = !r.grade; };
+  name.addEventListener('input', () => { picked.hidden = true; clearTimeout(sT); const q = name.value.trim(); if (sOff || q.length < 2) { hideSugs(); return; }
+    sT = setTimeout(async () => { const n = ++sN; let rows;
+      try { const r = await call('masar_student_search', { ...cred(), p_q: q }); rows = (r && r.rows) || []; }
+      catch (er) { if (/function|schema cache|unknown rpc/i.test(errText(er) + (er && er.message || ''))) sOff = true; hideSugs(); return; }
+      if (n !== sN || name.value.trim() !== q) return;
+      sugs.innerHTML = '';
+      if (!rows.length) sugs.append(h('div', { class: 'none' }, 'ما لقيت الاسم في القائمة، كمّلي كتابته وحددي الصف'));
+      rows.forEach(r => sugs.append(h('button', { type: 'button', role: 'option', onMousedown: e => e.preventDefault(), onClick: () => pick(r) }, h('span', { class: 'sn' }, r.name), h('span', { class: 'sg' }, [r.grade, r.section].filter(Boolean).join(' ')))));
+      sugs.hidden = false; }, 250); });
+  name.addEventListener('blur', () => setTimeout(hideSugs, 150));
+  name.addEventListener('keydown', e => { if (e.key === 'Escape') hideSugs(); if (e.key === 'ArrowDown' && !sugs.hidden) { const b = sugs.querySelector('button'); if (b) { e.preventDefault(); b.focus(); } } });
   const chips = h('div', { class: 'chips', role: 'group', 'aria-label': 'سبب الإحالة' }, Object.entries(KINDS).map(([k, v]) =>
     h('button', { type: 'button', class: 'chip', style: `--c:${v.c}`, 'aria-pressed': 'false', onClick: e => { kinds.has(k) ? kinds.delete(k) : kinds.add(k); e.currentTarget.setAttribute('aria-pressed', kinds.has(k)); renderDesc(); } }, h('span', { class: 'dot' }), v.t)));
   const details = h('textarea', { id: 'det', maxlength: '2000', placeholder: 'اختاري من الوصف فوق، أو اكتبي: ماذا لاحظتِ؟ متى بدأ؟ هل تكرر؟' });
@@ -404,7 +426,7 @@ function viewRefer() {
       go('done', { lastCode: r.code, lastName: name.value.trim() });
     } catch (er) { if (!wrongPw(er, 'refer')) { errBox.textContent = errText(er); errBox.hidden = false; btn.disabled = false; } }
   } },
-    step(1, 'من الطالبة؟', h('div', { class: 'stack', style: 'gap:10px' }, name, h('div', { class: 'row' }, h('div', { style: 'flex:2 1 140px' }, grade), h('div', { style: 'flex:1 1 90px' }, sec)))),
+    step(1, 'من الطالبة؟', h('p', { class: 'muted small', style: 'margin:-6px 0 10px' }, 'اكتبي أول الاسم واختاري الطالبة، والصف والشعبة يتعبون لحالهم.'), h('div', { class: 'stack', style: 'gap:10px' }, h('div', { class: 'sbox' }, name, sugs), picked, h('div', { class: 'row' }, h('div', { style: 'flex:2 1 140px' }, grade), h('div', { style: 'flex:1 1 90px' }, sec)))),
     step(2, 'سبب الإحالة', h('p', { class: 'muted small', style: 'margin:-6px 0 10px' }, 'اختاري سببًا أو أكثر.'), chips),
     step(3, 'ماذا لاحظتِ؟', h('p', { class: 'muted small', style: 'margin:-6px 0 10px' }, 'اضغطي على الوصف المناسب وينضاف، أو اكتبي بنفسك.'), descBox, details, h('label', { class: 'switch', style: 'margin-top:10px' }, urgent, h('span', null, h('b', null, 'حالة عاجلة'), h('span', { class: 'muted small', style: 'display:block' }, 'تحتاج الطالبة تدخلًا اليوم.')))),
     h('div', { class: 'stack', style: 'gap:10px' }, errBox, btn,

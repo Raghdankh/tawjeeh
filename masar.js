@@ -71,6 +71,9 @@
     const rpcs = {
       masar_info: () => { const d = load(); return ok({ school: d.settings.school, teacher_ready: d.teachers.length > 0, has_admin: true }); },
       masar_teacher_names: () => ok(load().teachers.map(t => ({ id: t.id, name: t.name })).sort((x, y) => x.name.localeCompare(y.name))),
+      masar_student_search: a => { if (!tOk(a)) return ok({ error: 'wrong' }); const nz = x => String(x || '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي');
+        const L = [['ريم أحمد سعيد', 'الرابع', 'أ'], ['ريماس خالد علي', 'الثاني', 'ب'], ['جود فهد علي', 'الثاني', 'ب'], ['جنى سعد محمد', 'الخامس', 'أ'], ['لمى عبدالله سالم', 'السادس', 'ب'], ['مريم ناصر حسن', 'الثالث', 'أ'], ['جوري ماجد فهد', 'الأول', 'ب']];
+        const w = nz(a.p_q).trim().split(/\s+/); return ok({ ok: true, rows: L.filter(([n]) => w.every(x => nz(n).includes(x))).map(([name, grade, section]) => ({ name, grade, section })) }); },
       masar_teacher_login: a => { const t = tOk(a); return ok(t ? { ok: true, name: t.name } : { error: 'wrong' }); },
       masar_submit: a => {
         const t = tOk(a); if (!t) return ok({ error: 'wrong' });

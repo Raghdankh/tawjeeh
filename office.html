@@ -761,7 +761,7 @@ function absRefsBulk(txt) {
     <div id="rf_p" class="full"></div></div><div class="toolbar"><button class="btn primary" type="submit">حفظ</button></div>`,
     async f => { const G = parse(); const ok = G.filter(g => g.f); if (!ok.length) throw new Error('ما تطابق ولا اسم مع ملفات الغياب المفتوحة'); const adm = f.querySelector('#rf_a').checked;
       const writes = []; let steps = 0;
-      ok.forEach(g => { const d = JSON.parse(JSON.stringify(DB.docs[g.f.id].data)); d.done = d.done || {}; const ds = Object.values(g.o).concat(g.def ? [g.def] : []).sort(); d.ref = ds[0];
+      ok.flatMap(g => [g.f].concat(g.dups || []).map(f => ({ ...g, f }))).forEach(g => { const d = JSON.parse(JSON.stringify(DB.docs[g.f.id].data)); d.done = d.done || {}; const ds = Object.values(g.o).concat(g.def ? [g.def] : []).sort(); d.ref = ds[0];
         dueSteps(d).forEach(k => { const [tr, lv] = k.split('-'); if (k === 'c-0') return; const dt = g.o[tr + '-' + lv] || g.o[tr] || g.def || (d.done[k] ? null : ds[0]); if (!dt) return;
           if (LEGAL_STEPS.has(k) && !d.done[k]) return; if (roleOf(d, k) === 'a' && !adm && !d.done[k]) return; if (!d.done[k]) steps++; d.done[k] = dt; });
         d.upd = todayH(); writes.push({ id: g.f.id, kind: 'absence', data: d }); });
@@ -775,14 +775,15 @@ function absRefsBulk(txt) {
       const mm = /^(.*?)\s(\d{1,2})\s*$/.exec(t.replace(/\s+/g, ' ')); if (!mm) { G.push({ l, bad: 'ما فيه رقم يوم' }); return; }
       const day = +mm[2]; if (day < 1 || day > 30) { G.push({ l, bad: 'رقم اليوم غلط' }); return; }
       const nm = mm[1].trim(); let c = files.filter(a => looseMatch(nm, a.studentName)); if (c.length > 1) { const q = looseTok(nm); const p2 = c.filter(a => { const y = looseTok(a.studentName); return q.every((t, i) => y[i] === t); }); if (p2.length) c = p2; }
-      if (c.length !== 1) { G.push({ l, bad: c.length ? 'أكثر من طالبة بنفس الاسم، زيدي اسم الجد' : 'ما لها ملف غياب مفتوح' }); return; }
-      let g = G.find(x => x.f && x.f.id === c[0].id); if (!g) G.push(g = { f: c[0], o: {}, def: '' }); const dt = `${y}-${mo}-${pad2(day)}`;
+      const dup = c.length > 1 && c.every(a => norm(a.studentName) === norm(c[0].studentName) && a.grade === c[0].grade);
+      if (c.length !== 1 && !dup) { G.push({ l, bad: c.length ? 'أكثر من طالبة بنفس الاسم، زيدي اسم الجد' : 'ما لها ملف غياب مفتوح' }); return; }
+      let g = G.find(x => x.f && x.f.id === c[0].id); if (!g) G.push(g = { f: c[0], dups: c.slice(1), o: {}, def: '' }); const dt = `${y}-${mo}-${pad2(day)}`;
       if (tr) g.o[tr + (lv ? '-' + lv : '')] = dt; else if (lv) { g.o['u-' + lv] = dt; g.o['e-' + lv] = dt; } else g.def = dt; });
     return G;
   }
   const TT = { u: 'بدون عذر', e: 'بعذر' };
   const show = () => { const G = parse();
-    $('#rf_p').innerHTML = G.length ? `<div class="glist">${G.map(g => g.f ? `<div><b>${esc(g.f.studentName)}</b><span class="tiny muted">${esc((g.f.grade || '') + ' ' + (g.f.section || ''))} · بدون عذر ${ar(unex(g.f))} · بعذر ${ar(exc(g.f))}</span><span class="tiny">${[g.def ? 'التحويل ' + hij(g.def) : ''].concat(Object.entries(g.o).map(([k, v]) => { const [tr, lv] = k.split('-'); return TT[tr] + (lv ? ' ' + ar(lv) + ' أيام' : '') + ': ' + hij(v); })).filter(Boolean).map(esc).join(' · ')}</span></div>` : `<div style="color:var(--bad)"><b>${esc(g.l)}</b><span class="tiny">${esc(g.bad)}</span></div>`).join('')}</div>` : ''; };
+    $('#rf_p').innerHTML = G.length ? `<div class="glist">${G.map(g => g.f ? `<div><b>${esc(g.f.studentName)}</b><span class="tiny muted">${esc((g.f.grade || '') + ' ' + (g.f.section || ''))} · بدون عذر ${ar(unex(g.f))} · بعذر ${ar(exc(g.f))}</span>${(g.dups || []).length ? `<span class="tiny" style="color:var(--z2)">${g.dups.length === 1 ? 'لها ملفين مكررين' : 'لها ' + ar(g.dups.length + 1) + ' ملفات مكررة'}، يتعبّى الكل. احذفي المكرر من ملفاتها</span>` : ''}<span class="tiny">${[g.def ? 'التحويل ' + hij(g.def) : ''].concat(Object.entries(g.o).map(([k, v]) => { const [tr, lv] = k.split('-'); return TT[tr] + (lv ? ' ' + ar(lv) + ' أيام' : '') + ': ' + hij(v); })).filter(Boolean).map(esc).join(' · ')}</span></div>` : `<div style="color:var(--bad)"><b>${esc(g.l)}</b><span class="tiny">${esc(g.bad)}</span></div>`).join('')}</div>` : ''; };
   $('#rf_t').addEventListener('input', show); $('#rf_m').addEventListener('change', show); show();
 }
 function absFillForm(one) {

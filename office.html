@@ -1883,7 +1883,7 @@ function absPlanHTML(a) {
     <div><b class="small">أسباب الغياب</b><div class="apchips">${AP_CAUSES.map(c => chip('c', c, (p.causes || []).includes(c))).join('')}</div></div>
     <div><b class="small">الأهداف</b><div class="apchips">${allGoals.map(g => chip('g', g, G.includes(g))).join('')}</div><div class="apadd"><input data-apin="g" placeholder="هدف آخر…"><button type="button" class="btn sm" data-apadd="g">＋</button></div></div>
     <div><b class="small">الإجراءات العلاجية</b><div class="apsteps">${allSteps.map(t => { const i = st.findIndex(s => s.t === t); const on = i >= 0; const s0 = on ? st[i] : null;
-      return `<div class="aprow${on ? ' on' : ''}">${chip('s', t, on)}${on && !sugg ? `<label class="chk tiny" style="--sc:var(--good)"><input type="checkbox" data-apdone="${i}" ${s0.done ? 'checked' : ''}><span>${s0.done ? 'نُفّذ' + (s0.doneAt ? ' ' + esc(hij(s0.doneAt)) : '') : 'نُفّذ؟'}</span></label>` : ''}</div>`; }).join('')}</div>
+      return `<div class="aprow${on ? ' on' : ''}">${chip('s', t, on)}${on && !sugg ? `<label class="chk tiny" style="--sc:var(--good)"><input type="checkbox" data-apdone="${i}" ${s0.done ? 'checked' : ''}><span>${s0.done ? 'نُفّذ' : 'نُفّذ؟'}</span></label>` : ''}</div>`; }).join('')}</div>
       <div class="apadd"><input data-apin="s" placeholder="إجراء آخر…"><button type="button" class="btn sm" data-apadd="s">＋</button></div></div>
     <div class="row" style="gap:10px;flex-wrap:wrap"><label class="f" style="flex:1 1 200px"><span>المسؤولة</span><input data-apf="who" value="${esc(p.who || 'الموجهة الطلابية')}"></label>
       <label class="f" style="flex:2 1 300px"><span>المتابعة والتقييم</span><input data-apf="follow" value="${esc(p.follow || '')}"></label></div>
@@ -1916,10 +1916,10 @@ function apForm() {
 function apReport(a) {
   const p = a.plan || {}; const st = p.steps || [];
   return `<div class="a4 prep-a4">${repHead('خطة علاجية لطالبة متكررة الغياب')}<div class="pband" style="border-color:#C9532A;background:#FCE9E1"><small style="color:#C9532A">${esc((a.grade || '') + ' ' + (a.section || ''))}</small><b>${esc(a.studentName)}</b></div>
-    <table class="pinfo-t"><tbody><tr><th>الغياب بدون عذر</th><td>${ar(unex(a))} أيام</td><th>الغياب بعذر</th><td>${ar(exc(a))} أيام</td></tr><tr><th>المسؤولة</th><td colspan="3">${esc(p.who || '')}</td></tr></tbody></table>
+    <table class="pinfo-t"><tbody><tr><th>الغياب بدون عذر</th><td>${ar(unex(a))} ${unex(a) > 2 && unex(a) < 11 ? 'أيام' : 'يوم'}</td><th>الغياب بعذر</th><td>${ar(exc(a))} ${exc(a) > 2 && exc(a) < 11 ? 'أيام' : 'يوم'}</td></tr><tr><th>المسؤولة</th><td colspan="3">${esc(p.who || '')}</td></tr></tbody></table>
     <div class="boxes"><div class="box full"><h4>أسباب الغياب</h4><p>${esc((p.causes || []).join('، ') || '—')}${p.causeNote ? '\n' + esc(p.causeNote) : ''}</p></div>
     <div class="box full"><h4>الأهداف</h4>${pList(p.goals)}</div>
-    <div class="box full"><h4>الإجراءات العلاجية</h4><table><thead><tr><th style="width:28px">م</th><th>الإجراء</th><th style="width:125px">تاريخ التنفيذ</th><th style="width:120px">المسؤولة</th><th style="width:50px">التنفيذ</th></tr></thead><tbody>${st.map((s, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(s.t)}</td><td>${s.done && s.doneAt ? esc(hij(s.doneAt)) : ''}</td><td>${esc(s.who || '')}</td><td style="text-align:center">${s.done ? '✔' : ''}</td></tr>`).join('') || '<tr><td colspan="5">—</td></tr>'}</tbody></table></div>
+    <div class="box full"><h4>الإجراءات العلاجية</h4><table><thead><tr><th style="width:28px">م</th><th>الإجراء</th><th style="width:120px">المسؤولة</th><th style="width:50px">التنفيذ</th></tr></thead><tbody>${st.map((s, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(s.t)}</td><td>${esc(s.who || '')}</td><td style="text-align:center">${s.done ? '✔' : ''}</td></tr>`).join('') || '<tr><td colspan="5">—</td></tr>'}</tbody></table></div>
     ${p.follow ? `<div class="box full"><h4>المتابعة والتقييم</h4><p>${esc(p.follow)}</p></div>` : ''}</div>${repSigs()}</div>`;
 }
 

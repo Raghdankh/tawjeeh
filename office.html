@@ -731,6 +731,25 @@ async function absFill(ids, o) {
     if (ch) { d.upd = todayH(); writes.push({ id, kind: 'absence', data: d }); n += ch; } });
   if (writes.length) await saveMany(writes); return { files: writes.length, steps: n };
 }
+function absSesBulk() {
+  const L = list('absence').filter(a => !a.closed).map(a => ({ a, u: unex(a), x: exc(a) })).sort((p, q) => (q.u + q.x) - (p.u + p.x));
+  if (!L.length) { toast('ما فيه ملفات غياب مفتوحة'); return; }
+  openSheet('تسجيل جلسات فردية', `<p class="small muted">تنسجل لكل طالبة تختارينها جلسة فردية جاهزة حسب وضعها (بعذر أو بدون عذر، وأيامها، وسبب غيابها)، وتطلع في ملفها وفي سجل جلسات التوجيه الفردي. اختاري بس اللي سويتي معهن جلسة فعلاً.</p>
+    <div class="form"><div class="f full"><span>تاريخ الجلسات</span>${hdInput('sb_d', todayH())}</div>
+    <div class="f full"><span>الطالبات <button type="button" class="btn sm ghost" id="sb_all">تحديد الكل</button><button type="button" class="btn sm ghost" id="sb_none">إلغاء التحديد</button></span>
+    <div class="apick">${L.map(({ a, u, x }) => { const v = absSesFill(a.id, a); return `<label class="chk" style="--sc:var(--abs)"><input type="checkbox" data-sb="${a.id}" checked><span><b>${esc(a.studentName)}</b> <span class="tiny muted">${esc((a.grade || '') + ' ' + (a.section || ''))} · بدون عذر ${ar(u)} · بعذر ${ar(x)}</span><br><span class="tiny">${esc(v.topic)}</span></span></label>`; }).join('')}</div></div>
+    <p class="small" id="sb_n" style="font-weight:700"></p></div>
+    <div class="toolbar"><button class="btn primary" type="submit">تسجيل الجلسات</button></div>`,
+    async f => { const date = readHD(f, 'sb_d'); const ids = [...f.querySelectorAll('[data-sb]:checked')].map(x => x.dataset.sb); if (!ids.length) throw new Error('اختاري طالبة وحدة على الأقل');
+      const writes = []; let skip = 0;
+      ids.forEach(id => { const d = JSON.parse(JSON.stringify(DB.docs[id].data)); d.log = d.log || []; if (d.log.some(l => l.type === 'session' && l.date === date)) { skip++; return; }
+        const v = absSesFill(id, d); d.log.push({ date, type: 'session', text: 'جلسة فردية: ' + v.topic, topic: v.topic, goal: v.goal, note: v.note, agree: v.agree, prog: '' }); d.upd = todayH(); writes.push({ id, kind: 'absence', data: d }); });
+      if (writes.length) await saveMany(writes); toast(`انسجلت ${ar(writes.length)} جلسة${skip ? ` · ${ar(skip)} لهن جلسة بنفس التاريخ` : ''}`); }, `--c:var(--abs);--cs:var(--abs-soft)`);
+  const upd = () => { $('#sb_n').textContent = `بتنسجل ${ar(document.querySelectorAll('[data-sb]:checked').length)} جلسة`; };
+  document.querySelectorAll('[data-sb]').forEach(x => x.addEventListener('change', upd));
+  $('#sb_all').addEventListener('click', () => { document.querySelectorAll('[data-sb]').forEach(x => { x.checked = true; }); upd(); });
+  $('#sb_none').addEventListener('click', () => { document.querySelectorAll('[data-sb]').forEach(x => { x.checked = false; }); upd(); }); upd();
+}
 function absFillForm(one) {
   const ids = one ? [one] : list('absence').filter(a => !a.closed).map(a => a.id);
   const cnt = o => ids.reduce((s, id) => { const d = DB.docs[id].data; return s + dueSteps(d).filter(k => !(d.done || {})[k] && !(LEGAL_STEPS.has(k) && !o.legal) && !(roleOf(d, k) === 'a' && !o.admin)).length; }, 0);
@@ -1106,7 +1125,7 @@ function vAbsence() {
   const f = S.filter.abs || 'all';
   const shown = rows.filter(a => f === 'all' ? !a.closed : f === 'closed' ? a.closed : f === 'pending' ? !a.closed && a.p > 0 : f === 'consec' ? !a.closed && a.st >= 3 : f[0] === 'e' ? !a.closed && a.x >= +f.slice(1) : !a.closed && a.n >= +f);
   const cnt = fn => rows.filter(a => !a.closed && fn(a)).length;
-  return `<div class="head"><h1><span class="dot"></span>التعامل مع حالات الغياب</h1><span class="sp"></span><button class="btn" data-binder="absence">📁 الملف الشامل</button><button class="btn wa" data-act="absWA">📲 مراسلة أولياء الأمور</button><button class="btn" data-act="absFill">✓ تعبئة الإجراءات</button><button class="btn primary" data-act="absAdd">＋ ملف غياب</button></div>
+  return `<div class="head"><h1><span class="dot"></span>التعامل مع حالات الغياب</h1><span class="sp"></span><button class="btn" data-binder="absence">📁 الملف الشامل</button><button class="btn wa" data-act="absWA">📲 مراسلة أولياء الأمور</button><button class="btn" data-act="absFill">✓ تعبئة الإجراءات</button><button class="btn" data-act="absSesAll">＋ جلسات فردية</button><button class="btn primary" data-act="absAdd">＋ ملف غياب</button></div>
     ${absSubtabs('files')}
     <p class="lede">حسب قواعد السلوك والمواظبة: المادة (٣٣) للغياب بعذر، والمادة (٣٤) للغياب بدون عذر. اكتبي عدد الأيام فقط، وتظهر إجراءات اليوم ٣ و٥ و١٠ تلقائياً.</p>
     <div class="tiles">
@@ -3648,6 +3667,7 @@ document.addEventListener('click', async e => {
   else if (act === 'dayLog') { const f = S.filter.day || 'today'; const td = todayH(); const rows = list('daily').filter(r => f === 'today' ? r.date === td : f === 'month' ? String(r.date || '').startsWith(td.slice(0, 7)) : f === 'open' ? r.status !== 'مغلقة' : true).filter(r => (S.filter.dayt || 'all') === 'all' || r.type === S.filter.dayt).sort((a, b) => String(a.date).localeCompare(String(b.date)) || String(a.time || '').localeCompare(String(b.time || ''))); openReport(dayLogReport(rows, 'سجل الحالات اليومية الطارئة' + (f === 'today' ? ' — ' + hij(td) : f === 'month' ? ' — شهر ' + hij(td).replace(/^\S+ /, '') : '')), 'الحالات-الطارئة'); }
   else if (act === 'absRep') { const nm = DB.docs[S.param].data.studentName; openSheet('تقرير الغياب', `<div class="reps"><button type="button" class="rep-btn" data-absrep="all" style="--c:var(--abs)"><b>التقرير الكامل</b><small>إجراءات الموجهة وإجراءات الإدارة، وتوقيع الموجهة والمديرة</small></button><button type="button" class="rep-btn" data-absrep="m" style="--c:var(--abs)"><b>إجراءات الموجهة فقط</b><small>لملف أعمالك: إجراءاتك أنتِ وتوقيعك</small></button></div>`, async () => false, `--c:var(--abs);--cs:var(--abs-soft)`); }
   else if (act === 'absFill') absFillForm(null);
+  else if (act === 'absSesAll') absSesBulk();
   else if (act === 'absFillOne') absFillForm(S.param);
   else if (act === 'absClose') absUpdate(a => { a.closed = !a.closed; }, 'تم');
   else if (act === 'absLog' || act === 'absSes') { setTimeout(() => { const r = $('#m_s'); if (!r) return; const A0 = DB.docs[S.param].data; const fill = () => { if (!r.checked || $('#ab_tp').value) return; const v = absSesFill(S.param, A0); $('#ab_tp').value = v.topic; $('#ab_g').value = v.goal; $('#ab_n').value = v.note; $('#ab_r').value = v.agree; const n = document.createElement('p'); n.className = 'tiny'; n.style.cssText = 'background:var(--good-soft);color:var(--good);border-radius:10px;padding:7px 10px;font-weight:700;margin:0'; n.textContent = '✓ تعبّت تلقائياً حسب نوع غيابها وأسبابه، عدّلي اللي يختلف في الجلسة'; $('#ab_tp').closest('.form').prepend(n); }; r.addEventListener('change', fill); if (act === 'absSes') { r.checked = true; fill(); } }, 0); const A = DB.docs[S.param].data; const absId = S.param; openSheet('تسجيل في ملف ' + A.studentName, `<div class="seg" role="radiogroup"><label><input type="radio" name="lm" id="m_c" value="c" checked><span>تواصل مع ولي الأمر</span></label><label><input type="radio" name="lm" id="m_o" value="o"><span>إجراء آخر</span></label><label><input type="radio" name="lm" id="m_s" value="s"><span>جلسة فردية</span></label></div>

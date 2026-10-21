@@ -793,13 +793,15 @@ function absFillForm(one) {
   openSheet(one ? 'تعبئة الإجراءات المستحقة' : 'تعبئة إجراءات كل الملفات', `<p class="small muted">تتأشّر الإجراءات اللي وصلت لها كل طالبة حسب أيامها: مسار <b>بدون عذر</b> (المادة ٣٤) على أيام الغياب بدون عذر، ومسار <b>بعذر</b> (المادة ٣٣) على أيام الغياب بعذر. الإجراءات المشروطة («في حال…») ما تتأشّر، والمؤشّر قبل ما يتغير.</p>
     <div class="form"><label class="chk full" style="--sc:var(--abs)"><input type="checkbox" id="af_a" checked><span>إجراءات الإدارة بعد (استدعاء ولي الأمر، التعهد…)</span></label>
     <label class="chk full" style="--sc:var(--bad)"><input type="checkbox" id="af_l"><span>مخاطبة الجهات المختصة (١٠ أيام بدون عذر أو غياب متصل) — أشّريها بس إذا تمت فعلاً</span></label>
-    <div class="f full"><span>تاريخ الإجراءات</span><label class="chk" style="--sc:var(--abs)"><input type="checkbox" id="af_ref" checked><span>تاريخ تحويل كل طالبة (من ملفها)</span></label>${hdInput('af_d', todayH())}</div>
+    <div class="f full"><span>تاريخ الإجراءات</span><p class="small" style="margin:0;font-weight:700;color:var(--good)">${one ? (DB.docs[one].data.ref ? '✓ بتاريخ الإحالة: ' + esc(hij(DB.docs[one].data.ref)) : 'ما لها تاريخ إحالة في ملفها، بيتسجل تاريخ اليوم') : (() => { const noRef = ids.filter(id => !DB.docs[id].data.ref).length; return '✓ كل طالبة بتاريخ إحالتها' + (noRef ? ` (${ar(noRef)} بدون تاريخ إحالة، يتسجل لهن تاريخ اليوم)` : ''); })()}</p>
+      <label class="chk" style="--sc:var(--abs)"><input type="checkbox" id="af_ref"><span>أبغى تاريخ مختلف</span></label><div id="af_dw" hidden>${hdInput('af_d', todayH())}</div></div>
     <p class="small" id="af_n" style="font-weight:700"></p></div>
     <div class="toolbar"><button class="btn primary" type="submit">تعبئة</button></div>`,
-    async f => { const o = { admin: f.querySelector('#af_a').checked, legal: f.querySelector('#af_l').checked, date: f.querySelector('#af_ref').checked ? '' : readHD(f, 'af_d') };
+    async f => { const o = { admin: f.querySelector('#af_a').checked, legal: f.querySelector('#af_l').checked, date: f.querySelector('#af_ref').checked ? readHD(f, 'af_d') : '' };
       const r = await absFill(ids, o); toast(r.steps ? `تعبّى ${ar(r.steps)} إجراء في ${ar(r.files)} ${r.files > 2 && r.files < 11 ? 'ملفات' : 'ملف'}` : 'كل الإجراءات المستحقة متعبّية'); }, `--c:var(--abs);--cs:var(--abs-soft)`);
   const upd = () => { const o = { admin: $('#af_a').checked, legal: $('#af_l').checked }; $('#af_n').textContent = `سيتعبّى ${ar(cnt(o))} إجراء${one ? '' : ' في ' + ar(ids.length) + ' ملف'}`; };
   ['#af_a', '#af_l'].forEach(x => $(x).addEventListener('change', upd)); upd();
+  $('#af_ref').addEventListener('change', e => { $('#af_dw').hidden = !e.target.checked; });
 }
 function pending(a) {
   let p = 0; const done = a.done || {};

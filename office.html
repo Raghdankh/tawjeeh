@@ -863,7 +863,7 @@ function absSesFill(id, a, ms) {
   else N.push('اتفقت مع الطالبة على تعويض ما فاتها بالتنسيق مع المعلمات');
   N.push('أبدت الطالبة رغبتها في الانتظام');
   const A = []; if (un) A.push(fol ? 'الالتزام بالخطة العلاجية' : 'الالتزام بالحضور اليومي'); if (K.has('sleep')) A.push('النوم مبكراً'); A.push('تعويض الدروس الفائتة مع المعلمات');
-  if (un && (K.has('transport') || K.has('family') || K.has('neglect') || !K.size || fol)) A.push('التواصل مع ولي الأمر'); A.push(fol ? 'متابعة أسبوعية' : 'جلسة متابعة بعد أسبوع');
+  if (un && (K.has('transport') || K.has('family') || K.has('neglect') || !K.size || fol)) A.push('التواصل مع ولي الأمر'); 
   return { topic, goal, note: N.join('\n'), agree: A.join('\n'), ms: ms ? ms.k : '', base: ms ? ms.base : (a.ref || '') };
 }
 const CTYPES = ['اتصال هاتفي', 'رسالة', 'لقاء حضوري', 'استدعاء ولي أمر', 'زيارة'];
@@ -1300,7 +1300,7 @@ function absReport(only) {
   if (ext.length) P.push(ext.join('، و') + '.');
   const sum = P.join(' ');
   const tb = (head, rows) => `<table style="font-size:12px"><thead><tr>${head.map(([h, w]) => `<th${w ? ` style="width:${w}px"` : ''}>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table>`;
-  const sesT = ses.length ? `<div class="box full"><h4>جلسات التوجيه الفردي</h4>${tb([['التاريخ', 92], ['المحطة', 96], ['الموضوع', 0], ['أبرز ما دار في الجلسة', 0], ['التقدم', 46]], ses.map(l => `<tr><td>${esc(hij(l.date))}</td><td>${esc(l.ms ? MS_T[l.ms] : 'جلسة إضافية')}</td><td>${esc(l.topic || '')}</td><td>${lines(l.note).slice(0, 3).map(esc).join('، ')}${l.agree ? `<br><small><b>الاتفاق:</b> ${esc(lines(l.agree).join('، '))}</small>` : ''}</td><td>${esc(SES_PROG[l.prog] || '—')}</td></tr>`))}</div>` : '';
+  const sesT = ses.length ? `<div class="box full"><h4>جلسات التوجيه الفردي</h4>${tb([['التاريخ', 92], ['المحطة', 96], ['الموضوع', 0], ['أبرز ما دار في الجلسة', 0]], ses.map(l => `<tr><td>${esc(hij(l.date))}</td><td>${esc(l.ms ? MS_T[l.ms] : 'جلسة إضافية')}</td><td>${esc(l.topic || '')}</td><td>${lines(l.note).slice(0, 3).map(esc).join('، ')}${l.agree ? `<br><small><b>الاتفاق:</b> ${esc(lines(l.agree).join('، '))}</small>` : ''}</td></tr>`))}</div>` : '';
   const conT = cons.length ? `<div class="box full"><h4>التواصل مع ولي الأمر</h4>${tb([['التاريخ', 92], ['نوع التواصل', 96], ['ما تم', 0]], cons.map(c => `<tr><td>${esc(hij(c.date))}</td><td>${esc((c.type || 'تواصل') + (c.guardian ? ' (' + c.guardian + ')' : ''))}</td><td>${esc(c.summary || '')}${c.outcome ? ' — ' + esc(c.outcome) : ''}</td></tr>`))}</div>` : '';
   const othT = other.length ? `<div class="box full"><h4>إجراءات أخرى</h4>${tb([['التاريخ', 92], ['الإجراء', 0]], other.map(l => `<tr><td>${esc(hij(l.date))}</td><td>${esc(l.text || '')}</td></tr>`))}</div>` : '';
   const sigs = only ? `<div class="sigs">${SIGS.slice(0, 1).map(s => `<div>${s[0]}<span></span><i>${s[1]}</i></div>`).join('')}<div></div></div>` : repSigs();
@@ -1892,12 +1892,12 @@ function absPlanHTML(a) {
   const id = S.param; const p = apCur(id, a); const sugg = !a.plan; const st = p.steps || []; const dn = st.filter(s => s.done).length; const G = lines(p.goals);
   const chip = (kind, v, on) => `<button type="button" class="apchip${on ? ' on' : ''}" data-apt="${kind}" data-v="${esc(v)}" aria-pressed="${on}">${on ? '✓ ' : ''}${esc(v)}</button>`;
   const allSteps = [...new Set(AP_STEPS.concat(st.map(s => s.t)))]; const allGoals = [...new Set(AP_GOAL_OPTS.concat(G))];
-  return `<section class="panel apbox" style="border-color:var(--abs)"><div class="head"><h3>الخطة العلاجية</h3>${sugg ? '<span class="pill" style="--pc:var(--good);--ps:var(--good-soft)">مقترحة حسب غيابها وأسبابه</span>' : `<span class="tiny muted">نُفّذ ${ar(dn)} من ${ar(st.length)}</span>`}<span class="sp"></span>${sugg ? '<button class="btn sm primary" data-apsave="1">اعتماد الخطة</button>' : '<button class="btn sm" data-act="apRep">طباعة الخطة</button><button class="btn sm ghost" data-apdel2="1">حذف</button>'}</div>
+  return `<section class="panel apbox" style="border-color:var(--abs)"><div class="head"><h3>الخطة العلاجية</h3>${sugg ? '<span class="pill" style="--pc:var(--good);--ps:var(--good-soft)">مقترحة حسب غيابها وأسبابه</span>' : ''}<span class="sp"></span>${sugg ? '<button class="btn sm primary" data-apsave="1">اعتماد الخطة</button>' : '<button class="btn sm" data-act="apRep">طباعة الخطة</button><button class="btn sm ghost" data-apdel2="1">حذف</button>'}</div>
     <p class="tiny muted" style="margin:0">اضغطي على أي خيار تضيفينه أو تشيلينه، وينحفظ على طول.</p>
     <div><b class="small">أسباب الغياب</b><div class="apchips">${AP_CAUSES.map(c => chip('c', c, (p.causes || []).includes(c))).join('')}</div></div>
     <div><b class="small">الأهداف</b><div class="apchips">${allGoals.map(g => chip('g', g, G.includes(g))).join('')}</div><div class="apadd"><input data-apin="g" placeholder="هدف آخر…"><button type="button" class="btn sm" data-apadd="g">＋</button></div></div>
     <div><b class="small">الإجراءات العلاجية</b><div class="apsteps">${allSteps.map(t => { const i = st.findIndex(s => s.t === t); const on = i >= 0; const s0 = on ? st[i] : null;
-      return `<div class="aprow${on ? ' on' : ''}">${chip('s', t, on)}${on && !sugg ? `<label class="chk tiny" style="--sc:var(--good)"><input type="checkbox" data-apdone="${i}" ${s0.done ? 'checked' : ''}><span>${s0.done ? 'نُفّذ' : 'نُفّذ؟'}</span></label>` : ''}</div>`; }).join('')}</div>
+      return `<div class="aprow${on ? ' on' : ''}">${chip('s', t, on)}</div>`; }).join('')}</div>
       <div class="apadd"><input data-apin="s" placeholder="إجراء آخر…"><button type="button" class="btn sm" data-apadd="s">＋</button></div></div>
     <div class="row" style="gap:10px;flex-wrap:wrap"><label class="f" style="flex:1 1 200px"><span>المسؤولة</span><input data-apf="who" value="${esc(p.who || 'الموجهة الطلابية')}"></label>
       <label class="f" style="flex:2 1 300px"><span>المتابعة والتقييم</span><input data-apf="follow" value="${esc(p.follow || '')}"></label></div>
@@ -1925,11 +1925,10 @@ function absSesHTML(a) {
       <div><b class="small">الهدف</b>${one('goal', opts([d.goal], SUG.ab_g.o))}</div>
       <div><b class="small">ما دار في الجلسة</b>${many('note', opts(d.note, SUG.ab_n.o))}</div>
       <div><b class="small">الاتفاق مع الطالبة</b>${many('agree', opts(d.agree, SUG.ab_r.o))}</div>
-      <div><b class="small">تقدم الطالبة</b>${one('prog', Object.values(SES_PROG))}</div>
       <div class="toolbar" style="justify-content:flex-start"><button class="btn primary sm" data-sessave="${esc(key)}">اعتماد الجلسة</button>${key === 'extra' ? '<button class="btn sm ghost" data-sesx="0">إلغاء</button>' : ''}</div></div>`; };
   return `<section class="panel apbox" style="border-color:var(--abs)"><div class="head"><h3>جلسات التوجيه الفردي</h3><span class="tiny muted">${ar(done.length)} ${done.length > 2 && done.length < 11 ? 'جلسات' : 'جلسة'}</span><span class="sp"></span>${S.sesx[id] ? '' : '<button class="btn sm" data-sesx="1">＋ جلسة إضافية</button>'}</div>
     <p class="tiny muted" style="margin:0">جلسة عند كل محطة: ٣ أيام بعذر، ٣ أيام بدون عذر، ٥ أيام. معبّاة حسب نوع غيابها وسببه، وتاريخها أول يوم دراسي بعد المحطة. عدّلي بالضغط واعتمديها.</p>
-    ${done.map(l => `<div class="sesdone"><div class="head"><b>${esc(l.ms ? 'جلسة ' + MS_T[l.ms] : 'جلسة فردية')}</b><span class="tiny muted">${esc(hij(l.date))}</span>${l.prog ? `<span class="pill">${esc(SES_PROG[l.prog] || l.prog)}</span>` : ''}<span class="sp"></span><button class="btn sm ghost" data-ldel="${l.i}" aria-label="حذف">✕</button></div>
+    ${done.map(l => `<div class="sesdone"><div class="head"><b>${esc(l.ms ? 'جلسة ' + MS_T[l.ms] : 'جلسة فردية')}</b><span class="tiny muted">${esc(hij(l.date))}</span><span class="sp"></span><button class="btn sm ghost" data-ldel="${l.i}" aria-label="حذف">✕</button></div>
       <div class="small"><b>${esc(l.topic || '')}</b>${l.goal ? ' · ' + esc(l.goal) : ''}</div>${l.note ? `<ul class="small" style="margin:4px 0;padding-inline-start:18px">${lines(l.note).map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}${l.agree ? `<div class="tiny muted">الاتفاق: ${esc(lines(l.agree).join('، '))}</div>` : ''}</div>`).join('')}
     ${pend.map(m => card(m.k, 'جلسة ' + MS_T[m.k])).join('')}${S.sesx[id] ? card('extra', 'جلسة إضافية') : ''}
     ${!done.length && !pend.length && !S.sesx[id] ? '<p class="small muted">ما وصلت الطالبة ٣ أيام بعد. تقدرين تضيفين جلسة إضافية.</p>' : ''}</section>`;
@@ -1964,7 +1963,7 @@ function apReport(a) {
     <table class="pinfo-t"><tbody><tr><th>الغياب بدون عذر</th><td>${ar(unex(a))} ${unex(a) > 2 && unex(a) < 11 ? 'أيام' : 'يوم'}</td><th>الغياب بعذر</th><td>${ar(exc(a))} ${exc(a) > 2 && exc(a) < 11 ? 'أيام' : 'يوم'}</td></tr><tr><th>المسؤولة</th><td colspan="3">${esc(p.who || '')}</td></tr></tbody></table>
     <div class="boxes"><div class="box full"><h4>أسباب الغياب</h4><p>${esc((p.causes || []).join('، ') || '—')}${p.causeNote ? '\n' + esc(p.causeNote) : ''}</p></div>
     <div class="box full"><h4>الأهداف</h4>${pList(p.goals)}</div>
-    <div class="box full"><h4>الإجراءات العلاجية</h4><table><thead><tr><th style="width:28px">م</th><th>الإجراء</th><th style="width:120px">المسؤولة</th><th style="width:50px">التنفيذ</th></tr></thead><tbody>${st.map((s, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(s.t)}</td><td>${esc(s.who || '')}</td><td style="text-align:center">${s.done ? '✔' : ''}</td></tr>`).join('') || '<tr><td colspan="5">—</td></tr>'}</tbody></table></div>
+    <div class="box full"><h4>الإجراءات العلاجية</h4><table><thead><tr><th style="width:28px">م</th><th>الإجراء</th><th style="width:120px">المسؤولة</th></tr></thead><tbody>${st.map((s, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(s.t)}</td><td>${esc(s.who || '')}</td></tr>`).join('') || '<tr><td colspan="5">—</td></tr>'}</tbody></table></div>
     ${p.follow ? `<div class="box full"><h4>المتابعة والتقييم</h4><p>${esc(p.follow)}</p></div>` : ''}</div>${repSigs()}</div>`;
 }
 
@@ -2989,8 +2988,8 @@ function tablePages(title, tiles, head, rows, per, row) {
 function indLog(o) {
   const R = mSessions('جلسة فردية'); const st = new Set(R.map(r => norm(r.name))).size; const bc = {}; R.forEach(r => r.cats.forEach(k => { bc[k] = (bc[k] || 0) + 1; }));
   const tiles = repTiles([[R.length, 'جلسة فردية'], [st, 'طالبة']].concat(Object.entries(bc).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k, v]) => [v, MCATS[k] || k])));
-  return tablePages('سجل جلسات التوجيه الفردي', tiles, [['التاريخ', 84], ['الطالبة', 110], ['الصف', 62], ['التصنيف', 92], ['موضوع الجلسة'], ['الهدف'], ['التقدم', 48]], R, 15,
-    r => [esc(hij(r.date)), esc(anonN(r.name, o)), esc((r.grade || '') + ' ' + (r.section || '')), esc(catT(r.cats)), esc(r.topic || ''), esc(r.goal || ''), esc(MPROG[r.prog] || '')]);
+  return tablePages('سجل جلسات التوجيه الفردي', tiles, [['التاريخ', 84], ['الطالبة', 110], ['الصف', 62], ['التصنيف', 92], ['موضوع الجلسة'], ['الهدف']], R, 15,
+    r => [esc(hij(r.date)), esc(anonN(r.name, o)), esc((r.grade || '') + ' ' + (r.section || '')), esc(catT(r.cats)), esc(r.topic || ''), esc(r.goal || '')]);
 }
 function grpLogAll() {
   const gs = list('group').sort((a, b) => String(a.date).localeCompare(String(b.date))); const M = mSessions('جلسة جماعية');
@@ -3112,7 +3111,7 @@ const SUG = {
   ab_tp: { m: 'set', o: ['أسباب الغياب وأهمية المواظبة', 'أثر الغياب على التحصيل الدراسي', 'تنظيم النوم والاستيقاظ المبكر', 'تعويض ما فات من دروس', 'رفع الدافعية والارتباط بالمدرسة', 'متابعة الالتزام بالخطة العلاجية'] },
   ab_g: { m: 'set', o: ['انتظام الطالبة في الحضور اليومي', 'خفض أيام الغياب بدون عذر', 'الحضور المبكر للطابور الصباحي', 'تعويض ما فات الطالبة من دروس', 'تعزيز ارتباط الطالبة بالمدرسة'] },
   ab_n: { m: 'lines', o: ['ناقشت مع الطالبة أسباب غيابها', 'ذكرت الطالبة ظرفاً صحياً', 'ذكرت الطالبة صعوبة الاستيقاظ صباحاً', 'ذكرت الطالبة ظروفاً أسرية', 'ذكرت الطالبة عدم توفر من يوصلها', 'وضحت للطالبة أثر الغياب على تحصيلها', 'أبدت الطالبة رغبتها في الانتظام'] },
-  ab_r: { m: 'lines', o: ['الالتزام بالحضور اليومي', 'النوم مبكراً', 'تعويض الدروس الفائتة مع المعلمات', 'جلسة متابعة بعد أسبوع', 'التواصل مع ولي الأمر'] },
+  ab_r: { m: 'lines', o: ['الالتزام بالحضور اليومي', 'النوم مبكراً', 'تعويض الدروس الفائتة مع المعلمات', 'التواصل مع ولي الأمر'] },
   am_a: { m: 'lines', o: ['حصر الطالبات الغائبات ومطابقتها مع ملفات الغياب', 'التواصل مع أولياء أمور الطالبات المتغيبات', 'استدعاء أولياء أمور كثيرات الغياب', 'إعداد خطط علاجية لكثيرات الغياب', 'جلسات إرشاد فردي للطالبات كثيرات الغياب', 'رسالة توعوية لأولياء الأمور عن أهمية الانتظام', 'توعية الطالبات بالمواظبة في الإذاعة المدرسية', 'تكريم المنضبطات في لوحة الشرف', 'تطبيق إجراءات قواعد السلوك والمواظبة'] },
   am_n: { m: 'lines', o: ['انخفاض الغياب مقارنة بالشهر السابق', 'ارتفاع الغياب مقارنة بالشهر السابق', 'تركّز الغياب في الصفوف الأولية', 'تركّز الغياب يومي الأحد والخميس', 'غياب جماعي قبل الإجازة', 'تم التواصل مع أسر الطالبات المتكرر غيابهن'] },
   am_r: { m: 'lines', o: ['التواصل مع أولياء أمور الطالبات المتغيبات', 'تكريم الطالبات المنتظمات في الحضور', 'تفعيل بطاقة الحضور المبكر', 'إعداد خطط علاجية للطالبات كثيرات الغياب', 'توعية الطالبات بأهمية المواظبة في الإذاعة', 'رسالة توعوية لأولياء الأمور عن أثر الغياب'] },
@@ -3829,7 +3828,7 @@ document.addEventListener('click', async e => {
       <label class="f full"><span>الهدف</span><input id="ab_g" placeholder="مثال: انتظام الطالبة في الحضور"></label>
       <label class="f full"><span>ما دار في الجلسة</span><textarea id="ab_n" style="min-height:70px"></textarea></label>
       <label class="f full"><span>الاتفاق مع الطالبة (اختياري)</span><textarea id="ab_r" style="min-height:50px"></textarea></label>
-      <label class="f"><span>تقدم الطالبة</span><select id="ab_p"><option value="">—</option><option value="up">تحسن</option><option value="same">ثابت</option><option value="down">تراجع</option></select></label></div>
+      </div>
     <div class="form onlyo"><label class="f full"><span>الإجراء</span><textarea id="l_t" placeholder="مثال: مقابلة الطالبة"></textarea></label></div>
     <div class="presets onlyo">${['مقابلة الطالبة', 'أخذ التعهد الخطي من الطالبة وولي الأمر', 'إحالة للجنة التوجيه الطلابي', 'تحديث الخطة العلاجية', 'جلسة توعوية مع ولي الأمر'].map(p => `<button type="button" onclick="document.getElementById('l_t').value='${p}'">${p}</button>`).join('')}</div>
     <div class="form"><div class="f"><span>التاريخ</span>${hdInput('l_d', '')}</div></div><div class="toolbar"><button class="btn primary" type="submit">حفظ</button></div>`,
@@ -3838,7 +3837,7 @@ document.addEventListener('click', async e => {
         await saveDoc(uid('contact'), 'contact', { studentId: A.studentId || '', studentName: A.studentName, grade: A.grade || '', section: A.section || '', guardian: f.querySelector('#c_g').value.trim(), type: f.querySelector('#c_type').value, date, reason: 'غياب', summary, outcome: f.querySelector('#c_o').value.trim(), follow: '', absId });
         toast('حُفظ هنا وفي سجل التواصل مع أولياء الأمور'); }
       else if (f.querySelector('#m_s').checked) { const v = k => f.querySelector('#' + k).value.trim(); const topic = v('ab_tp'); if (!topic) throw new Error('اكتبي موضوع الجلسة');
-        const dd = JSON.parse(JSON.stringify(DB.docs[absId].data)); const ms0 = f.querySelector('#m_s').dataset.ms || ''; dd.log = (dd.log || []).concat({ date, type: 'session', ms: ms0, text: 'جلسة فردية' + (ms0 ? ' (' + MS_T[ms0] + ')' : '') + ': ' + topic, topic, goal: v('ab_g'), note: v('ab_n'), agree: v('ab_r'), prog: v('ab_p') }); await saveDoc(absId, 'absence', dd); toast('حُفظت الجلسة هنا وفي سجل جلسات التوجيه الفردي'); }
+        const dd = JSON.parse(JSON.stringify(DB.docs[absId].data)); const ms0 = f.querySelector('#m_s').dataset.ms || ''; dd.log = (dd.log || []).concat({ date, type: 'session', ms: ms0, text: 'جلسة فردية' + (ms0 ? ' (' + MS_T[ms0] + ')' : '') + ': ' + topic, topic, goal: v('ab_g'), note: v('ab_n'), agree: v('ab_r'), prog: '' }); await saveDoc(absId, 'absence', dd); toast('حُفظت الجلسة هنا وفي سجل جلسات التوجيه الفردي'); }
       else { const text = f.querySelector('#l_t').value.trim(); if (!text) throw new Error('اكتبي الإجراء'); const dd = JSON.parse(JSON.stringify(DB.docs[absId].data)); dd.log = (dd.log || []).concat({ date, text }); await saveDoc(absId, 'absence', dd); } }, `--c:var(--abs);--cs:var(--abs-soft)`); }
   else if (act === 'certDl' || act === 'certSave') {
     const o = readCert(CF()); if (!o.name) { toast('اكتبي الاسم أولاً'); return; }

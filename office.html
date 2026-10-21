@@ -1840,6 +1840,7 @@ function amForm(id) {
     <div class="f full"><span>الأرقام من نور لكل صف (عدد الطالبات اختياري)</span><table class="amt in"><thead><tr><th>الصف</th><th>عدد الطالبات</th><th>مجموع أيام الغياب</th></tr></thead><tbody>${(r.rows || []).map((x, i) => `<tr><td><b>${esc(x.grade)}</b></td><td><input type="number" min="0" inputmode="numeric" data-amn="${i}" value="${esc(x.n)}" aria-label="عدد طالبات ${esc(x.grade)}"></td><td><input type="number" min="0" inputmode="numeric" data-ama="${i}" value="${esc(x.a)}" aria-label="أيام غياب ${esc(x.grade)}"></td></tr>`).join('')}</tbody></table>
       <span class="tiny muted">مجموع أيام الغياب = مجموع أيام غياب كل طالبات الصف في الشهر (من تقرير الغياب في نور).</span></div>
     <label class="f full"><span>ملاحظات (اختياري)</span><textarea id="am_n" style="min-height:60px">${esc(r.notes || '')}</textarea></label>
+    <label class="f full"><span>الإجراءات المتخذة (اختياري)</span><textarea id="am_a" style="min-height:60px">${esc(r.acts || '')}</textarea></label>
     <label class="f full"><span>التوصيات (اختياري)</span><textarea id="am_r" style="min-height:60px">${esc(r.recs || '')}</textarea></label></div>
     <div class="toolbar"><button class="btn primary" type="submit">حفظ</button></div>`,
     async f => {
@@ -1848,24 +1849,33 @@ function amForm(id) {
       const days = +f.querySelector('#am_d').value; if (!days) throw new Error('اكتبي عدد أيام الدراسة');
       const rows = (r.rows || []).map((x, i) => ({ grade: x.grade, n: f.querySelector(`[data-amn="${i}"]`).value, a: f.querySelector(`[data-ama="${i}"]`).value })).filter(x => +x.n > 0 || +x.a > 0);
       const total = +f.querySelector('#am_t').value || 0; if (!total && !rows.some(x => +x.n > 0)) throw new Error('اكتبي عدد طالبات المدرسة كلها');
-      await saveDoc(nid, 'absmonth', { ...r, hy, hm, days, limit: +f.querySelector('#am_l').value || 5, total, rows: rows.map(x => ({ grade: x.grade, n: +x.n || 0, a: +x.a || 0 })), notes: f.querySelector('#am_n').value.trim(), recs: f.querySelector('#am_r').value.trim() });
+      await saveDoc(nid, 'absmonth', { ...r, hy, hm, days, limit: +f.querySelector('#am_l').value || 5, total, rows: rows.map(x => ({ grade: x.grade, n: +x.n || 0, a: +x.a || 0 })), notes: f.querySelector('#am_n').value.trim(), acts: f.querySelector('#am_a').value.trim(), recs: f.querySelector('#am_r').value.trim() });
       S.filter.absm = nid; toast('تم الحفظ');
     }, `--c:var(--abs);--cs:var(--abs-soft)`);
 }
 function amReport(id) {
   const r = DB.docs[id].data; const c = amCalc(r); const lim = +r.limit || 5; const ms = amMonths(); const prevR = ms.find(m => m.hy * 100 + m.hm < r.hy * 100 + r.hm); const pc = prevR ? amCalc(prevR) : null;
-  const files = list('absence').filter(a => !a.closed); const pr = r.progId && DB.docs[r.progId] ? DB.docs[r.progId].data : null;
-  return `<div class="a4 prep-a4">${repHead('التقرير الشهري للغياب')}<div class="pband" style="border-color:#C9532A;background:#FCE9E1"><small style="color:#C9532A">نسبة الغياب ${pct(c.rate)}${pc && pc.rate != null ? ' · الشهر السابق ' + pct(pc.rate) : ''}</small><b>غياب شهر ${esc(amLabel(r))}</b></div>
-    <table><thead><tr><th>الصف</th><th>عدد الطالبات</th><th>أيام الغياب</th><th>${c.perG ? 'نسبة الغياب' : 'نصيب الصف من الغياب'}</th>${pc ? `<th>${esc(HM[prevR.hm - 1])}</th>` : ''}</tr></thead><tbody>${c.rows.map(x => { const p = pc && pc.rows.find(y => y.grade === x.grade); return `<tr><td>${esc(x.grade)}</td><td>${x.n ? ar(x.n) : '—'}</td><td>${ar(x.a)}</td><td style="${x.rate > lim ? 'color:#B3363B;font-weight:700' : ''}">${x.rate == null ? pct(x.share) + ' من الغياب' : pct(x.rate)}</td>${pc ? `<td>${p ? (p.rate != null ? pct(p.rate) : ar(p.a) + ' يوم') : '—'}</td>` : ''}</tr>`; }).join('')}
+  const files = list('absence').filter(a => !a.closed); const pr = r.progId && DB.docs[r.progId] ? DB.docs[r.progId].data : null; const sg = amSuggest(id); const L = r.list || [];
+  const notes = r.notes ? lines(r.notes) : sg.analysis.filter(x => !/^الأسباب: غير محدد/.test(x)).slice(0, 4);
+  if (!r.notes && !pc && c.rate != null) notes.unshift(`نسبة الغياب ${pct(c.rate)}، ${c.rate > lim ? 'وهي أعلى من' : 'وهي ضمن'} حد التنبيه (${ar(lim)}٪).`);
+  if (!r.notes && pc && pc.rate != null && c.rate != null && c.rate < pc.rate) notes.unshift(`انخفضت نسبة الغياب من ${pct(pc.rate)} في ${HM[prevR.hm - 1]} إلى ${pct(c.rate)}.`);
+  const many = L.filter(x => x.x + x.u >= 3).length; const auto = [];
+  if (L.length) auto.push(`حصر الطالبات الغائبات (${ar(L.length)} طالبة) ومطابقتها مع ملفات الغياب`);
+  if (files.filter(a => unex(a) >= 3).length) auto.push(`متابعة ملفات الطالبات المتكرر غيابهن (${ar(files.filter(a => unex(a) >= 3).length)} ملف)`);
+  if (files.filter(a => a.plan).length) auto.push(`خطط علاجية فردية (${ar(files.filter(a => a.plan).length)})`);
+  if (pr) auto.push(`خطة علاجية عامة: ${pr.title}`);
+  const acts = r.acts ? lines(r.acts) : auto;
+  const recs = r.recs ? lines(r.recs) : sg.items.filter(x => x.grp !== 'القياس').slice(0, 4).map(x => x.t.split(':').pop().trim()).concat(sg.items.filter(x => x.grp === 'القياس').map(x => x.t.replace('هدف الشهر القادم: ', 'الهدف: ')));
+  const ul = a => `<ul style="margin:0;padding-inline-start:18px">${a.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
+  const box = (t, a, col) => a.length ? `<div class="box" style="${col ? 'border-color:' + col : ''}"><h4${col ? ` style="color:${col}"` : ''}>${t}</h4>${ul(a)}</div>` : '';
+  const pb = (L.reduce((s, x) => s + x.x + x.u, 0));
+  return `<div class="a4 prep-a4" style="font-size:13px">${repHead('التقرير الشهري للغياب')}<div class="pband" style="border-color:#C9532A;background:#FCE9E1"><small style="color:#C9532A">نسبة الغياب ${pct(c.rate)}${pc && pc.rate != null ? ' · الشهر السابق ' + pct(pc.rate) : ''} · ${ar(c.days)} يوم دراسي · ${ar(c.N)} طالبة</small><b>غياب شهر ${esc(amLabel(r))}</b></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center">${[[pct(c.rate), 'نسبة الغياب'], [ar(c.A), 'أيام الغياب'], [ar(L.length || '—'), 'عدد الغائبات'], [ar(L.length ? Math.max(0, c.N - L.length) : '—'), 'المنضبطات']].map(([v, t]) => `<div style="border:1px solid #e3c9bd;border-radius:10px;padding:6px"><b style="font-size:19px;color:#C9532A;display:block;line-height:1.3">${v}</b><span style="font-size:11.5px;color:#56635f">${t}</span></div>`).join('')}</div>
+    <table style="font-size:12.5px"><thead><tr><th>الصف</th><th>عدد الطالبات</th><th>أيام الغياب</th><th>${c.perG ? 'نسبة الغياب' : 'نصيب الصف من الغياب'}</th>${pc ? `<th>${esc(HM[prevR.hm - 1])}</th>` : ''}</tr></thead><tbody>${c.rows.map(x => { const p = pc && pc.rows.find(y => y.grade === x.grade); return `<tr><td>${esc(x.grade)}</td><td>${x.n ? ar(x.n) : '—'}</td><td>${ar(x.a)}</td><td style="${x.rate > lim ? 'color:#B3363B;font-weight:700' : ''}">${x.rate == null ? pct(x.share) : pct(x.rate)}</td>${pc ? `<td>${p ? (p.rate == null ? pct(p.share) : pct(p.rate)) : '—'}</td>` : ''}</tr>`; }).join('')}
       <tr style="font-weight:700;background:#f4f7f6"><td>المدرسة</td><td>${ar(c.N)}</td><td>${ar(c.A)}</td><td>${pct(c.rate)}</td>${pc ? `<td>${pct(pc.rate)}</td>` : ''}</tr></tbody></table>
-    <p style="font-size:12px;color:#56635f">أيام الدراسة في الشهر: ${ar(c.days)} · نسبة الغياب = مجموع أيام الغياب ÷ (عدد الطالبات × أيام الدراسة) · حد التنبيه ${ar(lim)}٪</p>
-    <div style="border:1px solid #d8e0dd;border-radius:10px;padding:8px 10px;margin-bottom:10px">${amGradeChart(r, prevR, lim, AM_PRINT)}</div>
-    ${ms.length > 1 ? `<div class="amch" style="border:1px solid #d8e0dd;border-radius:10px;padding:6px 8px">${amChart(ms.filter(m => m.hy * 100 + m.hm <= r.hy * 100 + r.hm), lim).replace(/var\(--line\)/g, '#d8e0dd').replace(/var\(--muted\)/g, '#56635f').replace(/var\(--ink\)/g, '#18211f').replace(/var\(--bad\)/g, '#B3363B').replace(/var\(--abs\)/g, '#C9532A')}</div>` : ''}
-    </div><div class="a4 prep-a4">${repHead('تحليل غياب شهر ' + amLabel(r))}
-    ${(r.list || []).length ? (() => { const cats = {}; r.list.forEach(x => { const k = reasonCat(x.reason); cats[k] = (cats[k] || 0) + x.x + x.u; }); const t = Object.values(cats).reduce((a, b) => a + b, 0) || 1; return `<div class="box full" style="margin-bottom:10px"><h4>أسباب الغياب</h4><p>${Object.entries(cats).sort((a, b) => b[1] - a[1]).map(([k, v]) => esc(k) + ' ' + ar(Math.round(100 * v / t)) + '٪').join(' · ')} — عدد الغائبات ${ar(r.list.length)}، كثيرات الغياب ${ar(r.list.filter(x => x.x + x.u >= 3).length)}</p></div>`; })() : ''}
-    ${(() => { const sg = amSuggest(id); return sg.show ? `<div class="box full" style="margin-bottom:10px;border-color:#C9532A"><h4 style="color:#C9532A">تحليل الغياب والخطة المقترحة</h4>${pList(sg.analysis.join('\n'), 'ul')}<p style="font-weight:700;margin-top:6px">الإجراءات المقترحة:</p>${pList(sg.items.map(x => x.t).join('\n'))}</div>` : ''; })()}
-    <div class="boxes"><div class="box full"><h4>ملفات الطالبات متكررات الغياب</h4><p>٣ أيام فأكثر بدون عذر: ${ar(files.filter(a => unex(a) >= 3).length)} · ٥ أيام فأكثر: ${ar(files.filter(a => unex(a) >= 5).length)} · ١٠ أيام فأكثر: ${ar(files.filter(a => unex(a) >= 10).length)} · لها خطة علاجية: ${ar(files.filter(a => a.plan).length)}</p></div>
-    ${r.notes ? `<div class="box${r.recs ? '' : ' full'}"><h4>ملاحظات</h4>${pList(r.notes, 'ul')}</div>` : ''}${r.recs ? `<div class="box${r.notes ? '' : ' full'}"><h4>التوصيات</h4>${pList(r.recs, 'ul')}</div>` : ''}${pr ? `<div class="box full"><h4>الخطة العلاجية العامة</h4><p>${esc(pr.title)} (${esc(pr.status || '')})</p></div>` : ''}</div>${repSigs()}</div>`;
+    <div style="border:1px solid #d8e0dd;border-radius:10px;padding:6px 10px">${amGradeChart(r, prevR, lim, { ...AM_PRINT, h: 140 })}</div>
+    <div class="boxes">${box('أبرز الملاحظات', notes)}${box('الإجراءات المتخذة', acts)}</div>
+    <div class="boxes">${box('التوصيات', recs, '#C9532A').replace('class="box"', 'class="box full"')}</div>${repSigs()}</div>`;
 }
 async function amPlan(id) {
   const r = DB.docs[id].data; const T = JSON.parse(JSON.stringify(P_TPL[1])); const pid = uid('prog'); const st = todayH();
@@ -2830,6 +2840,7 @@ const TGT_L = ['جميع الطالبات', 'طالبات الصفوف الأو�
 const GUARD_L = ['الأم', 'الأب', 'الأخ', 'الأخت', 'الجدة', 'ولي الأمر'];
 // m: 'lines' تضيف سطر وتشيله، 'list' تضيف بفاصلة، 'set' تستبدل القيمة
 const SUG = {
+  am_a: { m: 'lines', o: ['حصر الطالبات الغائبات ومطابقتها مع ملفات الغياب', 'التواصل مع أولياء أمور الطالبات المتغيبات', 'استدعاء أولياء أمور كثيرات الغياب', 'إعداد خطط علاجية لكثيرات الغياب', 'جلسات إرشاد فردي للطالبات كثيرات الغياب', 'رسالة توعوية لأولياء الأمور عن أهمية الانتظام', 'توعية الطالبات بالمواظبة في الإذاعة المدرسية', 'تكريم المنضبطات في لوحة الشرف', 'تطبيق إجراءات قواعد السلوك والمواظبة'] },
   am_n: { m: 'lines', o: ['انخفاض الغياب مقارنة بالشهر السابق', 'ارتفاع الغياب مقارنة بالشهر السابق', 'تركّز الغياب في الصفوف الأولية', 'تركّز الغياب يومي الأحد والخميس', 'غياب جماعي قبل الإجازة', 'تم التواصل مع أسر الطالبات المتكرر غيابهن'] },
   am_r: { m: 'lines', o: ['التواصل مع أولياء أمور الطالبات المتغيبات', 'تكريم الطالبات المنتظمات في الحضور', 'تفعيل بطاقة الحضور المبكر', 'إعداد خطط علاجية للطالبات كثيرات الغياب', 'توعية الطالبات بأهمية المواظبة في الإذاعة', 'رسالة توعوية لأولياء الأمور عن أثر الغياب'] },
   ap_cn: { m: 'lines', o: ['ظرف صحي', 'ظروف أسرية', 'بُعد السكن عن المدرسة', 'عدم توفر مواصلات', 'السهر وصعوبة الاستيقاظ', 'ضعف الدافعية للمدرسة', 'مشكلة مع زميلات'] },

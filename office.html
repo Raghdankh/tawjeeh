@@ -527,6 +527,7 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .demo{background:#fff3dc;color:#8a5300;font-weight:600;font-size:.88rem;text-align:center;padding:6px 12px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 .imdata .imok{background:var(--good-soft,#e6f4ea);color:var(--good,#1e7b3c);font-weight:700;border-radius:10px;padding:8px 10px;margin:6px 0;font-size:.9rem}.imdata input.autof,.imdata select.autof{border-color:var(--good,#1e7b3c)}
+.cbtn{touch-action:manipulation}
 </style>
 </head>
 <body>
@@ -1190,6 +1191,12 @@ function absAdd() {
       const ex = list('absence').find(a => !a.closed && (s.studentId ? a.studentId === s.studentId : norm(a.studentName) === norm(s.studentName)));
       if (ex) { toast('للطالبة ملف مفتوح، عدّلي الأيام من داخله'); S.after = () => { location.hash = '#absence/' + ex.id; }; return; }
       const id = uid('abs'); await saveDoc(id, 'absence', { ...s, u, x, consec, ref: readHD(f, 'a_ref'), done: {}, log: [], closed: false, upd: todayH() }); S.after = () => { location.hash = '#absence/' + id; }; }, `--c:var(--abs);--cs:var(--abs-soft)`);
+  const fillDays = () => { const s0 = resolveStudent($('#a_stu').value); if (!s0.studentName) return; let u = 0, x = 0, n = 0;
+    amMonths().forEach(m => (m.list || []).forEach(r => { if (r.grade === s0.grade && (r.studentId && s0.studentId ? r.studentId === s0.studentId : (nameMatch(r.name, s0.studentName) || looseMatch(r.name, s0.studentName)))) { u += +r.u || 0; x += +r.x || 0; n++; } }));
+    const note = $('#a_note') || (() => { const el = document.createElement('p'); el.id = 'a_note'; el.className = 'tiny full'; el.style.cssText = 'margin:0;font-weight:700'; $('#a_u').closest('.ctr').before(el); return el; })();
+    if (n) { $('#a_u').value = u; $('#a_x').value = x; note.style.color = 'var(--good)'; note.textContent = `✓ تعبّت الأيام من كشوف الغياب الشهرية (${ar(n)} ${n > 2 && n < 11 ? 'أشهر' : 'شهر'}): بدون عذر ${ar(u)}، بعذر ${ar(x)}`; }
+    else { note.style.color = 'var(--muted)'; note.textContent = 'ما لقيت لها غياب في الكشوف الشهرية، اكتبي الأيام بنفسك'; } };
+  $('#a_stu').addEventListener('change', fillDays);
 }
 function trackHTML(a, k) {
   const tr = TRACKS[k]; const n = k === 'u' ? unex(a) : exc(a); const done = a.done || {};
@@ -2414,7 +2421,7 @@ function bestStu(pool, r) {
 }
 function findFile(r) { return bestStu(list('absence').filter(a => !a.closed), r) || undefined; }
 function findStu(r) { return bestStu(students(), r) || undefined; }
-function cumOther(r, mid) { let x = 0, u = 0; list('absmonth').forEach(m => { if (m.id === mid) return; (m.list || []).forEach(o => { if (o.grade === r.grade && (norm(o.name) === norm(r.name) || nameMatch(o.name, r.name))) { x += o.x; u += o.u; } }); }); return { x, u }; }
+function cumOther(r, mid) { let x = 0, u = 0; list('absmonth').forEach(m => { if (m.id === mid) return; (m.list || []).forEach(o => { if (o.grade === r.grade && (norm(o.name) === norm(r.name) || nameMatch(o.name, r.name) || looseMatch(o.name, r.name) || looseMatch(r.name, o.name))) { x += o.x; u += o.u; } }); }); return { x, u }; }
 function impForm() {
   const ms = amMonths(); const cur = todayH().split('-').map(Number); let hy = cur[0], hm = cur[1] - 1; if (hm < 1) { hm = 12; hy--; }
   const last = ms[0]; const cnt = {}; students().forEach(s => { if (s.grade) cnt[s.grade] = (cnt[s.grade] || 0) + 1; });
@@ -3580,7 +3587,7 @@ document.addEventListener('change', e => {
   else if (t.dataset && t.dataset.step) { const k = t.dataset.step, on = t.checked; absUpdate(d => { d.done = d.done || {}; if (on) d.done[k] = d.ref || todayH(); else delete d.done[k]; }, on ? 'تم تسجيل الإجراء' : ''); }
 });
 document.addEventListener('click', async e => {
-  const b = e.target.closest('button,[data-act]'); if (!b) return; if (b.closest('#sheetbg') && !b.dataset.delstu && !b.dataset.apdel && !b.dataset.ptpl && !b.dataset.ideadel && !b.dataset.ptpldel && !b.dataset.gtopic && !b.dataset.gaddcl && !b.dataset.absrep) return;
+  const b = e.target.closest('button,[data-act]'); if (!b) return; if (b.closest('#sheetbg') && !b.dataset.delstu && !b.dataset.apdel && !b.dataset.ptpl && !b.dataset.ideadel && !b.dataset.ptpldel && !b.dataset.gtopic && !b.dataset.gaddcl && !b.dataset.absrep && !b.dataset.cstep) return;
   const d = b.dataset;
   if (d.gofam) { S.sub.family = d.gofam; S.filter.fam = ''; S.filter.cr = 'all'; location.hash = '#family'; return; }
   if (d.fam) { S.sub.family = d.fam; S.filter.fam = ''; rerender(); return; }

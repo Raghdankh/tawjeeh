@@ -1283,7 +1283,7 @@ function absReport(only) {
     if (st >= 3 && roleOf(a, 'c-0') === r) g.push({ h: 'غياب متصل ٣ أيام فأكثر', L: [{ it: CONSEC_ITEM, dn: !!done['c-0'] }] }); return g; };
   const cnt = g => { const L = g.flatMap(x => x.L); return [L.filter(i => i.dn).length, L.length]; };
   const gm = items('m'), ga = only ? [] : items('a'); const [md, mt] = cnt(gm), [ad, at] = cnt(ga);
-  const col = (title, g, cls) => { const [d, t] = cnt(g); return `<div class="ar-col ${cls}"><div class="ar-ch"><b>${title}</b><span>${t ? `نُفذ ${ar(d)} من ${ar(t)}` : '—'}</span></div>${t ? `<div class="ar-bar"><i style="width:${Math.round(100 * d / t)}%"></i></div>` : ''}
+  const col = (title, g, cls) => { const [d, t] = cnt(g); return `<div class="ar-col ${cls}"><div class="ar-ch"><b>${title}</b></div>
     ${g.length ? g.map(x => `<div class="ar-g"><h5>${x.h}</h5>${x.L.map(i => `<div class="ar-it${i.dn ? ' ok' : ''}"><span class="ic">${i.dn ? '✓' : '–'}</span><span>${esc(i.it)}</span></div>`).join('')}</div>`).join('') : '<p class="ar-none">لم يصل الغياب إلى ٣ أيام، فلا توجد إجراءات مطلوبة بعد.</p>'}</div>`; };
   const stage = (k, c) => { const ds = [3, 5, 10]; return `<div class="ar-trk"><b>${lbl[k]} <small>${k === 'u' ? 'م ٣٤' : 'م ٣٣'}</small></b><div class="ar-steps">${ds.map(d => `<span class="${c >= d ? 'on' : ''}${c >= d && !ds.some(z => z > d && c >= z) ? ' now' : ''}">${ar(d)} أيام</span>`).join('<i></i>')}</div><em>${ar(c)} ${c === 1 ? 'يوم' : 'أيام'}</em></div>`; };
   const next = [];
@@ -1295,7 +1295,7 @@ function absReport(only) {
   const P = [`بلغ غياب الطالبة ${dd(n)} بدون عذر و${dd(x)} بعذر`];
   const stg = []; if (lv(n)) stg.push(`مرحلة ${ar(lv(n))} أيام في الغياب بدون عذر (المادة ٣٤)`); if (lv(x)) stg.push(`مرحلة ${ar(lv(x))} أيام في الغياب بعذر (المادة ٣٣)`);
   P[0] += stg.length ? `، ووصلت إلى ${stg.join(' و')}.` : '، ولم تصل إلى مرحلة تستوجب إجراءات.';
-  if (mt + at) P.push(next.length ? `نُفِّذ ${ar(md + ad)} من ${ar(mt + at)} إجراءً، ويتبقى ${next.join(' و')}.` : `نُفِّذت جميع الإجراءات المطلوبة (${ar(mt + at)} إجراءات) وفق قواعد السلوك والمواظبة.`);
+  if (mt + at) P.push(next.length ? 'ويجري استكمال بقية الإجراءات المطلوبة وفق قواعد السلوك والمواظبة.' : 'نُفِّذت الإجراءات المطلوبة وفق قواعد السلوك والمواظبة.');
   const ext = []; if (ses.length) ext.push(`عُقدت مع الطالبة ${ses.length === 1 ? 'جلسة توجيه فردي' : ses.length === 2 ? 'جلستا توجيه فردي' : ar(ses.length) + ' جلسات توجيه فردي'}`); if (cons.length) ext.push(`تم التواصل مع ولي الأمر ${cons.length === 1 ? 'مرة واحدة' : cons.length === 2 ? 'مرتين' : ar(cons.length) + ' مرات'}`); if (a.plan) ext.push('أُعدّت لها خطة علاجية');
   if (ext.length) P.push(ext.join('، و') + '.');
   const sum = P.join(' ');
@@ -1306,7 +1306,7 @@ function absReport(only) {
   const sigs = only ? `<div class="sigs">${SIGS.slice(0, 1).map(s => `<div>${s[0]}<span></span><i>${s[1]}</i></div>`).join('')}<div></div></div>` : repSigs();
   return `<div class="a4 absrep">${repHead(only ? 'إجراءات الموجهة الطلابية في متابعة الغياب' : 'تقرير متابعة غياب طالبة')}
     <div class="ar-who"><div><small>الطالبة</small><b>${esc(a.studentName)}</b></div><div><small>الصف</small><b>${esc((a.grade || '') + ' ' + (a.section || ''))}</b></div><div><small>تاريخ التحويل للموجهة</small><b>${a.ref ? esc(hij(a.ref)) : '—'}</b></div></div>
-    <div class="ar-stats"><div class="u"><b>${ar(n)}</b><span>غياب بدون عذر</span></div><div class="e"><b>${ar(x)}</b><span>غياب بعذر</span></div><div class="g"><b>${ar(Math.max(0, 100 - n))}</b><span>درجة المواظبة المتوقعة</span></div><div class="d"><b>${ar(md + ad)} <small>من ${ar(mt + at)}</small></b><span>إجراءات منفذة</span></div></div>
+    <div class="ar-stats" style="grid-template-columns:repeat(3,1fr)"><div class="u"><b>${ar(n)}</b><span>غياب بدون عذر</span></div><div class="e"><b>${ar(x)}</b><span>غياب بعذر</span></div><div class="g"><b>${ar(Math.max(0, 100 - n))}</b><span>درجة المواظبة المتوقعة</span></div></div>
     <div class="ar-trks">${stage('u', n)}${stage('e', x)}${st >= 3 ? '<p class="ar-warn">الغياب بدون عذر متصل ٣ أيام أو أكثر</p>' : ''}</div>
     <div class="ar-cols${only ? ' one' : ''}">${col('إجراءات الموجهة الطلابية', gm, 'm')}${only ? '' : col('إجراءات الإدارة المدرسية', ga, 'a')}</div>
     <div class="ar-sum"><b>الخلاصة:</b> ${esc(sum)}</div>

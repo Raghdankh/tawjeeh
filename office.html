@@ -533,6 +533,7 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .apsteps{display:flex;flex-direction:column;gap:6px;margin-top:6px}.aprow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.aprow .apchip{text-align:start}.apadd{display:flex;gap:6px;margin-top:6px;max-width:460px}.apadd input{flex:1}
 .sescard,.sesdone{border:1.5px dashed var(--abs);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}.sesdone{border-style:solid;border-color:var(--line);gap:2px}.sescard .head,.sesdone .head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .a4 .artb td,.a4 .artb th{white-space:normal;word-break:break-word;overflow-wrap:anywhere;vertical-align:top}
+.homesig{display:block;color:var(--good);font-weight:700;font-size:.8rem}.homebox{background:var(--good-soft);border-radius:12px;padding:10px 12px}.homebox small{display:block;color:var(--muted);font-weight:400}
 </style>
 </head>
 <body>
@@ -804,12 +805,14 @@ function absFillForm(one) {
   const cnt = o => ids.reduce((s, id) => { const d = DB.docs[id].data; return s + dueSteps(d).filter(k => !(d.done || {})[k] && !(LEGAL_STEPS.has(k) && !o.legal) && !(roleOf(d, k) === 'a' && !o.admin)).length; }, 0);
   openSheet(one ? 'تعبئة الإجراءات المستحقة' : 'تعبئة إجراءات كل الملفات', `<p class="small muted">تتأشّر الإجراءات اللي وصلت لها كل طالبة حسب أيامها: مسار <b>بدون عذر</b> (المادة ٣٤) على أيام الغياب بدون عذر، ومسار <b>بعذر</b> (المادة ٣٣) على أيام الغياب بعذر. الإجراءات المشروطة («في حال…») ما تتأشّر، والمؤشّر قبل ما يتغير.</p>
     <div class="form"><label class="chk full" style="--sc:var(--abs)"><input type="checkbox" id="af_a" checked><span>إجراءات الإدارة بعد (استدعاء ولي الأمر، التعهد…)</span></label>
+    <label class="chk full" style="--sc:var(--abs)"><input type="checkbox" id="af_h" checked><span>ولي الأمر اعتذر عن الحضور ووقّع على الإجراءات المتخذة والتعهد من المنزل (يتسجل للي وصلن الاستدعاء)</span></label>
     <label class="chk full" style="--sc:var(--bad)"><input type="checkbox" id="af_l"><span>مخاطبة الجهات المختصة (١٠ أيام بدون عذر أو غياب متصل) — أشّريها بس إذا تمت فعلاً</span></label>
     <div class="f full"><span>تاريخ الإجراءات</span><p class="small" style="margin:0;font-weight:700;color:var(--good)">${one ? (DB.docs[one].data.ref ? '✓ بتاريخ الإحالة: ' + esc(hij(DB.docs[one].data.ref)) : 'ما لها تاريخ إحالة في ملفها، بيتسجل تاريخ اليوم') : (() => { const noRef = ids.filter(id => !DB.docs[id].data.ref).length; return '✓ كل طالبة بتاريخ إحالتها' + (noRef ? ` (${ar(noRef)} بدون تاريخ إحالة، يتسجل لهن تاريخ اليوم)` : ''); })()}</p>
       <label class="chk" style="--sc:var(--abs)"><input type="checkbox" id="af_ref"><span>أبغى تاريخ مختلف</span></label><div id="af_dw" hidden>${hdInput('af_d', todayH())}</div></div>
     <p class="small" id="af_n" style="font-weight:700"></p></div>
     <div class="toolbar"><button class="btn primary" type="submit">تعبئة</button></div>`,
-    async f => { const o = { admin: f.querySelector('#af_a').checked, legal: f.querySelector('#af_l').checked, date: f.querySelector('#af_ref').checked ? readHD(f, 'af_d') : '' };
+    async f => { if (f.querySelector('#af_h').checked) { const W = []; ids.forEach(id => { const d = DB.docs[id].data; if (!homeDue(d) || d.home) return; const c = homeContact(id, d); if (c) W.push(c); W.push({ id, kind: 'absence', data: { ...JSON.parse(JSON.stringify(d)), home: true } }); }); if (W.length) await saveMany(W); }
+      const o = { admin: f.querySelector('#af_a').checked, legal: f.querySelector('#af_l').checked, date: f.querySelector('#af_ref').checked ? readHD(f, 'af_d') : '' };
       const r = await absFill(ids, o); toast(r.steps ? `تعبّى ${ar(r.steps)} إجراء في ${ar(r.files)} ${r.files > 2 && r.files < 11 ? 'ملفات' : 'ملف'}` : 'كل الإجراءات المستحقة متعبّية'); }, `--c:var(--abs);--cs:var(--abs-soft)`);
   const upd = () => { const o = { admin: $('#af_a').checked, legal: $('#af_l').checked }; $('#af_n').textContent = `سيتعبّى ${ar(cnt(o))} إجراء${one ? '' : ' في ' + ar(ids.length) + ' ملف'}`; };
   ['#af_a', '#af_l'].forEach(x => $(x).addEventListener('change', upd)); upd();
@@ -867,7 +870,16 @@ function absSesFill(id, a, ms) {
   if (un && (K.has('transport') || K.has('family') || K.has('neglect') || !K.size || fol)) A.push('التواصل مع ولي الأمر'); 
   return { topic, goal, note: N.join('\n'), agree: A.join('\n'), ms: ms ? ms.k : '', base: ms ? ms.base : (a.ref || '') };
 }
-const CTYPES = ['اتصال هاتفي', 'رسالة', 'لقاء حضوري', 'استدعاء ولي أمر', 'زيارة'];
+const CTYPES = ['اتصال هاتفي', 'رسالة', 'لقاء حضوري', 'استدعاء ولي أمر', 'توقيع على الإجراءات من المنزل', 'زيارة'];
+/* ولي الأمر يعتذر عن الحضور ويوقّع نموذج الإجراءات من المنزل */
+const HOME_KEYS = new Set(['u-3-1', 'u-3-3', 'u-5-0', 'e-3-1']);
+const HOME_NOTE = 'اعتذر ولي الأمر عن الحضور، ووقّع على الإجراءات المتخذة من المنزل';
+const homeNote = k => k === 'u-3-3' ? 'اعتذر ولي الأمر عن الحضور، ووقّع على التعهد من المنزل' : HOME_NOTE;
+const homeTah = a => unex(a) >= 3;
+const homeDue = a => [...HOME_KEYS].some(k => { const [tr, lv] = k.split('-'); return (tr === 'u' ? unex(a) : exc(a)) >= +lv; });
+function homeContact(id, a) { if (absContacts(id, a).some(c => c.type === 'توقيع على الإجراءات من المنزل')) return null;
+  return { id: uid('contact'), kind: 'contact', data: { studentId: a.studentId || '', studentName: a.studentName, grade: a.grade || '', section: a.section || '', guardian: 'ولي الأمر', type: 'توقيع على الإجراءات من المنزل', date: a.ref || todayH(), reason: 'غياب', absId: id,
+    summary: 'اعتذر ولي الأمر عن الحضور للمدرسة\nأُرسلت الإجراءات المتخذة' + (homeTah(a) ? ' والتعهد' : '') + ' مع الطالبة، ووقّع عليها ولي الأمر من المنزل', outcome: 'الالتزام بمتابعة حضور الطالبة' } }; }
 
 /* ═════════ state & routing ═════════ */
 const S = { school: 'ابتدائية الخنساء برغدان', route: 'students', sub: {}, filter: {}, busy: false };
@@ -1233,7 +1245,7 @@ function trackHTML(a, k) {
   const tr = TRACKS[k]; const n = k === 'u' ? unex(a) : exc(a); const done = a.done || {};
   return `<section class="panel" style="gap:10px"><div class="head"><h3>${tr.t} <span class="tiny muted">${tr.art}</span></h3><span class="sp"></span><span class="pill" style="--pc:${levelColors(n)[0]};--ps:${levelColors(n)[1]}">${ar(n)} ${n === 1 ? 'يوم' : 'أيام'}</span></div>
     <div class="stages">${tr.steps.map(s => `<div class="stage${n >= s.d ? ' on' : ''}" style="--sc:${STEP_C[s.d][0]}"><h4><span class="d">${ar(s.d)}</span>عند ${ar(s.d)} أيام${n >= s.d ? '' : ` <span class="tiny muted">(لم تصل، باقي ${ar(s.d - n)})</span>`}</h4>
-      ${s.items.map((it, ii) => { const key = k + '-' + s.d + '-' + ii, dn = done[key]; return `<div class="steprow"><label class="chk"><input type="checkbox" data-step="${key}" ${dn ? 'checked' : ''} ${n >= s.d || dn ? '' : 'disabled'}><span>${it}</span></label>${roleTag(a, key)}</div>`; }).join('')}</div>`).join('')}</div></section>`;
+      ${s.items.map((it, ii) => { const key = k + '-' + s.d + '-' + ii, dn = done[key]; return `<div class="steprow"><label class="chk"><input type="checkbox" data-step="${key}" ${dn ? 'checked' : ''} ${n >= s.d || dn ? '' : 'disabled'}><span>${it}${a.home && HOME_KEYS.has(key) ? `<small class="homesig">${homeNote(key)}</small>` : ''}</span></label>${roleTag(a, key)}</div>`; }).join('')}</div>`).join('')}</div></section>`;
 }
 function vAbsenceOne() {
   const id = S.param; const doc = DB.docs[id]; if (!doc) return `<div class="empty"><b>الملف غير موجود</b><a class="btn" href="#absence">رجوع</a></div>`;
@@ -1249,6 +1261,7 @@ function vAbsenceOne() {
     ${st >= 3 ? `<section class="panel" style="border-color:var(--bad);background:var(--bad-soft)"><h3 style="color:var(--bad)">غياب متصل ٣ أيام أو أكثر بدون عذر</h3><p class="small">في حال كانت أيام الغياب متصلة (٣ أيام أو أكثر) تخاطب المدرسة الجهات ذات الاختصاص.</p>
       <div class="steprow"><label class="chk" style="--sc:var(--bad)"><input type="checkbox" data-step="c-0" ${done['c-0'] ? 'checked' : ''}><span>${CONSEC_ITEM}</span></label>${roleTag(a, 'c-0')}</div></section>` : ''}
     ${pending(a) ? `<div class="toolbar" style="justify-content:flex-start"><button class="btn primary" data-act="absFillOne">✓ تعبئة الإجراءات المستحقة (${ar(pending(a))})</button></div>` : ''}
+    ${homeDue(a) ? `<label class="chk homebox" style="--sc:var(--abs)"><input type="checkbox" data-home="1" ${a.home ? 'checked' : ''}><span><b>ولي الأمر اعتذر عن الحضور، ووقّع على الإجراءات المتخذة${homeTah(a) ? ' والتعهد' : ''} من المنزل</b><small>ينكتب عند إجراءات الاستدعاء والتعهد، ويتسجل في التواصل مع ولي الأمر، ويطلع في التقرير</small></span></label>` : ''}
     ${trackHTML(a, 'u')}${trackHTML(a, 'e')}
     ${absSesHTML(a)}
     ${absPlanHTML(a)}
@@ -1280,7 +1293,7 @@ async function absUpdate(fn, msg) { const id = S.param; const d = JSON.parse(JSO
 function absReport(only) {
   const a = DB.docs[S.param].data; const n = unex(a), x = exc(a), st = maxStreak(a); const done = a.done || {};
   const lbl = { u: 'بدون عذر', e: 'بعذر', c: 'غياب متصل' };
-  const items = r => { const g = []; ['u', 'e'].forEach(k => { const c = k === 'u' ? n : x; TRACKS[k].steps.filter(s => c >= s.d).forEach(s => { const L = s.items.map((it, ii) => ({ key: k + '-' + s.d + '-' + ii, it })).filter(o => roleOf(a, o.key) === r).map(o => ({ it: o.it, dn: !!done[o.key] })); if (L.length) g.push({ h: lbl[k] + ' · ' + ar(s.d) + ' أيام', L }); }); });
+  const items = r => { const g = []; ['u', 'e'].forEach(k => { const c = k === 'u' ? n : x; TRACKS[k].steps.filter(s => c >= s.d).forEach(s => { const L = s.items.map((it, ii) => ({ key: k + '-' + s.d + '-' + ii, it: it + (a.home && HOME_KEYS.has(k + '-' + s.d + '-' + ii) ? (k + '-' + s.d + '-' + ii === 'u-3-3' ? ' (وقّع ولي الأمر على التعهد من المنزل)' : ' (وقّع ولي الأمر على الإجراءات المتخذة من المنزل)') : '') })).filter(o => roleOf(a, o.key) === r).map(o => ({ it: o.it, dn: !!done[o.key] })); if (L.length) g.push({ h: lbl[k] + ' · ' + ar(s.d) + ' أيام', L }); }); });
     if (st >= 3 && roleOf(a, 'c-0') === r) g.push({ h: 'غياب متصل ٣ أيام فأكثر', L: [{ it: CONSEC_ITEM, dn: !!done['c-0'] }] }); return g; };
   const cnt = g => { const L = g.flatMap(x => x.L); return [L.filter(i => i.dn).length, L.length]; };
   const gm = items('m'), ga = only ? [] : items('a'); const [md, mt] = cnt(gm), [ad, at] = cnt(ga);
@@ -1297,7 +1310,7 @@ function absReport(only) {
   const stg = []; if (lv(n)) stg.push(`مرحلة ${ar(lv(n))} أيام في الغياب بدون عذر (المادة ٣٤)`); if (lv(x)) stg.push(`مرحلة ${ar(lv(x))} أيام في الغياب بعذر (المادة ٣٣)`);
   P[0] += stg.length ? `، ووصلت إلى ${stg.join(' و')}.` : '، ولم تصل إلى مرحلة تستوجب إجراءات.';
   if (mt + at) P.push(next.length ? 'ويجري استكمال بقية الإجراءات المطلوبة وفق قواعد السلوك والمواظبة.' : 'نُفِّذت الإجراءات المطلوبة وفق قواعد السلوك والمواظبة.');
-  const ext = []; if (ses.length) ext.push(`عُقدت مع الطالبة ${ses.length === 1 ? 'جلسة توجيه فردي' : ses.length === 2 ? 'جلستا توجيه فردي' : ar(ses.length) + ' جلسات توجيه فردي'}`); if (cons.length) ext.push(`تم التواصل مع ولي الأمر ${cons.length === 1 ? 'مرة واحدة' : cons.length === 2 ? 'مرتين' : ar(cons.length) + ' مرات'}`); if (a.plan) ext.push('أُعدّت لها خطة علاجية');
+  const ext = []; if (ses.length) ext.push(`عُقدت مع الطالبة ${ses.length === 1 ? 'جلسة توجيه فردي' : ses.length === 2 ? 'جلستا توجيه فردي' : ar(ses.length) + ' جلسات توجيه فردي'}`); const cn = cons.filter(c => c.type !== 'توقيع على الإجراءات من المنزل').length; if (cn) ext.push(`تم التواصل مع ولي الأمر ${cn === 1 ? 'مرة واحدة' : cn === 2 ? 'مرتين' : ar(cn) + ' مرات'}`); if (a.home) ext.push('اعتذر ولي الأمر عن الحضور، ووقّع على الإجراءات المتخذة' + (homeTah(a) ? ' وعلى التعهد' : '') + ' من المنزل وأعادها مع الطالبة'); if (a.plan) ext.push('أُعدّت لها خطة علاجية');
   if (ext.length) P.push(ext.join('، و') + '.');
   const sum = P.join(' ');
   const tb = (head, rows) => `<table class="artb" style="font-size:12px;table-layout:fixed;width:100%"><thead><tr>${head.map(([h, w]) => `<th${w ? ` style="width:${w}px"` : ''}>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table>`;
@@ -3110,7 +3123,7 @@ const GUARD_L = ['الأم', 'الأب', 'الأخ', 'الأخت', 'الجدة',
 // m: 'lines' تضيف سطر وتشيله، 'list' تضيف بفاصلة، 'set' تستبدل القيمة
 const SUG = {
   c_g: { m: 'set', o: ['الأم', 'الأب', 'الأخ', 'الأخت', 'الجدة'] },
-  c_s: { m: 'lines', o: ['تم إبلاغ ولي الأمر بغياب الطالبة', 'تم إبلاغ ولي الأمر بالإجراءات المترتبة وفق قواعد السلوك والمواظبة', 'أفادت الأم بظرف صحي', 'أفادت الأم بظرف أسري', 'أفادت الأم بسفر الأسرة', 'أفادت الأم بصعوبة الاستيقاظ والسهر', 'أفادت الأم بعدم توفر من يوصل الطالبة', 'تم التأكيد على إحضار التقرير الطبي', 'لم يتم الرد على الاتصال'] },
+  c_s: { m: 'lines', o: ['تم إبلاغ ولي الأمر بغياب الطالبة', 'تم إبلاغ ولي الأمر بالإجراءات المترتبة وفق قواعد السلوك والمواظبة', 'أفادت الأم بظرف صحي', 'أفادت الأم بظرف أسري', 'أفادت الأم بسفر الأسرة', 'أفادت الأم بصعوبة الاستيقاظ والسهر', 'أفادت الأم بعدم توفر من يوصل الطالبة', 'تم التأكيد على إحضار التقرير الطبي', 'اعتذر ولي الأمر عن الحضور للمدرسة', 'وقّع ولي الأمر على الإجراءات المتخذة من المنزل', 'وقّع ولي الأمر على التعهد من المنزل', 'لم يتم الرد على الاتصال'] },
   c_o: { m: 'lines', o: ['التزام ولي الأمر بمتابعة حضور الطالبة', 'إحضار التقرير الطبي', 'تعويض الطالبة ما فاتها من دروس', 'حضور ولي الأمر للمدرسة'] },
   ab_tp: { m: 'set', o: ['أسباب الغياب وأهمية المواظبة', 'أثر الغياب على التحصيل الدراسي', 'تنظيم النوم والاستيقاظ المبكر', 'تعويض ما فات من دروس', 'رفع الدافعية والارتباط بالمدرسة', 'متابعة الالتزام بالخطة العلاجية'] },
   ab_g: { m: 'set', o: ['انتظام الطالبة في الحضور اليومي', 'خفض أيام الغياب بدون عذر', 'الحضور المبكر للطابور الصباحي', 'تعويض ما فات الطالبة من دروس', 'تعزيز ارتباط الطالبة بالمدرسة'] },
@@ -3674,6 +3687,7 @@ document.addEventListener('change', e => {
   else if (t.dataset && t.dataset.consec) { const on = t.checked; absUpdate(a => { a.consec = on; if (a.u == null) { a.u = unex(a); a.x = exc(a); } }); }
   else if (t.dataset && t.dataset.amsvc != null) { const ms = amMonths(); const sel = DB.docs[S.filter.absm] ? S.filter.absm : ms[0] && ms[0].id; const d = JSON.parse(JSON.stringify(DB.docs[sel].data)); d.list[+t.dataset.amsvc].svc = t.value.trim(); saveDoc(sel, 'absmonth', d).then(() => toast('حُفظت الخدمة'), er => toast(errT(er))); }
   else if (t.dataset && t.dataset.lpdone != null) { const i = +t.dataset.lpdone, on = t.checked; absUpdate(a => { a.lp.rows[i].done = on; a.lp.rows[i].doneAt = on ? todayH() : ''; }, on ? 'تم تعويض المادة' : ''); }
+  else if (t.dataset && t.dataset.home) { const id = S.param; const on = t.checked; const a = DB.docs[id].data; const c = on ? homeContact(id, a) : null; (c ? saveDoc(c.id, 'contact', c.data) : Promise.resolve()).then(() => absUpdate(d => { d.home = on; }, on ? 'تسجّل التوقيع من المنزل' : '')); }
   else if (t.dataset && t.dataset.apf) { const k = t.dataset.apf, v = t.value.trim(); apMut(p => { p[k] = v; }); }
   else if (t.dataset && t.dataset.apdone != null) { const i = +t.dataset.apdone, on = t.checked; absUpdate(a => { a.plan.steps[i].done = on; a.plan.steps[i].doneAt = on ? todayH() : ''; }, on ? 'تم' : ''); }
   else if (t.dataset && t.dataset.vdone != null) { const i = +t.dataset.vdone, on = t.checked; valUpdate(S.param, x => { x.steps[i].done = on; x.steps[i].doneAt = on ? todayH() : ''; if (on && !x.steps[i].date) x.steps[i].date = todayH(); }, on ? 'تم' : ''); }

@@ -532,6 +532,7 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .apchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.apchip{border:1.5px solid var(--line);background:var(--surface,#fff);border-radius:999px;padding:6px 12px;font:inherit;font-size:.88rem;cursor:pointer;color:var(--ink);touch-action:manipulation}.apchip.on{background:var(--abs-soft);border-color:var(--abs);color:var(--abs);font-weight:700}.apchip.sm{font-size:.8rem;padding:4px 10px;color:var(--muted)}
 .apsteps{display:flex;flex-direction:column;gap:6px;margin-top:6px}.aprow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.aprow .apchip{text-align:start}.apadd{display:flex;gap:6px;margin-top:6px;max-width:460px}.apadd input{flex:1}
 .sescard,.sesdone{border:1.5px dashed var(--abs);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}.sesdone{border-style:solid;border-color:var(--line);gap:2px}.sescard .head,.sesdone .head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.a4 .artb td,.a4 .artb th{white-space:normal;word-break:break-word;overflow-wrap:anywhere;vertical-align:top}
 </style>
 </head>
 <body>
@@ -1299,9 +1300,9 @@ function absReport(only) {
   const ext = []; if (ses.length) ext.push(`عُقدت مع الطالبة ${ses.length === 1 ? 'جلسة توجيه فردي' : ses.length === 2 ? 'جلستا توجيه فردي' : ar(ses.length) + ' جلسات توجيه فردي'}`); if (cons.length) ext.push(`تم التواصل مع ولي الأمر ${cons.length === 1 ? 'مرة واحدة' : cons.length === 2 ? 'مرتين' : ar(cons.length) + ' مرات'}`); if (a.plan) ext.push('أُعدّت لها خطة علاجية');
   if (ext.length) P.push(ext.join('، و') + '.');
   const sum = P.join(' ');
-  const tb = (head, rows) => `<table style="font-size:12px"><thead><tr>${head.map(([h, w]) => `<th${w ? ` style="width:${w}px"` : ''}>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table>`;
+  const tb = (head, rows) => `<table class="artb" style="font-size:12px;table-layout:fixed;width:100%"><thead><tr>${head.map(([h, w]) => `<th${w ? ` style="width:${w}px"` : ''}>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table>`;
   const sesT = ses.length ? `<div class="box full"><h4>جلسات التوجيه الفردي</h4>${tb([['التاريخ', 92], ['المحطة', 96], ['الموضوع', 0], ['أبرز ما دار في الجلسة', 0]], ses.map(l => `<tr><td>${esc(hij(l.date))}</td><td>${esc(l.ms ? MS_T[l.ms] : 'جلسة إضافية')}</td><td>${esc(l.topic || '')}</td><td>${lines(l.note).slice(0, 3).map(esc).join('، ')}${l.agree ? `<br><small><b>الاتفاق:</b> ${esc(lines(l.agree).join('، '))}</small>` : ''}</td></tr>`))}</div>` : '';
-  const conT = cons.length ? `<div class="box full"><h4>التواصل مع ولي الأمر</h4>${tb([['التاريخ', 92], ['نوع التواصل', 96], ['ما تم', 0]], cons.map(c => `<tr><td>${esc(hij(c.date))}</td><td>${esc((c.type || 'تواصل') + (c.guardian ? ' (' + c.guardian + ')' : ''))}</td><td>${esc(c.summary || '')}${c.outcome ? ' — ' + esc(c.outcome) : ''}</td></tr>`))}</div>` : '';
+  const conT = cons.length ? `<div class="box full"><h4>التواصل مع ولي الأمر</h4>${tb([['التاريخ', 92], ['نوع التواصل', 110], ['ما تم', 0]], cons.map(c => `<tr><td>${esc(hij(c.date))}</td><td>${esc((c.type || 'تواصل') + (c.guardian ? ' (' + c.guardian + ')' : ''))}</td><td>${lines(c.summary).map(esc).join('<br>')}${c.outcome ? `<br><small><b>الاتفاق:</b> ${esc(lines(c.outcome).join('، '))}</small>` : ''}</td></tr>`))}</div>` : '';
   const othT = other.length ? `<div class="box full"><h4>إجراءات أخرى</h4>${tb([['التاريخ', 92], ['الإجراء', 0]], other.map(l => `<tr><td>${esc(hij(l.date))}</td><td>${esc(l.text || '')}</td></tr>`))}</div>` : '';
   const sigs = only ? `<div class="sigs">${SIGS.slice(0, 1).map(s => `<div>${s[0]}<span></span><i>${s[1]}</i></div>`).join('')}<div></div></div>` : repSigs();
   return `<div class="a4 absrep">${repHead(only ? 'إجراءات الموجهة الطلابية في متابعة الغياب' : 'تقرير متابعة غياب طالبة')}

@@ -1288,17 +1288,29 @@ function absReport(only) {
   const stage = (k, c) => { const ds = [3, 5, 10]; return `<div class="ar-trk"><b>${lbl[k]} <small>${k === 'u' ? 'م ٣٤' : 'م ٣٣'}</small></b><div class="ar-steps">${ds.map(d => `<span class="${c >= d ? 'on' : ''}${c >= d && !ds.some(z => z > d && c >= z) ? ' now' : ''}">${ar(d)} أيام</span>`).join('<i></i>')}</div><em>${ar(c)} ${c === 1 ? 'يوم' : 'أيام'}</em></div>`; };
   const next = [];
   if (mt > md) next.push(`${ar(mt - md)} من إجراءات الموجهة`); if (at > ad) next.push(`${ar(at - ad)} من إجراءات الإدارة`);
-  const reach = n >= 10 ? 'مرحلة ١٠ أيام' : n >= 5 ? 'مرحلة ٥ أيام' : n >= 3 ? 'مرحلة ٣ أيام' : 'لم تصل لمرحلة إجراءات';
-  const sum = `وصلت الطالبة في الغياب بدون عذر إلى ${reach}، ${(mt + at) ? `ونُفذ ${ar(md + ad)} من ${ar(mt + at)} إجراء${next.length ? '، والمتبقي: ' + next.join(' و') : ' (اكتملت الإجراءات المطلوبة)'}` : 'ولا توجد إجراءات مطلوبة حتى الآن'}.`;
-  const tl = absTimeline(S.param, a).slice().reverse();
+  const dd = v => `${ar(v)} ${v > 2 && v < 11 ? 'أيام' : 'يوم'}`; const lv = c => c >= 10 ? 10 : c >= 5 ? 5 : c >= 3 ? 3 : 0;
+  const ses = (a.log || []).filter(l => l.type === 'session').slice().sort((p, q) => String(p.date).localeCompare(String(q.date)));
+  const cons = absContacts(S.param, a).slice().sort((p, q) => String(p.date).localeCompare(String(q.date)));
+  const other = (a.log || []).filter(l => l.type !== 'session').slice().sort((p, q) => String(p.date).localeCompare(String(q.date)));
+  const P = [`بلغ غياب الطالبة ${dd(n)} بدون عذر و${dd(x)} بعذر`];
+  const stg = []; if (lv(n)) stg.push(`مرحلة ${ar(lv(n))} أيام في الغياب بدون عذر (المادة ٣٤)`); if (lv(x)) stg.push(`مرحلة ${ar(lv(x))} أيام في الغياب بعذر (المادة ٣٣)`);
+  P[0] += stg.length ? `، ووصلت إلى ${stg.join(' و')}.` : '، ولم تصل إلى مرحلة تستوجب إجراءات.';
+  if (mt + at) P.push(next.length ? `نُفِّذ ${ar(md + ad)} من ${ar(mt + at)} إجراءً، ويتبقى ${next.join(' و')}.` : `نُفِّذت جميع الإجراءات المطلوبة (${ar(mt + at)} إجراءات) وفق قواعد السلوك والمواظبة.`);
+  const ext = []; if (ses.length) ext.push(`عُقدت مع الطالبة ${ses.length === 1 ? 'جلسة توجيه فردي' : ses.length === 2 ? 'جلستا توجيه فردي' : ar(ses.length) + ' جلسات توجيه فردي'}`); if (cons.length) ext.push(`تم التواصل مع ولي الأمر ${cons.length === 1 ? 'مرة واحدة' : cons.length === 2 ? 'مرتين' : ar(cons.length) + ' مرات'}`); if (a.plan) ext.push('أُعدّت لها خطة علاجية');
+  if (ext.length) P.push(ext.join('، و') + '.');
+  const sum = P.join(' ');
+  const tb = (head, rows) => `<table style="font-size:12px"><thead><tr>${head.map(([h, w]) => `<th${w ? ` style="width:${w}px"` : ''}>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table>`;
+  const sesT = ses.length ? `<div class="box full"><h4>جلسات التوجيه الفردي</h4>${tb([['التاريخ', 92], ['المحطة', 96], ['الموضوع', 0], ['أبرز ما دار في الجلسة', 0], ['التقدم', 46]], ses.map(l => `<tr><td>${esc(hij(l.date))}</td><td>${esc(l.ms ? MS_T[l.ms] : 'جلسة إضافية')}</td><td>${esc(l.topic || '')}</td><td>${lines(l.note).slice(0, 3).map(esc).join('، ')}${l.agree ? `<br><small><b>الاتفاق:</b> ${esc(lines(l.agree).join('، '))}</small>` : ''}</td><td>${esc(SES_PROG[l.prog] || '—')}</td></tr>`))}</div>` : '';
+  const conT = cons.length ? `<div class="box full"><h4>التواصل مع ولي الأمر</h4>${tb([['التاريخ', 92], ['نوع التواصل', 96], ['ما تم', 0]], cons.map(c => `<tr><td>${esc(hij(c.date))}</td><td>${esc((c.type || 'تواصل') + (c.guardian ? ' (' + c.guardian + ')' : ''))}</td><td>${esc(c.summary || '')}${c.outcome ? ' — ' + esc(c.outcome) : ''}</td></tr>`))}</div>` : '';
+  const othT = other.length ? `<div class="box full"><h4>إجراءات أخرى</h4>${tb([['التاريخ', 92], ['الإجراء', 0]], other.map(l => `<tr><td>${esc(hij(l.date))}</td><td>${esc(l.text || '')}</td></tr>`))}</div>` : '';
   const sigs = only ? `<div class="sigs">${SIGS.slice(0, 1).map(s => `<div>${s[0]}<span></span><i>${s[1]}</i></div>`).join('')}<div></div></div>` : repSigs();
   return `<div class="a4 absrep">${repHead(only ? 'إجراءات الموجهة الطلابية في متابعة الغياب' : 'تقرير متابعة غياب طالبة')}
     <div class="ar-who"><div><small>الطالبة</small><b>${esc(a.studentName)}</b></div><div><small>الصف</small><b>${esc((a.grade || '') + ' ' + (a.section || ''))}</b></div><div><small>تاريخ التحويل للموجهة</small><b>${a.ref ? esc(hij(a.ref)) : '—'}</b></div></div>
     <div class="ar-stats"><div class="u"><b>${ar(n)}</b><span>غياب بدون عذر</span></div><div class="e"><b>${ar(x)}</b><span>غياب بعذر</span></div><div class="g"><b>${ar(Math.max(0, 100 - n))}</b><span>درجة المواظبة المتوقعة</span></div><div class="d"><b>${ar(md + ad)} <small>من ${ar(mt + at)}</small></b><span>إجراءات منفذة</span></div></div>
     <div class="ar-trks">${stage('u', n)}${stage('e', x)}${st >= 3 ? '<p class="ar-warn">الغياب بدون عذر متصل ٣ أيام أو أكثر</p>' : ''}</div>
     <div class="ar-cols${only ? ' one' : ''}">${col('إجراءات الموجهة الطلابية', gm, 'm')}${only ? '' : col('إجراءات الإدارة المدرسية', ga, 'a')}</div>
-    <div class="ar-sum"><b>الخلاصة:</b> ${sum}</div>
-    ${tl.length ? `<div class="box full"><h4>سجل المتابعة والتواصل</h4><p>${tl.map(l => '• ' + esc(hij(l.date)) + ': ' + esc(l.text)).join('\n')}</p></div>` : ''}${sigs}</div>`;
+    <div class="ar-sum"><b>الخلاصة:</b> ${esc(sum)}</div>
+    ${sesT}${conT}${othT}${sigs}</div>`;
 }
 
 /* ═════════ view: daily emergency cases ═════════ */

@@ -529,6 +529,8 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .imdata .imok{background:var(--good-soft,#e6f4ea);color:var(--good,#1e7b3c);font-weight:700;border-radius:10px;padding:8px 10px;margin:6px 0;font-size:.9rem}.imdata input.autof,.imdata select.autof{border-color:var(--good,#1e7b3c)}
 .cbtn{touch-action:manipulation}
 .absgrp{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:18px 0 8px;padding-inline-start:10px;border-inline-start:4px solid var(--gc)}.absgrp h3{margin:0;font-size:1.1rem;color:var(--gc)}.absgrp .n{display:inline-block;min-width:24px;padding:0 8px;border-radius:999px;background:var(--gc);color:#fff;font-size:.85rem;text-align:center}
+.apchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.apchip{border:1.5px solid var(--line);background:var(--surface,#fff);border-radius:999px;padding:6px 12px;font:inherit;font-size:.88rem;cursor:pointer;color:var(--ink);touch-action:manipulation}.apchip.on{background:var(--abs-soft);border-color:var(--abs);color:var(--abs);font-weight:700}.apchip.sm{font-size:.8rem;padding:4px 10px;color:var(--muted)}
+.apsteps{display:flex;flex-direction:column;gap:6px;margin-top:6px}.aprow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.aprow .apchip{text-align:start}.apadd{display:flex;gap:6px;margin-top:6px;max-width:460px}.apadd input{flex:1}
 </style>
 </head>
 <body>
@@ -1808,7 +1810,7 @@ function aiGroup(g) {
 function progGroups(id) { return list('group').filter(g => g.progId === id).sort((a, b) => String(a.date).localeCompare(String(b.date))); }
 
 /* ═════════ absence: individual treatment plan ═════════ */
-const AP_CAUSES = ['ظرف صحي', 'ظرف أسري', 'صعوبات دراسية', 'مشكلات مع الزميلات', 'رفض المدرسة أو عدم الرغبة', 'السهر واضطراب النوم', 'بُعد المسكن أو المواصلات', 'تهاون الأسرة في المتابعة'];
+const AP_CAUSES = ['ظرف صحي', 'السفر', 'ظرف أسري', 'صعوبات دراسية', 'مشكلات مع الزميلات', 'رفض المدرسة أو عدم الرغبة', 'السهر واضطراب النوم', 'بُعد المسكن أو المواصلات', 'تهاون الأسرة في المتابعة'];
 const AP_STEPS = ['مقابلة الطالبة لدراسة أسباب الغياب', 'التواصل مع ولي الأمر وإطلاعه على الإجراءات المترتبة', 'أخذ التعهد على الطالبة وولي الأمر', 'خطة تعويضية لما فات من دروس بالتعاون مع المعلمات', 'تكليف الطالبة بمهمة تحبّبها في المدرسة', 'لوحة متابعة الحضور ومكافأة عند الانتظام', 'متابعة يومية لحضور الطالبة لمدة أسبوعين', 'إشراك الطالبة في نشاط أو نادٍ تحبه', 'إحالة الطالبة للجنة التوجيه الطلابي', 'التنسيق مع المرشدة الصحية إذا كان السبب صحياً'];
 const AP_GOALS = 'انتظام الطالبة في الحضور اليومي\nتعويض ما فاتها من دروس\nمعالجة أسباب الغياب بالتعاون مع الأسرة';
 /* ═════════ خطة التعلم في أيام الغياب ═════════ */
@@ -1860,15 +1862,34 @@ function lpReportBox(a) {
     ${(p.methods || []).length ? `<p style="margin-top:4px"><b>طريقة التعويض:</b> ${p.methods.map(esc).join('، ')}</p>` : ''}
     ${lines(p.parent).length ? `<p><b>دور ولي الأمر:</b> ${lines(p.parent).map(esc).join('، ')}</p>` : ''}${p.follow ? `<p><b>المتابعة والتقويم:</b> ${esc(p.follow)}</p>` : ''}</div>`;
 }
-function absPlanHTML(a) {
-  const p = a.plan; if (!p) return `<section class="panel"><div class="head"><h3>الخطة العلاجية</h3></div><p class="small muted">إذا احتاجت الطالبة خطة علاجية، جهّزيها هنا: الأسباب، والأهداف، والإجراءات ومواعيدها، وتطلع في التقرير.</p><button class="btn primary" data-act="apEdit" style="align-self:flex-start">＋ إعداد خطة علاجية</button></section>`;
-  const st = p.steps || []; const dn = st.filter(s => s.done).length;
-  return `<section class="panel" style="border-color:var(--abs)"><div class="head"><h3>الخطة العلاجية</h3><span class="tiny muted">${ar(dn)} من ${ar(st.length)}</span><span class="sp"></span><button class="btn sm" data-act="apRep">طباعة الخطة</button><button class="btn sm" data-act="apEdit">تعديل</button></div>
-    ${(p.causes || []).length || p.causeNote ? `<div><b class="small">أسباب الغياب</b><div class="meta" style="margin-top:4px">${(p.causes || []).map(c => `<span class="chip c">${esc(c)}</span>`).join('')}</div>${p.causeNote ? `<p class="small" style="margin-top:4px">${esc(p.causeNote)}</p>` : ''}</div>` : ''}
-    ${lines(p.goals).length ? `<div><b class="small">الأهداف</b><ol class="goals">${lines(p.goals).map(g => `<li>${esc(g)}</li>`).join('')}</ol></div>` : ''}
-    ${st.length ? `<div class="pbar" style="--c:var(--abs)"><i style="width:${Math.round(100 * dn / st.length)}%"></i></div><ol class="steps">${st.map((s, i) => `<li class="${s.done ? 'done' : ''}"><label class="chk" style="--sc:var(--abs)"><input type="checkbox" data-apdone="${i}" ${s.done ? 'checked' : ''}><span>${esc(s.t)}${s.doneAt || s.who ? `<small>${[s.done && s.doneAt ? 'نُفّذ ' + hij(s.doneAt) : '', s.who].filter(Boolean).map(esc).join(' · ')}</small>` : ''}${s.done && s.doneAt ? `<small>نُفّذ: ${esc(hij(s.doneAt))}</small>` : ''}</span></label></li>`).join('')}</ol>` : ''}
-    ${p.follow ? `<div><b class="small">المتابعة والتقييم</b><p class="small">${esc(p.follow)}</p></div>` : ''}</section>`;
+const AP_GOAL_OPTS = ['انتظام الطالبة في الحضور اليومي', 'خفض أيام الغياب بدون عذر', 'تعويض ما فاتها من دروس', 'معالجة أسباب الغياب بالتعاون مع الأسرة', 'إحضار التقارير الطبية في وقتها', 'الحضور المبكر للطابور الصباحي', 'تعزيز ارتباط الطالبة بالمدرسة'];
+const AP_FOLLOW = ['متابعة الحضور أسبوعياً لمدة شهر، ومراجعة الخطة نهاية الشهر', 'متابعة يومية لمدة أسبوعين ثم أسبوعية', 'مراجعة الخطة مع ولي الأمر بعد شهر', 'مقارنة أيام الغياب في التقرير الشهري القادم'];
+const AP_KMAP = { health: 'ظرف صحي', travel: 'السفر', family: 'ظرف أسري', study: 'صعوبات دراسية', peers: 'مشكلات مع الزميلات', refuse: 'رفض المدرسة أو عدم الرغبة', sleep: 'السهر واضطراب النوم', transport: 'بُعد المسكن أو المواصلات', neglect: 'تهاون الأسرة في المتابعة' };
+function apSuggest(id, a) {
+  const u = unex(a), x = exc(a), K = absCauses(id, a); const causes = Object.keys(AP_KMAP).filter(k => K.has(k)).map(k => AP_KMAP[k]);
+  const G = []; if (u >= 3 || !x) G.push(AP_GOAL_OPTS[0]); if (u >= 3) G.push(AP_GOAL_OPTS[1]); if (x >= 3 || u >= 3) G.push(AP_GOAL_OPTS[2]); if (u >= 3 || K.has('family') || K.has('neglect')) G.push(AP_GOAL_OPTS[3]);
+  if (u && K.has('health')) G.push(AP_GOAL_OPTS[4]); if (K.has('sleep')) G.push(AP_GOAL_OPTS[5]); if (K.has('refuse') || K.has('peers')) G.push(AP_GOAL_OPTS[6]);
+  const S2 = [AP_STEPS[0], AP_STEPS[1]]; if (u >= 3) S2.push(AP_STEPS[2]); if (x >= 3 || u >= 3) S2.push(AP_STEPS[3]); if (K.has('refuse') || K.has('peers')) S2.push(AP_STEPS[4], AP_STEPS[7]);
+  S2.push(AP_STEPS[5]); if (u >= 3) S2.push(AP_STEPS[6]); if (u >= 5) S2.push(AP_STEPS[8]); if (K.has('health')) S2.push(AP_STEPS[9]);
+  return { causes, causeNote: '', goals: [...new Set(G)].join('\n'), who: 'الموجهة الطلابية', follow: AP_FOLLOW[0], steps: [...new Set(S2)].map(t => ({ t, date: '', who: 'الموجهة الطلابية', done: false })) };
 }
+const apCur = (id, a) => a.plan ? JSON.parse(JSON.stringify(a.plan)) : apSuggest(id, a);
+function absPlanHTML(a) {
+  const id = S.param; const p = apCur(id, a); const sugg = !a.plan; const st = p.steps || []; const dn = st.filter(s => s.done).length; const G = lines(p.goals);
+  const chip = (kind, v, on) => `<button type="button" class="apchip${on ? ' on' : ''}" data-apt="${kind}" data-v="${esc(v)}" aria-pressed="${on}">${on ? '✓ ' : ''}${esc(v)}</button>`;
+  const allSteps = [...new Set(AP_STEPS.concat(st.map(s => s.t)))]; const allGoals = [...new Set(AP_GOAL_OPTS.concat(G))];
+  return `<section class="panel apbox" style="border-color:var(--abs)"><div class="head"><h3>الخطة العلاجية</h3>${sugg ? '<span class="pill" style="--pc:var(--good);--ps:var(--good-soft)">مقترحة حسب غيابها وأسبابه</span>' : `<span class="tiny muted">نُفّذ ${ar(dn)} من ${ar(st.length)}</span>`}<span class="sp"></span>${sugg ? '<button class="btn sm primary" data-apsave="1">اعتماد الخطة</button>' : '<button class="btn sm" data-act="apRep">طباعة الخطة</button><button class="btn sm ghost" data-apdel2="1">حذف</button>'}</div>
+    <p class="tiny muted" style="margin:0">اضغطي على أي خيار تضيفينه أو تشيلينه، وينحفظ على طول.</p>
+    <div><b class="small">أسباب الغياب</b><div class="apchips">${AP_CAUSES.map(c => chip('c', c, (p.causes || []).includes(c))).join('')}</div></div>
+    <div><b class="small">الأهداف</b><div class="apchips">${allGoals.map(g => chip('g', g, G.includes(g))).join('')}</div><div class="apadd"><input data-apin="g" placeholder="هدف آخر…"><button type="button" class="btn sm" data-apadd="g">＋</button></div></div>
+    <div><b class="small">الإجراءات العلاجية</b><div class="apsteps">${allSteps.map(t => { const i = st.findIndex(s => s.t === t); const on = i >= 0; const s0 = on ? st[i] : null;
+      return `<div class="aprow${on ? ' on' : ''}">${chip('s', t, on)}${on && !sugg ? `<label class="chk tiny" style="--sc:var(--good)"><input type="checkbox" data-apdone="${i}" ${s0.done ? 'checked' : ''}><span>${s0.done ? 'نُفّذ' + (s0.doneAt ? ' ' + esc(hij(s0.doneAt)) : '') : 'نُفّذ؟'}</span></label>` : ''}</div>`; }).join('')}</div>
+      <div class="apadd"><input data-apin="s" placeholder="إجراء آخر…"><button type="button" class="btn sm" data-apadd="s">＋</button></div></div>
+    <div class="row" style="gap:10px;flex-wrap:wrap"><label class="f" style="flex:1 1 200px"><span>المسؤولة</span><input data-apf="who" value="${esc(p.who || 'الموجهة الطلابية')}"></label>
+      <label class="f" style="flex:2 1 300px"><span>المتابعة والتقييم</span><input data-apf="follow" value="${esc(p.follow || '')}"></label></div>
+    <div class="apchips">${AP_FOLLOW.map(f => `<button type="button" class="apchip sm" data-apfol="${esc(f)}">${esc(f)}</button>`).join('')}</div></section>`;
+}
+async function apMut(fn, msg) { const id = S.param; const a = DB.docs[id].data; const p = apCur(id, a); fn(p); await absUpdate(d => { d.plan = p; }, msg || ''); }
 function apForm() {
   const id = S.param; const a = DB.docs[id].data; const p = a.plan || { causes: [], goals: AP_GOALS, steps: [], follow: '' };
   const have = new Set((p.steps || []).map(s => s.t)); const custom = (p.steps || []).filter(s => !AP_STEPS.includes(s.t)).map(s => s.t).join('\n');
@@ -3605,6 +3626,7 @@ document.addEventListener('change', e => {
   else if (t.dataset && t.dataset.consec) { const on = t.checked; absUpdate(a => { a.consec = on; if (a.u == null) { a.u = unex(a); a.x = exc(a); } }); }
   else if (t.dataset && t.dataset.amsvc != null) { const ms = amMonths(); const sel = DB.docs[S.filter.absm] ? S.filter.absm : ms[0] && ms[0].id; const d = JSON.parse(JSON.stringify(DB.docs[sel].data)); d.list[+t.dataset.amsvc].svc = t.value.trim(); saveDoc(sel, 'absmonth', d).then(() => toast('حُفظت الخدمة'), er => toast(errT(er))); }
   else if (t.dataset && t.dataset.lpdone != null) { const i = +t.dataset.lpdone, on = t.checked; absUpdate(a => { a.lp.rows[i].done = on; a.lp.rows[i].doneAt = on ? todayH() : ''; }, on ? 'تم تعويض المادة' : ''); }
+  else if (t.dataset && t.dataset.apf) { const k = t.dataset.apf, v = t.value.trim(); apMut(p => { p[k] = v; }); }
   else if (t.dataset && t.dataset.apdone != null) { const i = +t.dataset.apdone, on = t.checked; absUpdate(a => { a.plan.steps[i].done = on; a.plan.steps[i].doneAt = on ? todayH() : ''; }, on ? 'تم' : ''); }
   else if (t.dataset && t.dataset.vdone != null) { const i = +t.dataset.vdone, on = t.checked; valUpdate(S.param, x => { x.steps[i].done = on; x.steps[i].doneAt = on ? todayH() : ''; if (on && !x.steps[i].date) x.steps[i].date = todayH(); }, on ? 'تم' : ''); }
   else if (t.dataset && t.dataset.vph != null && t.files && t.files.length) { valAddPhotos(S.param, [...t.files]); t.value = ''; }
@@ -3630,6 +3652,14 @@ document.addEventListener('click', async e => {
   if (d.binder) { binderForm(d.binder); return; }
   if (d.aml) { S.filter.aml = d.aml; rerender(); return; }
   if (d.amsel) { S.filter.absm = d.amsel; rerender(); return; }
+  if (d.apsave) { apMut(() => {}, 'اعتُمدت الخطة'); return; }
+  if (d.apdel2) { if (b.dataset.confirm !== '1') { b.dataset.confirm = '1'; b.textContent = 'تأكيد الحذف؟'; return; } absUpdate(a => { delete a.plan; }, 'حُذفت الخطة'); return; }
+  if (d.apt) { const v = d.v, k = d.apt; apMut(p => {
+      if (k === 'c') { p.causes = p.causes || []; p.causes = p.causes.includes(v) ? p.causes.filter(x => x !== v) : p.causes.concat(v); }
+      else if (k === 'g') { const G = lines(p.goals); p.goals = (G.includes(v) ? G.filter(x => x !== v) : G.concat(v)).join('\n'); }
+      else { p.steps = p.steps || []; const i = p.steps.findIndex(s => s.t === v); if (i >= 0) p.steps.splice(i, 1); else p.steps.push({ t: v, date: '', who: p.who || 'الموجهة الطلابية', done: false }); } }); return; }
+  if (d.apadd) { const inp = document.querySelector(`[data-apin="${d.apadd}"]`); const v = inp && inp.value.trim(); if (!v) return; apMut(p => { if (d.apadd === 'g') p.goals = lines(p.goals).concat(v).join('\n'); else { p.steps = p.steps || []; if (!p.steps.some(s => s.t === v)) p.steps.push({ t: v, date: '', who: p.who || 'الموجهة الطلابية', done: false }); } }); return; }
+  if (d.apfol) { apMut(p => { p.follow = d.apfol; }); return; }
   if (d.apdel) { if (b.dataset.confirm !== '1') { b.dataset.confirm = '1'; b.textContent = 'تأكيد حذف الخطة؟'; return; } closeSheet(); absUpdate(a => { delete a.plan; }, 'حُذفت الخطة'); return; }
   if (d.psub) { S.sub.prg = d.psub; rerender(); return; }
   if (d.gview) { S.filter.gview = d.gview; rerender(); return; }

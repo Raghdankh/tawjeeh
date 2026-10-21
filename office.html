@@ -528,6 +528,7 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 .imdata .imok{background:var(--good-soft,#e6f4ea);color:var(--good,#1e7b3c);font-weight:700;border-radius:10px;padding:8px 10px;margin:6px 0;font-size:.9rem}.imdata input.autof,.imdata select.autof{border-color:var(--good,#1e7b3c)}
 .cbtn{touch-action:manipulation}
+.absgrp{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:18px 0 8px;padding-inline-start:10px;border-inline-start:4px solid var(--gc)}.absgrp h3{margin:0;font-size:1.1rem;color:var(--gc)}.absgrp .n{display:inline-block;min-width:24px;padding:0 8px;border-radius:999px;background:var(--gc);color:#fff;font-size:.85rem;text-align:center}
 </style>
 </head>
 <body>
@@ -1171,12 +1172,17 @@ function vAbsence() {
       <div class="tile" style="--tc:var(--z1)"><b class="num">${ar(cnt(a => a.n >= 3))}</b><span>٣ أيام فأكثر بدون عذر</span></div>
       <div class="tile" style="--tc:var(--z2)"><b class="num">${ar(cnt(a => a.n >= 5))}</b><span>٥ أيام فأكثر بدون عذر</span></div>
       <div class="tile" style="--tc:var(--z3)"><b class="num">${ar(cnt(a => a.n >= 10))}</b><span>١٠ أيام فأكثر بدون عذر</span></div>
+      <div class="tile" style="--tc:var(--good)"><b class="num">${ar(cnt(a => a.x >= 3))}</b><span>٣ أيام فأكثر بعذر</span></div>
       <div class="tile" style="--tc:var(--bad)"><b class="num">${ar(cnt(a => a.st >= 3))}</b><span>غياب متصل ٣ أيام فأكثر</span></div>
       <div class="tile" style="--tc:var(--abs)"><b class="num">${ar(cnt(a => a.p > 0))}</b><span>ملفات فيها إجراءات ناقصة</span></div></div>
     <div class="subtabs">${[['all', 'المفتوحة'], ['pending', 'إجراءات ناقصة'], ['consec', 'غياب متصل'], ['3', 'بدون عذر ٣+'], ['5', 'بدون عذر ٥+'], ['10', 'بدون عذر ١٠+'], ['e3', 'بعذر ٣+'], ['closed', 'المغلقة']].map(([k, t]) => `<button data-absf="${k}" aria-selected="${f === k}">${t}</button>`).join('')}</div>
-    ${shown.length ? `<div class="list">${shown.map(a => { const [pc, ps] = levelColors(a.n); const [xc, xs] = levelColors(a.x); return `<a class="rec" href="#absence/${a.id}" style="text-decoration:none;color:inherit;--c:${a.n ? pc : xc}"><div class="t"><b>${esc(a.studentName)}</b></div>
-      <div class="meta"><span class="chip">${esc(a.grade || '')} ${esc(a.section || '')}</span><span class="pill" style="--pc:${pc};--ps:${ps}">بدون عذر: ${ar(a.n)}</span><span class="pill" style="--pc:${xc};--ps:${xs}">بعذر: ${ar(a.x)}</span>${a.st >= 3 ? `<span class="pill" style="--pc:var(--bad);--ps:var(--bad-soft)">غياب متصل</span>` : ''}</div>
-      <div class="meta">${a.p ? `<span class="chip" style="color:var(--bad)">${ar(a.p)} إجراء ناقص</span>` : '<span class="chip" style="color:var(--good)">الإجراءات مكتملة</span>'}</div></a>`; }).join('')}</div>`
+    ${shown.length ? (() => { const card = a => { const [pc, ps] = levelColors(a.n); const grp = a.n >= 3 ? 'u' : a.x >= 3 ? 'e' : '';
+        return `<a class="rec" href="#absence/${a.id}" style="text-decoration:none;color:inherit;--c:${grp === 'u' ? pc : grp === 'e' ? 'var(--good)' : 'var(--muted)'}"><div class="t"><b>${esc(a.studentName)}</b></div>
+      <div class="meta"><span class="chip">${esc(a.grade || '')} ${esc(a.section || '')}</span><span class="pill" style="--pc:${a.n ? pc : 'var(--muted)'};--ps:${a.n ? ps : 'var(--sunk)'};${grp === 'u' ? 'font-weight:800' : ''}">بدون عذر: ${ar(a.n)}</span><span class="pill" style="--pc:${a.x ? 'var(--good)' : 'var(--muted)'};--ps:${a.x ? 'var(--good-soft)' : 'var(--sunk)'};${grp === 'e' ? 'font-weight:800' : ''}">بعذر: ${ar(a.x)}</span>${a.st >= 3 ? `<span class="pill" style="--pc:var(--bad);--ps:var(--bad-soft)">غياب متصل</span>` : ''}</div>
+      <div class="meta">${a.p ? `<span class="chip" style="color:var(--bad)">${ar(a.p)} إجراء ناقص</span>` : '<span class="chip" style="color:var(--good)">الإجراءات مكتملة</span>'}</div></a>`; };
+      if (!['all', 'pending', 'closed'].includes(f)) return `<div class="list">${shown.map(card).join('')}</div>`;
+      const G = [['u', 'الغياب بدون عذر', 'المادة (٣٤) · ٣ أيام فأكثر بدون عذر', 'var(--z3)', shown.filter(a => a.n >= 3)], ['e', 'الغياب بعذر', 'المادة (٣٣) · ٣ أيام فأكثر بعذر', 'var(--good)', shown.filter(a => a.n < 3 && a.x >= 3).sort((p, q) => q.x - p.x)], ['l', 'أقل من ٣ أيام', 'ما وصلت ٣ أيام لا بعذر ولا بدون عذر', 'var(--muted)', shown.filter(a => a.n < 3 && a.x < 3)]];
+      return G.filter(g => g[4].length).map(([k, t, sub, c, L]) => `<div class="absgrp" style="--gc:${c}"><h3>${t} <span class="n">${ar(L.length)}</span></h3><span class="tiny muted">${sub}</span></div><div class="list">${L.map(card).join('')}</div>`).join(''); })()
       : `<div class="empty"><b>لا توجد ملفات هنا</b><span>افتحي ملفاً لأي طالبة تكرر غيابها.</span><button class="btn primary" data-act="absAdd">＋ ملف غياب</button></div>`}${stuDatalist()}`;
 }
 function counterHTML(id, label, v, color) {
@@ -2036,7 +2042,7 @@ function amReport(id) {
     if (EX.uh) notes.splice(1, 0, `${ar(EX.uh)} ${EX.uh > 2 && EX.uh < 11 ? 'أيام' : 'يوماً'} من الغياب بدون عذر أسبابها صحية، ولم يُقدَّم عنها تقرير طبي.`); }
   if (!r.notes && !pc && c.rate != null) notes.unshift(`نسبة الغياب ${pct(c.rate)}، ${c.rate > lim ? 'وهي أعلى من' : 'وهي ضمن'} حد التنبيه (${ar(lim)}٪).`);
   if (!r.notes && pc && pc.rate != null && c.rate != null && c.rate < pc.rate) notes.unshift(`انخفضت نسبة الغياب من ${pct(pc.rate)} في ${HM[prevR.hm - 1]} إلى ${pct(c.rate)}.`);
-  const many = L.filter(x => x.x + x.u >= 3).length; const auto = [];
+  const many = L.filter(x => (x.x >= 3 || x.u >= 3)).length; const auto = [];
   if (L.length) auto.push(`حصر الطالبات الغائبات (${ar(L.length)} طالبة) ومطابقتها مع ملفات الغياب`);
   if (files.filter(a => unex(a) >= 3).length) auto.push(`متابعة ملفات الطالبات المتكرر غيابهن (${ar(files.filter(a => unex(a) >= 3).length)} ملف)`);
   if (files.filter(a => a.plan).length) auto.push(`خطط علاجية فردية (${ar(files.filter(a => a.plan).length)})`);
@@ -2069,7 +2075,7 @@ function amSuggest(id) {
   const L = r.list || []; const X = L.reduce((s, x) => s + x.x, 0), U = L.reduce((s, x) => s + x.u, 0), T = X + U;
   const cats = {}; L.forEach(x => { const k = reasonCat(x.reason); cats[k] = (cats[k] || 0) + x.x + x.u; }); const share = k => T ? 100 * (cats[k] || 0) / T : 0;
   const gUp = pc ? c.rows.map(x => { const p = pc.rows.find(y => y.grade === x.grade); if (!p) return null; const d = c.perG && x.rate != null && p.rate != null ? x.rate - p.rate : x.a - p.a; return d > 0 ? { g: x.grade, d, perG: c.perG && x.rate != null } : null; }).filter(Boolean).sort((a, b) => b.d - a.d) : [];
-  const many = L.filter(x => x.x + x.u >= 3); const rc = L.length ? reconcile({ id, list: L }) : { miss: [], behind: [] };
+  const many = L.filter(x => (x.x >= 3 || x.u >= 3)); const rc = L.length ? reconcile({ id, list: L }) : { miss: [], behind: [] };
   const A = [], S2 = []; let s_target = lim;
   if (up) A.push(`ارتفعت نسبة الغياب من ${pct(pc.rate)} في ${HM[prevR.hm - 1]} إلى ${pct(c.rate)} في ${HM[r.hm - 1]} (بزيادة ${pct(c.rate - pc.rate)}).`);
   if (over) A.push(`النسبة أعلى من حد التنبيه المعتمد (${ar(lim)}٪).`);
@@ -2460,7 +2466,7 @@ function impForm() {
   $('#im_file').addEventListener('change', async e => { const file = e.target.files[0]; if (!file) return; const fn = $('#im_fn'); fn.textContent = 'جارٍ قراءة ' + file.name + '…';
     try { XLSX_META = null; t.value = await fileToSheetText(file); impMeta(); t.dispatchEvent(new Event('input')); fn.textContent = '✓ ' + file.name; } catch (er) { fn.textContent = ''; prevBox.innerHTML = `<div class="impv" style="color:var(--bad)">${esc(errT(er))}</div>`; } });
   t.addEventListener('input', () => { const { rows, bad } = parseAbsSheet(t.value); if (!t.value.trim()) { prevBox.innerHTML = ''; return; }
-    const X = rows.reduce((s, r) => s + r.x, 0), U = rows.reduce((s, r) => s + r.u, 0); const many = rows.filter(r => r.x + r.u >= 3).length; const linked = rows.filter(r => findFile(r)).length;
+    const X = rows.reduce((s, r) => s + r.x, 0), U = rows.reduce((s, r) => s + r.u, 0); const many = rows.filter(r => (r.x >= 3 || r.u >= 3)).length; const linked = rows.filter(r => findFile(r)).length;
     prevBox.innerHTML = `<div class="impv"><b>قرأت ${ar(rows.length)} طالبة</b> · ${ar(X + U)} يوم غياب (بعذر ${ar(X)}، بدون عذر ${ar(U)}) · ${ar(many)} كثيرة الغياب هذا الشهر · ${ar(linked)} لها ملف غياب مفتوح
       ${bad.length ? `<div class="tiny" style="color:var(--bad);margin-top:4px">ما قدرت أقرأ ${ar(bad.length)} سطر: ${bad.slice(0, 3).map(esc).join(' | ')}${bad.length > 3 ? '…' : ''}</div>` : ''}
       <div class="tscroll" style="max-height:220px;overflow:auto;margin-top:6px"><table class="amt"><thead><tr><th>الاسم</th><th>الصف</th><th>بعذر</th><th>بدون</th><th>السبب</th></tr></thead><tbody>${rows.map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.grade + ' ' + r.section)}</td><td>${ar(r.x)}</td><td>${ar(r.u)}</td><td class="tiny">${esc(r.reason)}</td></tr>`).join('')}</tbody></table></div></div>`; });
@@ -2476,7 +2482,7 @@ function impMeta() {
 function reconcile(m) {
   const miss = [], behind = [];
   (m.list || []).forEach((r, i) => { const o = cumOther(r, m.id); const cx = o.x + r.x, cu = o.u + r.u; const f = findFile(r);
-    if (!f) { if (cx + cu >= 3) miss.push({ r, i, cx, cu }); }
+    if (!f) { if ((cx >= 3 || cu >= 3)) miss.push({ r, i, cx, cu }); }
     else if (cu > unex(f) || cx > exc(f)) behind.push({ r, i, f, cx, cu }); });
   return { miss, behind };
 }
@@ -2484,28 +2490,28 @@ function reconHTML(m) {
   const { miss, behind } = reconcile(m); if (!(m.list || []).length) return '';
   if (!miss.length && !behind.length) return `<section class="panel" style="border-color:var(--good)"><h3 style="color:var(--good)">✓ المطابقة مع ملفاتك</h3><p class="small">كل طالبات الكشف اللي وصلن ٣ أيام فأكثر لهن ملفات، وأرقام ملفاتك ما تقل عن الكشف. ما يحتاج شي.</p></section>`;
   return `<section class="panel" style="border-color:var(--z2)"><h3>المطابقة مع ملفاتك</h3><p class="small muted">ملفاتك ما تغيّرت. هذي الطالبات بس اللي الكشف يختلف فيهن عن اللي سجلتيه، والقرار لك.</p>
-    ${miss.length ? `<b class="small">وصل غيابهن ٣ أيام فأكثر وما لهن ملف (${ar(miss.length)})</b><div class="glist">${miss.map(x => `<div><b>${esc(x.r.name)}</b><span class="tiny muted">${esc(x.r.grade + ' ' + x.r.section)} · بعذر ${ar(x.cx)} · بدون عذر ${ar(x.cu)} (مجموع الشهور)</span><button class="btn sm primary" data-amopen="${x.i}">فتح ملف</button></div>`).join('')}</div>` : ''}
+    ${miss.length ? `<b class="small">وصل غيابهن ٣ أيام فأكثر (بعذر أو بدون عذر) وما لهن ملف (${ar(miss.length)})</b><div class="glist">${miss.map(x => `<div><b>${esc(x.r.name)}</b><span class="tiny muted">${esc(x.r.grade + ' ' + x.r.section)} · بعذر ${ar(x.cx)} · بدون عذر ${ar(x.cu)} (مجموع الشهور)</span><button class="btn sm primary" data-amopen="${x.i}">فتح ملف</button></div>`).join('')}</div>` : ''}
     ${behind.length ? `<b class="small">أرقام الكشف أكثر من ملفها (${ar(behind.length)})</b><div class="glist">${behind.map(x => `<div><a href="#absence/${x.f.id}"><b>${esc(x.r.name)}</b></a><span class="tiny muted">ملفك: بعذر ${ar(exc(x.f))}، بدون ${ar(unex(x.f))} · الكشف: بعذر ${ar(x.cx)}، بدون ${ar(x.cu)}</span><button class="btn sm" data-amsync="${x.i}">اعتماد أرقام الكشف</button></div>`).join('')}</div>` : ''}</section>`;
 }
 function svcFor(r) {
   if (r.svc) return r.svc; const out = []; const a = r.fileId && DB.docs[r.fileId] ? { id: r.fileId, ...DB.docs[r.fileId].data } : findFile(r);
   if (a) { const d = a.done || {}; if (Object.keys(d).some(k => k.endsWith('-0') && k !== 'c-0')) out.push('تحويل للموجهة ودراسة الحالة'); if (absContacts(a.id, a).length) out.push('تواصل مع ولي الأمر'); if (a.plan) out.push('خطة علاجية'); if (d['u-5-1']) out.push('إحالة للجنة التوجيه'); if (!out.length) out.push('متابعة في ملف الغياب'); }
-  else if (r.x + r.u >= 3) out.push('—');
+  else if ((r.x >= 3 || r.u >= 3)) out.push('—');
   return out.join('، ');
 }
 function absListHTML(r) {
   const L = (r.list || []).map((x, i) => ({ ...x, i })); if (!L.length) return '';
-  const f = S.filter.aml || 'all'; const shown = f === 'many' ? L.filter(x => x.x + x.u >= 3) : f === 'u' ? L.filter(x => x.u > 0) : L;
+  const f = S.filter.aml || 'all'; const shown = f === 'many' ? L.filter(x => (x.x >= 3 || x.u >= 3)) : f === 'u' ? L.filter(x => x.u > 0) : L;
   const cats = {}; L.forEach(x => { const c = reasonCat(x.reason); cats[c] = (cats[c] || 0) + x.x + x.u; }); const tot = Object.values(cats).reduce((s, v) => s + v, 0) || 1;
   return reconHTML(r) + `<section class="panel"><div class="head"><h3>أسباب الغياب</h3></div><div class="rcats">${Object.entries(cats).sort((a, b) => b[1] - a[1]).map(([c, v]) => `<div><span>${esc(c)}</span><span class="rbar wide"><i style="width:${Math.round(100 * v / tot)}%"></i></span><b>${ar(Math.round(100 * v / tot))}٪</b></div>`).join('')}</div></section>
     <section class="panel"><div class="head"><h3>كشف الغائبات</h3><span class="tiny muted">${ar(L.length)} طالبة</span><span class="sp"></span><button class="btn sm wa" data-act="amWA">📲 مراسلة</button><button class="btn sm primary" data-act="amList">طباعة الكشف مع الخدمات</button></div>
-    <div class="subtabs">${[['all', 'الكل', L.length], ['many', 'كثيرات الغياب (٣ فأكثر)', L.filter(x => x.x + x.u >= 3).length], ['u', 'بدون عذر', L.filter(x => x.u > 0).length]].map(([k, t, n]) => `<button data-aml="${k}" aria-selected="${f === k}">${t}<span class="n">${ar(n)}</span></button>`).join('')}</div>
-    <div class="tscroll"><table class="amt"><thead><tr><th>الطالبة</th><th>الصف</th><th>بعذر</th><th>بدون عذر</th><th class="hide-sm">السبب</th><th>الخدمات الإرشادية</th></tr></thead><tbody>${shown.map(x => { const file = x.fileId && DB.docs[x.fileId] ? x.fileId : (findFile(x) || {}).id; return `<tr${x.x + x.u >= 3 ? ' class="hot"' : ''}><td>${file ? `<a href="#absence/${file}">${esc(x.name)}</a>` : esc(x.name)}${x.x + x.u >= 3 ? ' <span class="pill" style="--pc:var(--bad);--ps:var(--bad-soft)">' + ar(x.x + x.u) + ' أيام</span>' : ''}</td><td>${esc(x.grade + ' ' + x.section)}</td><td>${x.x ? ar(x.x) : ''}</td><td>${x.u ? ar(x.u) : ''}</td><td class="hide-sm tiny">${esc(x.reason)}</td>
+    <div class="subtabs">${[['all', 'الكل', L.length], ['many', 'كثيرات الغياب (٣ فأكثر)', L.filter(x => (x.x >= 3 || x.u >= 3)).length], ['u', 'بدون عذر', L.filter(x => x.u > 0).length]].map(([k, t, n]) => `<button data-aml="${k}" aria-selected="${f === k}">${t}<span class="n">${ar(n)}</span></button>`).join('')}</div>
+    <div class="tscroll"><table class="amt"><thead><tr><th>الطالبة</th><th>الصف</th><th>بعذر</th><th>بدون عذر</th><th class="hide-sm">السبب</th><th>الخدمات الإرشادية</th></tr></thead><tbody>${shown.map(x => { const file = x.fileId && DB.docs[x.fileId] ? x.fileId : (findFile(x) || {}).id; return `<tr${(x.x >= 3 || x.u >= 3) ? ' class="hot"' : ''}><td>${file ? `<a href="#absence/${file}">${esc(x.name)}</a>` : esc(x.name)}${(x.x >= 3 || x.u >= 3) ? ' <span class="pill" style="--pc:var(--bad);--ps:var(--bad-soft)">' + ar(x.x + x.u) + ' أيام</span>' : ''}</td><td>${esc(x.grade + ' ' + x.section)}</td><td>${x.x ? ar(x.x) : ''}</td><td>${x.u ? ar(x.u) : ''}</td><td class="hide-sm tiny">${esc(x.reason)}</td>
       <td><input class="svc" data-amsvc="${x.i}" value="${esc(x.svc || '')}" placeholder="${esc(svcFor({ ...x, svc: '' }) || 'اكتبي الخدمة')}" aria-label="الخدمات الإرشادية"></td></tr>`; }).join('')}</tbody></table></div>
     <span class="tiny muted">الخدمات تتعبى تلقائياً من ملف الطالبة (الرمادي)، وتقدرين تكتبين غيرها.</span></section>`;
 }
 function amListReport(r) {
-  const L = r.list || []; const per = 26; const pages = []; for (let i = 0; i < Math.max(L.length, 1); i += per) pages.push(L.slice(i, i + per)); const many = L.filter(x => x.x + x.u >= 3);
+  const L = r.list || []; const per = 26; const pages = []; for (let i = 0; i < Math.max(L.length, 1); i += per) pages.push(L.slice(i, i + per)); const many = L.filter(x => (x.x >= 3 || x.u >= 3));
   const tbl = (rows, off) => `<table><thead><tr><th style="width:26px">م</th><th>اسم الطالبة</th><th style="width:62px">الصف</th><th style="width:44px">بعذر</th><th style="width:52px">بدون عذر</th><th>أسباب الغياب</th><th>الخدمات الإرشادية</th></tr></thead><tbody>${rows.map((x, i) => `<tr><td>${ar(off + i + 1)}</td><td>${esc(x.name)}</td><td>${esc(x.grade.replace('ال', '') + ' ' + x.section)}</td><td>${x.x ? ar(x.x) : ''}</td><td>${x.u ? ar(x.u) : ''}</td><td>${esc(x.reason)}</td><td>${esc(svcFor(x))}</td></tr>`).join('')}</tbody></table>`;
   return pages.map((ch, pi) => `<div class="a4" style="font-size:11.5px">${repHead('الطالبات الغائبات لشهر ' + amLabel(r))}${tbl(ch, pi * per)}</div>`).join('') +
     `<div class="a4" style="font-size:12px">${repHead('كثيرات الغياب لشهر ' + amLabel(r))}${tbl(many, 0)}<p style="margin-top:8px"><b>عدد الطالبات كثيرات الغياب:</b> ${ar(many.length)} طالبة، وتم تحويلهن إلى الموجهة الطلابية.</p>${repSigs()}</div>`;
@@ -3668,7 +3674,7 @@ document.addEventListener('click', async e => {
   else if (act === 'absWA') { const f = S.filter.abs || 'all'; const rows = list('absence').filter(a => !a.closed).map(a => ({ ...a, n: unex(a), x: exc(a), p: pending(a), st: maxStreak(a) })).filter(a => f === 'all' || f === 'closed' ? true : f === 'pending' ? a.p > 0 : f === 'consec' ? a.st >= 3 : f[0] === 'e' ? a.x >= +f.slice(1) : a.n >= +f);
     waQueue(rows.map(a => ({ studentId: a.studentId, name: a.studentName, grade: a.grade, section: a.section, u: a.n, x: a.x, absId: a.id })), f === '5' || f === '10' ? 'u5' : 'u3'); }
   else if (act === 'absWA1') { const a = { id: S.param, ...DB.docs[S.param].data }; waQueue([{ studentId: a.studentId, name: a.studentName, grade: a.grade, section: a.section, u: unex(a), x: exc(a), absId: a.id }], unex(a) >= 5 ? 'u5' : unex(a) >= 3 ? 'u3' : 'ask', 'واتساب ولي أمر ' + a.studentName); }
-  else if (act === 'amWA') { const ms = amMonths(); const sel = DB.docs[S.filter.absm] ? S.filter.absm : ms[0] && ms[0].id; const L = DB.docs[sel].data.list || []; const f = S.filter.aml || 'all'; const sh = f === 'many' ? L.filter(x => x.x + x.u >= 3) : f === 'u' ? L.filter(x => x.u > 0) : L;
+  else if (act === 'amWA') { const ms = amMonths(); const sel = DB.docs[S.filter.absm] ? S.filter.absm : ms[0] && ms[0].id; const L = DB.docs[sel].data.list || []; const f = S.filter.aml || 'all'; const sh = f === 'many' ? L.filter(x => (x.x >= 3 || x.u >= 3)) : f === 'u' ? L.filter(x => x.u > 0) : L;
     waQueue(sh.map(x => ({ studentId: x.studentId, name: x.name, grade: x.grade, section: x.section, u: x.u, x: x.x })), 'u3', 'مراسلة أولياء أمور الغائبات'); }
   else if (act === 'apEdit') apForm();
   else if (act === 'famWA') { const k = S.sub.family || 'council'; waPick(k === 'survey' ? 'إرسال رابط استبانة' : 'دعوة أولياء الأمور', { title: k === 'council' ? 'مجلس الأمهات' : 'اللقاء' }, k === 'survey' ? 'i_srv' : 'i_inv'); }

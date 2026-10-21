@@ -750,6 +750,41 @@ function absSesBulk() {
   $('#sb_all').addEventListener('click', () => { document.querySelectorAll('[data-sb]').forEach(x => { x.checked = true; }); upd(); });
   $('#sb_none').addEventListener('click', () => { document.querySelectorAll('[data-sb]').forEach(x => { x.checked = false; }); upd(); }); upd();
 }
+const looseTok = n => norm(n).replace(/[ئ]/g, 'ي').replace(/عبد\s+/g, 'عبد').split(' ').filter(t => t && !/^(بن|ابن|بنت|آل)$/.test(t)).map(t => t.replace(/[ةهاى]$/, '').replace(/[ياى]/g, '').replace(/^ل(?=..)/, '')).filter(Boolean);
+function looseMatch(q, name) { const x = looseTok(q), y = looseTok(name); if (!x.length || x[0] !== y[0]) return false; return subseq(x, y); }
+function absRefsBulk(txt) {
+  const files = list('absence').filter(a => !a.closed);
+  openSheet('تواريخ التحويل والإجراءات', `<p class="small muted">في كل سطر: اسم الطالبة ورقم اليوم (ويمديك تكتبين الشهر بعد الرقم مثل «١٤ ربيع الأول»، وإذا ما كتبتيه ياخذ الشهر المختار تحت). وإذا اختلف التاريخ حسب نوع الغياب زيدي «بعذر» أو «بدون عذر»، وإذا وصلت ٥ أو ١٠ أيام زيدي «٥ أيام». تتأشّر إجراءاتها المستحقة بهذي التواريخ.</p>
+    <div class="form"><label class="f full"><span>الأسماء والأيام</span><textarea id="rf_t" style="min-height:160px" placeholder="تالا توفيق ٣&#10;تالا توفيق ١١ بدون عذر ٥ أيام&#10;غاده حسن ١٦ بعذر">${esc(txt || '')}</textarea></label>
+    <div class="f full"><span>الشهر والسنة</span>${hdInput('rf_m', todayH().slice(0, 8) + '01').replace('aria-label="اليوم"', 'aria-label="اليوم" hidden')}</div>
+    <label class="chk full" style="--sc:var(--abs)"><input type="checkbox" id="rf_a" checked><span>تأشير إجراءات الإدارة بعد (استدعاء ولي الأمر، التعهد…)</span></label>
+    <div id="rf_p" class="full"></div></div><div class="toolbar"><button class="btn primary" type="submit">حفظ</button></div>`,
+    async f => { const G = parse(); const ok = G.filter(g => g.f); if (!ok.length) throw new Error('ما تطابق ولا اسم مع ملفات الغياب المفتوحة'); const adm = f.querySelector('#rf_a').checked;
+      const writes = []; let steps = 0;
+      ok.forEach(g => { const d = JSON.parse(JSON.stringify(DB.docs[g.f.id].data)); d.done = d.done || {}; const ds = Object.values(g.o).concat(g.def ? [g.def] : []).sort(); d.ref = ds[0];
+        dueSteps(d).forEach(k => { const [tr, lv] = k.split('-'); if (k === 'c-0') return; const dt = g.o[tr + '-' + lv] || g.o[tr] || g.def || (d.done[k] ? null : ds[0]); if (!dt) return;
+          if (LEGAL_STEPS.has(k) && !d.done[k]) return; if (roleOf(d, k) === 'a' && !adm && !d.done[k]) return; if (!d.done[k]) steps++; d.done[k] = dt; });
+        d.upd = todayH(); writes.push({ id: g.f.id, kind: 'absence', data: d }); });
+      await saveMany(writes); toast(`انحفظ لـ${ar(writes.length)} ${writes.length > 2 && writes.length < 11 ? 'طالبات' : 'طالبة'}${steps ? ' · تأشّر ' + ar(steps) + ' إجراء' : ''}`); }, `--c:var(--abs);--cs:var(--abs-soft)`);
+  function parse() {
+    const [y, m] = readHD(document, 'rf_m').split('-'); const G = [];
+    AD($('#rf_t').value).split(/[\n،,]+/).map(l => l.trim()).filter(Boolean).forEach(l => {
+      let t = ' ' + l + ' '; let tr = ''; let mo = m;
+      t = t.replace(/ربيع\s*(الأول|الاول|اول|أول)/, () => { mo = '03'; return ' '; }).replace(/ربيع\s*(الآخر|الاخر|الثاني|ثاني|آخر|اخر)/, () => { mo = '04'; return ' '; }).replace(/جمادى\s*(الأولى|الاولى|اولى|أولى)/, () => { mo = '05'; return ' '; }).replace(/جمادى\s*(الآخرة|الاخرة|الثانية|ثانية)/, () => { mo = '06'; return ' '; }); if (/بدون\s*عذر|بدون/.test(t)) tr = 'u'; else if (/بعذر|بالعذر/.test(t)) tr = 'e'; t = t.replace(/بدون\s*عذر|بدون|بعذر|بالعذر/g, ' ');
+      let lv = 0; t = t.replace(/(\d+)\s*(أيام|ايام|يوم)/, (_, n) => { lv = trackLevel(+n); return ' '; });
+      const mm = /^(.*?)\s(\d{1,2})\s*$/.exec(t.replace(/\s+/g, ' ')); if (!mm) { G.push({ l, bad: 'ما فيه رقم يوم' }); return; }
+      const day = +mm[2]; if (day < 1 || day > 30) { G.push({ l, bad: 'رقم اليوم غلط' }); return; }
+      const nm = mm[1].trim(); let c = files.filter(a => looseMatch(nm, a.studentName)); if (c.length > 1) { const q = looseTok(nm); const p2 = c.filter(a => { const y = looseTok(a.studentName); return q.every((t, i) => y[i] === t); }); if (p2.length) c = p2; }
+      if (c.length !== 1) { G.push({ l, bad: c.length ? 'أكثر من طالبة بنفس الاسم، زيدي اسم الجد' : 'ما لها ملف غياب مفتوح' }); return; }
+      let g = G.find(x => x.f && x.f.id === c[0].id); if (!g) G.push(g = { f: c[0], o: {}, def: '' }); const dt = `${y}-${mo}-${pad2(day)}`;
+      if (tr) g.o[tr + (lv ? '-' + lv : '')] = dt; else if (lv) { g.o['u-' + lv] = dt; g.o['e-' + lv] = dt; } else g.def = dt; });
+    return G;
+  }
+  const TT = { u: 'بدون عذر', e: 'بعذر' };
+  const show = () => { const G = parse();
+    $('#rf_p').innerHTML = G.length ? `<div class="glist">${G.map(g => g.f ? `<div><b>${esc(g.f.studentName)}</b><span class="tiny muted">${esc((g.f.grade || '') + ' ' + (g.f.section || ''))} · بدون عذر ${ar(unex(g.f))} · بعذر ${ar(exc(g.f))}</span><span class="tiny">${[g.def ? 'التحويل ' + hij(g.def) : ''].concat(Object.entries(g.o).map(([k, v]) => { const [tr, lv] = k.split('-'); return TT[tr] + (lv ? ' ' + ar(lv) + ' أيام' : '') + ': ' + hij(v); })).filter(Boolean).map(esc).join(' · ')}</span></div>` : `<div style="color:var(--bad)"><b>${esc(g.l)}</b><span class="tiny">${esc(g.bad)}</span></div>`).join('')}</div>` : ''; };
+  $('#rf_t').addEventListener('input', show); $('#rf_m').addEventListener('change', show); show();
+}
 function absFillForm(one) {
   const ids = one ? [one] : list('absence').filter(a => !a.closed).map(a => a.id);
   const cnt = o => ids.reduce((s, id) => { const d = DB.docs[id].data; return s + dueSteps(d).filter(k => !(d.done || {})[k] && !(LEGAL_STEPS.has(k) && !o.legal) && !(roleOf(d, k) === 'a' && !o.admin)).length; }, 0);
@@ -1125,7 +1160,7 @@ function vAbsence() {
   const f = S.filter.abs || 'all';
   const shown = rows.filter(a => f === 'all' ? !a.closed : f === 'closed' ? a.closed : f === 'pending' ? !a.closed && a.p > 0 : f === 'consec' ? !a.closed && a.st >= 3 : f[0] === 'e' ? !a.closed && a.x >= +f.slice(1) : !a.closed && a.n >= +f);
   const cnt = fn => rows.filter(a => !a.closed && fn(a)).length;
-  return `<div class="head"><h1><span class="dot"></span>التعامل مع حالات الغياب</h1><span class="sp"></span><button class="btn" data-binder="absence">📁 الملف الشامل</button><button class="btn wa" data-act="absWA">📲 مراسلة أولياء الأمور</button><button class="btn" data-act="absFill">✓ تعبئة الإجراءات</button><button class="btn" data-act="absSesAll">＋ جلسات فردية</button><button class="btn primary" data-act="absAdd">＋ ملف غياب</button></div>
+  return `<div class="head"><h1><span class="dot"></span>التعامل مع حالات الغياب</h1><span class="sp"></span><button class="btn" data-binder="absence">📁 الملف الشامل</button><button class="btn wa" data-act="absWA">📲 مراسلة أولياء الأمور</button><button class="btn" data-act="absFill">✓ تعبئة الإجراءات</button><button class="btn" data-act="absSesAll">＋ جلسات فردية</button><button class="btn" data-act="absRefs">تواريخ الإجراءات</button><button class="btn primary" data-act="absAdd">＋ ملف غياب</button></div>
     ${absSubtabs('files')}
     <p class="lede">حسب قواعد السلوك والمواظبة: المادة (٣٣) للغياب بعذر، والمادة (٣٤) للغياب بدون عذر. اكتبي عدد الأيام فقط، وتظهر إجراءات اليوم ٣ و٥ و١٠ تلقائياً.</p>
     <div class="tiles">
@@ -3668,6 +3703,7 @@ document.addEventListener('click', async e => {
   else if (act === 'absRep') { const nm = DB.docs[S.param].data.studentName; openSheet('تقرير الغياب', `<div class="reps"><button type="button" class="rep-btn" data-absrep="all" style="--c:var(--abs)"><b>التقرير الكامل</b><small>إجراءات الموجهة وإجراءات الإدارة، وتوقيع الموجهة والمديرة</small></button><button type="button" class="rep-btn" data-absrep="m" style="--c:var(--abs)"><b>إجراءات الموجهة فقط</b><small>لملف أعمالك: إجراءاتك أنتِ وتوقيعك</small></button></div>`, async () => false, `--c:var(--abs);--cs:var(--abs-soft)`); }
   else if (act === 'absFill') absFillForm(null);
   else if (act === 'absSesAll') absSesBulk();
+  else if (act === 'absRefs') absRefsBulk();
   else if (act === 'absFillOne') absFillForm(S.param);
   else if (act === 'absClose') absUpdate(a => { a.closed = !a.closed; }, 'تم');
   else if (act === 'absLog' || act === 'absSes') { setTimeout(() => { const r = $('#m_s'); if (!r) return; const A0 = DB.docs[S.param].data; const fill = () => { if (!r.checked || $('#ab_tp').value) return; const v = absSesFill(S.param, A0); $('#ab_tp').value = v.topic; $('#ab_g').value = v.goal; $('#ab_n').value = v.note; $('#ab_r').value = v.agree; const n = document.createElement('p'); n.className = 'tiny'; n.style.cssText = 'background:var(--good-soft);color:var(--good);border-radius:10px;padding:7px 10px;font-weight:700;margin:0'; n.textContent = '✓ تعبّت تلقائياً حسب نوع غيابها وأسبابه، عدّلي اللي يختلف في الجلسة'; $('#ab_tp').closest('.form').prepend(n); }; r.addEventListener('change', fill); if (act === 'absSes') { r.checked = true; fill(); } }, 0); const A = DB.docs[S.param].data; const absId = S.param; openSheet('تسجيل في ملف ' + A.studentName, `<div class="seg" role="radiogroup"><label><input type="radio" name="lm" id="m_c" value="c" checked><span>تواصل مع ولي الأمر</span></label><label><input type="radio" name="lm" id="m_o" value="o"><span>إجراء آخر</span></label><label><input type="radio" name="lm" id="m_s" value="s"><span>جلسة فردية</span></label></div>

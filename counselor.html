@@ -360,6 +360,27 @@ const CATS = [
 ];
 CATS.forEach(c=>c.ideas=c.iv.map(x=>x[1]));
 const CAT = Object.fromEntries(CATS.map(c=>[c.k,c]));
+
+/* توصيات مقترحة حسب تصنيف الحالة */
+const REC_SUG = {
+  economic: ['الاستمرار في توفير الاحتياجات المدرسية للطالبة بسرية تامة', 'متابعة استلام الطالبة وجبة الفسحة يومياً', 'التنسيق مع الجمعيات الخيرية لدعم الأسرة', 'تعزيز ثقة الطالبة بنفسها ودمجها في الأنشطة دون تمييز', 'الحفاظ على سرية وضع الطالبة الاقتصادي'],
+  separation: ['تقديم الدعم النفسي للطالبة والاستماع لمشاعرها', 'التواصل مع الوالدين لتوحيد أسلوب التعامل مع الطالبة', 'إبعاد الطالبة عن الخلافات الأسرية', 'متابعة تحصيل الطالبة الدراسي مع المعلمات', 'إشراك الطالبة في الأنشطة لتعزيز ثقتها بنفسها'],
+  orphan: ['احتواء الطالبة نفسياً وتقديم الدعم المستمر لها', 'تعيين معلمة صديقة قريبة من الطالبة', 'التواصل مع الأم أو الولي لمتابعة احتياجات الطالبة', 'التنسيق مع الجمعيات الخيرية لكفالة الأيتام', 'إشراك الطالبة في الأنشطة المدرسية'],
+  health: ['التنسيق مع المرشدة الصحية لمتابعة حالة الطالبة', 'تعريف معلمات الطالبة بحالتها الصحية وطريقة التعامل معها', 'التأكد من وجود الدواء أو خطة الطوارئ في المدرسة', 'تعويض الطالبة ما فاتها من دروس بسبب ظرفها الصحي', 'دمج الطالبة مع زميلاتها في الأنشطة المناسبة لحالتها'],
+  delayed: ['متابعة الطالبة مع معلمات المواد بخطة علاجية', 'إحالة الطالبة لمعلمة صعوبات التعلم إذا احتاجت', 'تقديم أوراق عمل مبسطة ودروس تقوية', 'تحفيز الطالبة وتعزيز كل تقدم تحققه', 'التواصل مع ولي الأمر لمتابعة الطالبة في المنزل'],
+  psych: ['الاستمرار في الجلسات الإرشادية الفردية', 'تدريب الطالبة على مهارات التعبير عن المشاعر', 'التواصل مع ولي الأمر لمتابعة الطالبة في المنزل', 'إحالة الطالبة لمختص نفسي عند الحاجة', 'إشراك الطالبة في أنشطة جماعية تناسبها'],
+  behavior: ['تطبيق قواعد السلوك والمواظبة بحزم وعدل', 'تعزيز السلوك الإيجابي لدى الطالبة', 'عقد عقد سلوكي مع الطالبة بأهداف واضحة', 'التواصل مع ولي الأمر لتوحيد أسلوب التعامل', 'متابعة الطالبة مع معلمة الفصل'],
+  excellent: ['تكريم الطالبة وإبراز تفوقها', 'تقديم أنشطة إثرائية تناسب مستواها', 'ترشيح الطالبة للمسابقات والبرامج المتميزة', 'تشجيع الطالبة على مساعدة زميلاتها', 'التواصل مع ولي الأمر لتعزيز تفوقها'],
+  gifted: ['ترشيح الطالبة لبرامج الموهوبات', 'تنمية موهبة الطالبة بأنشطة إثرائية', 'إبراز موهبة الطالبة في المناسبات المدرسية', 'التواصل مع ولي الأمر لرعاية موهبتها', 'إشراك الطالبة في المسابقات المناسبة لموهبتها']
+};
+const REC_GEN = ['الاستمرار في الجلسات الإرشادية الفردية', 'متابعة الطالبة مع معلمة الفصل', 'التواصل المستمر مع ولي الأمر'];
+function recSugHTML(c) {
+  const on = new Set(String(c.rec || '').split('\n').map(x => x.trim()).filter(Boolean)); const seen = new Set();
+  const btn = t => { if (seen.has(t)) return ''; seen.add(t); return `<button type="button" class="btn sm ghost" data-recsg="${esc(t)}" style="${on.has(t) ? 'font-weight:700' : ''}">${esc(t)}</button>`; };
+  const groups = (c.cats || []).filter(k => REC_SUG[k]).map(k => `<div><b class="small" style="display:block;margin:8px 0 4px">${esc((CAT[k] || {}).t || '')}</b><div style="display:flex;flex-wrap:wrap;gap:6px">${REC_SUG[k].map(btn).join('')}</div></div>`).join('');
+  const gen = REC_GEN.map(btn).join('');
+  return `<div class="recsg" style="margin-top:6px"><p class="small muted" style="margin:0">اضغطي على التوصية تنضاف، واضغطي مرة ثانية تنشال</p>${groups}${gen ? `<div><b class="small" style="display:block;margin:8px 0 4px">عامة</b><div style="display:flex;flex-wrap:wrap;gap:6px">${gen}</div></div>` : ''}</div>`;
+}
 const SURVEY=['مراجعة الملفات الشاملة وبيانات نظام نور','استبانة لأولياء الأمور عن الظروف الأسرية والصحية (بسرية)','ترشيحات المعلمات للمتأخرات والمتفوقات والموهوبات','التنسيق مع الوكيلة والمرشدة الصحية لحصر الحالات الصحية','إعداد سجل سري لكل فئة واعتماد الخطة من لجنة التوجيه والإرشاد'];
 const PHASES=[{t:'الحصر والتصنيف',a:1,b:2,tasks:'مراجعة الملفات، استبانة الأسر، ترشيحات المعلمات',out:'سجلات الحصر'},{t:'التخطيط والاعتماد',a:3,b:3,tasks:'خطة لكل فئة، اجتماع لجنة التوجيه، توجيه المعلمات',out:'الخطة المعتمدة'},{t:'التنفيذ',a:4,b:12,tasks:'الجلسات، البرامج الجماعية، لقاءات الأسر، الخطط العلاجية',out:'الشواهد والاستمارات'},{t:'المتابعة والقياس',a:13,b:15,tasks:'مقارنة الدرجات، بطاقات المتابعة، استبانة الرضا',out:'جداول المقارنة'},{t:'التكريم والتقرير',a:16,b:18,tasks:'تكريم المتفوقات، معرض المواهب، التقرير الختامي',out:'ملف الإنجاز'}];
 
@@ -843,7 +864,7 @@ function renderCase(){
          <div class="row" style="margin-top:8px"><button class="btn sm primary" data-act="sessreport" data-id="${esc(f.id)}">عرض التقرير وطباعته</button><button class="btn sm" data-act="editfollow" data-id="${esc(f.id)}">تعديل</button><button class="btn sm ghost" data-act="addfph" data-id="${esc(f.id)}">+ شاهد</button><button class="btn sm ghost danger" data-act="rmfollow" data-id="${esc(f.id)}">حذف</button></div></div>`).join('')}</div>`
          :(S.fmode==='new'?'<p class="small muted">املئي الجلسة أعلاه واحفظيها.</p>':`<div class="empty" style="padding:12px"><p class="muted">لا توجد جلسات لهذه الحالة بعد.</p><button class="btn primary" data-act="newfollow">+ تسجيل أول جلسة</button></div>`)}</div>
      <div class="panel"><h3 style="margin-bottom:8px">وضع الحالة</h3><div class="seg" role="group">${STATUS.map(s=>`<button data-act="status" data-k="${s.k}" aria-pressed="${c.status===s.k}">${s.t}</button>`).join('')}</div></div>
-     <div class="panel"><label class="field"><span>التوصيات العامة للحالة</span><textarea id="rec" placeholder="توصيات الموجهة للحالة…">${esc(c.rec||'')}</textarea></label><div class="recsg" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"><button type="button" class="btn sm ghost" data-recsg="الاستمرار في الجلسات الإرشادية الفردية">الاستمرار في الجلسات الإرشادية الفردية</button><button type="button" class="btn sm ghost" data-recsg="متابعة الطالبة مع معلمة الفصل">متابعة الطالبة مع معلمة الفصل</button><button type="button" class="btn sm ghost" data-recsg="التواصل المستمر مع ولي الأمر">التواصل المستمر مع ولي الأمر</button><button type="button" class="btn sm ghost" data-recsg="تعزيز الطالبة عند أي تحسن">تعزيز الطالبة عند أي تحسن</button><button type="button" class="btn sm ghost" data-recsg="إشراك الطالبة في الأنشطة المدرسية">إشراك الطالبة في الأنشطة المدرسية</button><button type="button" class="btn sm ghost" data-recsg="دمج الطالبة في مجموعة إرشادية صغيرة">دمج الطالبة في مجموعة إرشادية صغيرة</button><button type="button" class="btn sm ghost" data-recsg="إحالة الحالة لجهة مختصة عند الحاجة">إحالة الحالة لجهة مختصة عند الحاجة</button><button type="button" class="btn sm ghost" data-recsg="إغلاق الحالة بعد استقرار وضع الطالبة">إغلاق الحالة بعد استقرار وضع الطالبة</button></div></div>
+     <div class="panel"><label class="field"><span>التوصيات العامة للحالة</span><textarea id="rec" placeholder="توصيات الموجهة للحالة…">${esc(c.rec||'')}</textarea></label>${recSugHTML(c)}</div>
      <div class="row" style="justify-content:space-between">
        <button class="btn" data-act="edit">تعديل بيانات الطالبة</button>
        <button class="btn ghost danger" data-act="del">${S.confirmDel?'اضغطي مرة أخرى لتأكيد الحذف':'حذف الحالة'}</button></div>

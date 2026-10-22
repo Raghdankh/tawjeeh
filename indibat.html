@@ -117,7 +117,7 @@ button.ncard-in{font:inherit;border:0;background:none;width:100%;text-align:star
 .cimg{border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--bg);display:grid;place-items:center;min-height:160px}
 .cimg img{display:block;width:100%;height:auto;-webkit-touch-callout:default}
 .cact{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.medal{font-size:1.25rem;line-height:1;flex:0 0 auto}
+.medal{font-size:1.25rem;line-height:1;flex:0 0 auto;color:#C98A0B}
 .nmw{display:flex;flex-direction:column;flex:1;min-width:0;line-height:1.4}
 .streak{align-self:flex-start;font-size:.7rem;font-weight:700;color:var(--surface);background:var(--c);border-radius:999px;padding:1px 8px;margin-top:3px}
 .ctag{font-size:.75rem;font-weight:700;color:var(--c);white-space:nowrap}
@@ -292,6 +292,18 @@ footer b{color:var(--on-brand);font-weight:600}
 .survbn{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 16px;margin-bottom:14px;border-radius:16px;background:var(--paper,#fff);border:1.5px solid var(--mint,#2E7A72);color:inherit;text-decoration:none}.survbn span{font-weight:700;font-size:.85rem;opacity:.75}.survbn b{flex:1;min-width:160px}.survbn em{font-style:normal;font-weight:700;color:var(--mint,#2E7A72)}
 @media (prefers-reduced-motion:no-preference){.tab,.chip,.btn,a.cert{transition:background .15s,border-color .15s,color .15s}}
 .formstatus{margin:8px 0 0;padding:8px 12px;border-radius:8px;background:#EAF4EE;color:#1F5F3F;font-weight:700}
+.qnav{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 4px}.qbtn{font:inherit;font-weight:800;font-size:15px;border:0;border-radius:999px;padding:10px 18px;cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.ico{width:1.15em;height:1.15em;vertical-align:-.2em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}.ico .f{fill:currentColor;stroke:none}.qbtn{display:inline-flex;align-items:center;gap:7px}
+.qbtn[data-tab="honor"]{background:#FFC233;color:#3a2600}
+.qbtn[data-tab="behavior"]{background:#E0482B;color:#fff}
+.qbtn[data-tab="attendance"]{background:#2F7DD6;color:#fff}
+.qbtn.on{box-shadow:0 0 0 3px #fff,0 3px 10px rgba(0,0,0,.25)}
+.tab[data-tab="honor"]{border-color:#E8A700;color:#8a5a00}
+.tab[data-tab="behavior"]{border-color:#E0482B;color:#B8321A}
+.tab[data-tab="attendance"]{border-color:#2F7DD6;color:#1A5FAE}
+.tab[data-tab="honor"][aria-selected="true"]{background:#FFC233;border-color:#FFC233;color:#3a2600}
+.tab[data-tab="behavior"][aria-selected="true"]{background:#E0482B;border-color:#E0482B;color:#fff}
+.tab[data-tab="attendance"][aria-selected="true"]{background:#2F7DD6;border-color:#2F7DD6;color:#fff}
 </style>
 </head>
 <body>
@@ -441,8 +453,15 @@ function ringSvg(label,col){
 /* ---------- honor ---------- */
 function norm(s){return String(s||'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/[ً-ْ]/g,'').replace(/\s+/g,' ').trim();}
 function timesHonored(key,name){var n=norm(name),c=0;S.months.forEach(function(m){if(m[key].some(function(p){return norm(p.name)===n;}))c++;});return c;}
+var ICO={
+  medal:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8l-2.5 6h-3z"/><circle cx="12" cy="15" r="5.5"/><path d="m12 12.4.9 1.8 2 .3-1.45 1.4.35 2-1.8-.95-1.8.95.35-2-1.45-1.4 2-.3z" class="f"/></svg>',
+  star:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6-4.5-4.2 6.1-.7z"/></svg>',
+  book:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5M8 7.5h8M8 11h6"/></svg>',
+  cal:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="m9 14.8 2 2 4-4"/></svg>',
+  note:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 3h6v3H9zM8.5 11h7M8.5 14.5h7M8.5 18h4"/></svg>'
+};
 function card(key,p,i){
-  var medal=key==='regular'?'🏅':'🎖️';
+  var medal=key==='regular'?ICO.medal:ICO.star;
   var times=timesHonored(key,p.name);
   var badge=times>1?'<span class="streak">'+(key==='regular'?'مواظبة ':'متميزة ')+ar(times)+' أشهر</span>':'';
   var inner='<span class="medal" aria-hidden="true">'+medal+'</span><span class="nmw"><span class="nm">'+esc(p.name)+'</span>'+(p.cls?'<span class="ncls">'+esc(p.cls)+'</span>':'')+badge+'</span>'+
@@ -487,7 +506,7 @@ function searchHtml(q){
   if(!ids.length)return '<p class="nores">لم نجد هذا الاسم في لوحة الشرف حتى الآن. تأكدي من كتابة الاسم، أو اطّلعي على <button class="linkish" data-crit="1">طريقة اختيار المتميزات</button>.</p>';
   return '<ul class="hits">'+ids.slice(0,20).map(function(id){var h=hits[id];
     return '<li><div class="hit-n"><span class="hit-ok" aria-hidden="true">✓</span><b>'+esc(h.name)+'</b>'+(h.cls?' <span class="cls">'+esc(h.cls)+'</span>':'')+'</div><p class="hit-say">مبروك! كُرِّمت في '+(h.rows.length>2?ar(h.rows.length)+' أشهر':h.rows.length===2?'شهرين':'شهر واحد')+'. اضغطي على الشهادة لعرضها وحفظها:</p><div class="hit-m">'+h.rows.map(function(r){
-      var lbl='<span class="hc-k">'+(r.k==='regular'?'🏅 شهادة الانضباط':'🎖️ شهادة التميّز السلوكي')+'</span><span class="hc-m">'+esc(mLabel(S.months[r.mi]))+'</span>';
+      var lbl='<span class="hc-k">'+(r.k==='regular'?ICO.medal+' شهادة الانضباط':ICO.star+' شهادة التميّز السلوكي')+'</span><span class="hc-m">'+esc(mLabel(S.months[r.mi]))+'</span>';
       var cls='hchip '+(r.k==='regular'?'hc-reg':'hc-exc');
       return r.cert?'<a class="'+cls+'" href="/_blob/'+esc(r.cert)+'" target="_blank" rel="noopener">'+lbl+'</a>':'<button class="'+cls+'" data-gcert="'+r.mi+':'+r.k+':'+r.i+'">'+lbl+'</button>';}).join('')+'</div></li>';}).join('')+'</ul>';
 }
@@ -501,7 +520,7 @@ function honor(){
     '<div class="search"><label for="q" class="search-l">ابحثي عن اسم ابنتك</label><div class="search-box"><span aria-hidden="true">⌕</span><input id="q" type="search" autocomplete="off" placeholder="مثال: لورا عادل" value="'+esc(ui.q||'')+'"></div><div id="results" aria-live="polite">'+searchHtml(ui.q||'')+'</div></div>'+
     '<div class="or"><span>أو تصفّحي لوحة الشرف</span></div>'+
     '<div class="mrow"><span class="mlabel">الشهر:</span><div class="months" role="group" aria-label="الأشهر">'+S.months.map(function(x,i){return i;}).map(function(i){return '<button class="chip" data-month="'+i+'" aria-pressed="'+(i===ui.month)+'">'+esc(mLabel(S.months[i]))+'</button>';}).join('')+'</div></div>'+
-    '<div class="seg" role="tablist" aria-label="القائمة"><button role="tab" data-sec="regular" aria-selected="'+(sec==='regular')+'">🏅 المواظبات <span>'+ar(m.regular.length)+'</span></button><button role="tab" data-sec="excellent" aria-selected="'+(sec==='excellent')+'">🎖️ المتميزات سلوكياً <span>'+ar(m.excellent.length)+'</span></button></div>'+
+    '<div class="seg" role="tablist" aria-label="القائمة"><button role="tab" data-sec="regular" aria-selected="'+(sec==='regular')+'">'+ICO.medal+' المواظبات <span>'+ar(m.regular.length)+'</span></button><button role="tab" data-sec="excellent" aria-selected="'+(sec==='excellent')+'">'+ICO.star+' المتميزات سلوكياً <span>'+ar(m.excellent.length)+'</span></button></div>'+
     '<div class="board" data-sec="'+sec+'">'+col('regular')+col('excellent')+'</div>'+criteria(false);
 }
 
@@ -594,10 +613,10 @@ function render(){
   var y=window.scrollY;
   app.innerHTML=
     '<header class="hero"><div class="wrap"><div><div class="eyebrow">'+esc(S.school)+' · التوجيه الطلابي</div>'+
-      '<h1>انضباط <span class="glow">وتميّز</span></h1><span class="tag">لوحة الشرف · قواعد السلوك والمواظبة</span><p class="lede">نعزّز السلوك الإيجابي والمواظبة المدرسية لدى طالباتنا، ونضع بين يدي أولياء الأمور قواعد السلوك والمواظبة وأسماء المتميزات كل شهر.</p></div>'+
+      '<h1>انضباط <span class="glow">وتميّز</span></h1><div class="qnav" aria-label="انتقلي إلى">'+[['honor',ICO.medal+'لوحة الشرف'],['behavior',ICO.book+'قواعد السلوك'],['attendance',ICO.cal+'قواعد المواظبة']].map(function(t){return '<button class="qbtn'+(ui.tab===t[0]?' on':'')+'" data-tab="'+t[0]+'" data-jump="1">'+t[1]+'</button>';}).join('')+'</div><p class="lede">نعزّز السلوك الإيجابي والمواظبة المدرسية لدى طالباتنا، ونضع بين يدي أولياء الأمور قواعد السلوك والمواظبة وأسماء المتميزات كل شهر.</p></div>'+
       '<div class="scores">'+ringSvg('درجة السلوك','#ffa48f')+ringSvg('درجة المواظبة','#ffd66b')+'</div></div><div class="band"></div></header>'+
     '<nav class="nav" aria-label="أقسام الصفحة"><div class="wrap" role="tablist">'+tabs.map(function(t){return '<button class="tab" role="tab" data-tab="'+t[0]+'" aria-selected="'+(ui.tab===t[0])+'">'+t[1]+'</button>';}).join('')+'</div></nav>'+
-    '<main class="wrap t-'+ui.tab+'">'+(SURV.length&&ui.tab==='honor'?SURV.map(function(f){return '<a class="survbn" href="survey.html?s='+encodeURIComponent(f.id)+'"><span>📝 استبانة</span><b>'+esc(f.data.title)+'</b><em>شاركينا رأيك ←</em></a>';}).join(''):'')+(S.note&&ui.tab==='honor'?'<div class="note"><b>رسالة</b><p>'+esc(S.note)+'</p></div>':'')+bar+panel()+body+'</main>'+
+    '<main class="wrap t-'+ui.tab+'">'+(SURV.length&&ui.tab==='honor'?SURV.map(function(f){return '<a class="survbn" href="survey.html?s='+encodeURIComponent(f.id)+'"><span>'+ICO.note+' استبانة</span><b>'+esc(f.data.title)+'</b><em>شاركينا رأيك ←</em></a>';}).join(''):'')+(S.note&&ui.tab==='honor'?'<div class="note"><b>رسالة</b><p>'+esc(S.note)+'</p></div>':'')+bar+panel()+body+'</main>'+
     '<footer><div class="wrap"><span>انضباط وتميّز · '+esc(S.school)+'</span><span>مديرة المدرسة: <b>أ. هند علي هياس</b></span><span>الموجهة الطلابية: <b>أ. أمل علي الغامدي</b></span><span>المرجع: قواعد السلوك والمواظبة للمرحلة الابتدائية ١٤٤٧هـ</span>'+(ui.canEdit?'':'<button class="footlink" id="openLogin">دخول الموجهة</button>')+'</div></footer>';
   window.scrollTo(0,y);
 }
@@ -621,7 +640,7 @@ app.addEventListener('click',function(e){
   if(b.dataset.sec){ui.sec=b.dataset.sec;render();return;}
   if(b.dataset.crit){var d=document.getElementById('crit');if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'});}return;}
   if(b.dataset.gcert){var g=b.dataset.gcert.split(':');openCert(+g[0],g[1],+g[2]);return;}
-  if(b.dataset.tab){ui.tab=b.dataset.tab;try{sessionStorage.setItem('indibat-tab',ui.tab);}catch(x){}render();window.scrollTo(0,0);return;}
+  if(b.dataset.tab){var jmp=!!b.dataset.jump;ui.tab=b.dataset.tab;try{sessionStorage.setItem('indibat-tab',ui.tab);history.replaceState(null,'','#'+ui.tab);}catch(x){}render();if(jmp){var nv=document.querySelector('.nav');if(nv)nv.scrollIntoView({behavior:'smooth',block:'start'});}else window.scrollTo(0,0);return;}
   if(b.dataset.month){ui.month=+b.dataset.month;ui.confirmDel=false;render();return;}
   if(b.dataset.del){var p=b.dataset.del.split(':');var row=S.months[ui.month][p[0]][+p[1]];if(row)act(function(){return api.delHonor(row.id);},'حُذفت '+row.name+' ✓');return;}
   if(b.id==='toggleEdit'){ui.editing=!ui.editing;ui.confirmDel=false;ui.status='';if(ui.editing)ui.tab='honor';render();return;}

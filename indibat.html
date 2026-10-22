@@ -571,7 +571,7 @@ function panel(){
     '<label>الصف (اختياري)<input id="fCls" autocomplete="off" placeholder="مثال: الرابع أ"></label>'+
     '<label>القائمة<select id="fKey"><option value="regular">المواظبات</option><option value="excellent">المتميزات سلوكياً</option></select></label>'+
     '<button class="btn" type="submit">إضافة</button></form>'+
-    '<p class="hint">لإضافة قائمة كاملة: الصقي الأسماء في خانة الاسم، بشرط أن يكون كل اسم في سطر مستقل.</p>'+
+    '<p class="hint">لإضافة قائمة كاملة: الصقي الأسماء في خانة الاسم، كل اسم في سطر. وإذا كتبتي الصف بعد الاسم بشرطة (مثال: ريم أحمد سعيد - الرابع أ) ينحفظ صف كل طالبة لحالها.</p>'+
     '<h3>شهر جديد</h3>'+monthForm()+
     '<h3>النصوص</h3><label>رسالة أولياء الأمور<textarea id="fNote">'+esc(S.note)+'</textarea></label>'+
     '<label>عبارة تحفيزية للمواظبات<textarea id="fQR">'+esc(S.quotes.regular)+'</textarea></label>'+
@@ -602,12 +602,17 @@ function render(){
 }
 
 function addNames(txt){
-  var names=txt.split(/\r?\n/).map(function(s){return s.trim();}).filter(Boolean);
-  var long=names.filter(function(n){return n.split(/\s+/).length>5;});
+  var CR=/^(.*?)\s*(?:[-–|\t،,]\s*)?((?:الصف\s+)?(?:ال)?(?:أول|اول|ثاني|ثالث|رابع|خامس|سادس)(?:\s+[أاب])?)\s*$/;
+  var clsAll=document.getElementById('fCls').value.trim();var key=document.getElementById('fKey').value;
+  var rows=txt.split(/\r?\n/).map(function(s){return s.trim();}).filter(Boolean).map(function(l){var m=CR.exec(l);
+    if(m&&m[1].trim().split(/\s+/).length>=2){var c=m[2].replace(/^الصف\s+/,'').replace(/^(?!ال)/,'ال').replace(/\sا$/,' أ');return {name:m[1].trim(),cls:c};}return {name:l,cls:clsAll};});
+  var long=rows.filter(function(r){return r.name.split(/\s+/).length>9;});
   if(long.length){ui.status='يبدو أن عدة أسماء لُصقت في سطر واحد. اجعلي كل اسم في سطر مستقل ثم أعيدي الإضافة.';render();return;}
-  var cls=document.getElementById('fCls').value.trim();var key=document.getElementById('fKey').value;
-  if(!names.length)return;var mo=S.months[ui.month];
-  act(function(){return api.addNames(names.map(function(n){return {hy:mo.y,hm:mo.m,list:key,name:n,cls:cls};}));},'أُضيفت '+ar(names.length)+' ✓').then(function(){var f=document.getElementById('fName');if(f)f.focus();});
+  if(!rows.length)return;var mo=S.months[ui.month];
+  var have={};(mo[key]||[]).forEach(function(r){have[(r.name||'').replace(/\s+/g,'')]=1;});
+  var add=rows.filter(function(r){var k=r.name.replace(/\s+/g,'');if(have[k])return false;have[k]=1;return true;});var skip=rows.length-add.length;
+  if(!add.length){ui.status='كل الأسماء مضافة من قبل';render();return;}
+  act(function(){return api.addNames(add.map(function(r){return {hy:mo.y,hm:mo.m,list:key,name:r.name,cls:r.cls};}));},'أُضيفت '+ar(add.length)+(skip?' · '+ar(skip)+' مكررة ما انضافت':'')+' ✓').then(function(){var f=document.getElementById('fName');if(f)f.focus();});
 }
 
 app.addEventListener('click',function(e){

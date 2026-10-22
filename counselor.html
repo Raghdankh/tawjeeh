@@ -120,7 +120,7 @@ button{cursor:pointer}
 .plan{display:grid;gap:6px}
 .plan label{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:9px;background:var(--surface);border:1px solid var(--line)}
 .plan input{margin-top:5px;accent-color:var(--c);width:17px;height:17px;flex:none}
-.plan .done span{text-decoration:line-through;color:var(--muted)}
+.plan .done span{color:var(--ink)}
 .rm{margin-inline-start:auto;border:0;background:transparent;color:var(--muted);font-size:1.1rem;padding:0 4px}
 .timeline{display:grid;border-inline-start:2px solid var(--line);margin-inline-start:6px}
 .ev{position:relative;padding-block:4px 16px;padding-inline:18px 0}
@@ -689,7 +689,7 @@ function caseRow(c){
   return `<button class="case" data-act="open" data-id="${esc(c.id)}">
     <span class="av k-${k}" aria-hidden="true">${esc(initial(c.name))}</span>
     <span class="body"><span class="nm">${esc(c.name)}</span><span class="meta">${catChips(c.cats)}</span>
-      <span class="small muted">الصف ${esc(c.grade||'—')}${c.section?' / '+esc(c.section):''} · الخطة ${N(pd.d)}/${N(pd.t)}</span></span>
+      <span class="small muted">الصف ${esc(c.grade||'—')}${c.section?' / '+esc(c.section):''}</span></span>
     <span class="side"><span class="st st-${c.status}">${ST[c.status]||''}</span><span class="${late?'late':''}">${l?'آخر متابعة: '+N(daysSince(l))+' يوم':'لا متابعات'}</span></span></button>`;
 }
 function repRow(r){
@@ -790,13 +790,13 @@ function viewPlan(){
     <p class="note">مبادئ تحكم كل التدخلات: السرية التامة، عدم تمييز الطالبة أمام زميلاتها، إشراك الأسرة، والمتابعة الدورية. الطفلة تعبّر بالرسم واللعب والقصة أكثر من الكلام.</p></section>
   <section class="section"><div class="sechead"><h2>الخطة الزمنية للفصل</h2>${w?`<span class="small muted">الأسبوع الحالي: ${N(w)}</span>`:`<button class="btn sm" data-act="settings">حددي بداية الفصل</button>`}</div>
     <div class="phases">${PHASES.map(p=>{const now=w&&w>=p.a&&w<=p.b,past=w&&w>p.b;return `<div class="phase ${now?'now':''} ${past?'past':''}"><span class="wk num">${p.a===p.b?'أسبوع '+N(p.a):'أسابيع '+N(p.a)+'–'+N(p.b)}</span><div><b>${esc(p.t)}</b>${now?' <span class="chip k-all">الآن</span>':''}<p class="small muted">${esc(p.tasks)} · المخرج: ${esc(p.out)}</p></div></div>`}).join('')}</div></section>
-  <section class="section"><div class="sechead"><h2>خطة الفئات</h2><span class="small muted">نسبة التنفيذ من خطط الحالات</span></div>
+  <section class="section"><div class="sechead"><h2>خطة الفئات</h2><span class="small muted">عدد الحالات اللي فيها كل تدخل</span></div>
    ${CATS.map(c=>{const inCat=cs.filter(x=>(x.cats||[]).includes(c.k));const progs=rs.filter(r=>(r.cats||[]).includes(c.k));
     return `<details class="plancat k-${c.k}"><summary><i class="dot"></i><h3>${esc(c.t)}</h3><span class="small muted">${N(inCat.length)} حالة · ${N(progs.length)} برنامج</span></summary><div class="in">
      <p><b>الهدف:</b> ${esc(c.goal)}</p><p class="small"><b>${esc(c.indL)}:</b> ${esc(c.ind)}</p>
-     <div class="tablewrap"><table class="ivt"><thead><tr><th>النوع</th><th>التدخل</th><th>الشاهد</th><th>التنفيذ</th></tr></thead><tbody>
+     <div class="tablewrap"><table class="ivt"><thead><tr><th>النوع</th><th>التدخل</th><th>الشاهد</th><th>الحالات</th></tr></thead><tbody>
       ${c.iv.map(([ty,t,sh])=>{const withIt=inCat.filter(x=>(x.plan||[]).some(p=>p.t===t));const done=withIt.filter(x=>(x.plan||[]).some(p=>p.t===t&&p.done)).length;
-        return `<tr><td class="muted">${esc(ty)}</td><td>${esc(t)}</td><td class="small">${esc(sh)}</td><td class="small num" style="white-space:nowrap">${withIt.length?`<span class="meter"><i style="width:${done/withIt.length*100}%"></i></span>${N(done)}/${N(withIt.length)}`:'—'}</td></tr>`}).join('')}
+        return `<tr><td class="muted">${esc(ty)}</td><td>${esc(t)}</td><td class="small">${esc(sh)}</td><td class="small num" style="white-space:nowrap">${withIt.length?N(withIt.length):'—'}</td></tr>`}).join('')}
      </tbody></table></div>
      <div class="idea"><b>فكرة مبتكرة: ${esc(c.idea[0])}</b><p class="small">${esc(c.idea[1])}</p>
        <div><button class="btn sm" data-act="preset" data-i="${PRESETS.findIndex(p=>p.cats.includes(c.k)&&p.t.includes(c.idea[0]))}">إنشاء تقرير لهذا البرنامج</button></div></div>
@@ -852,7 +852,7 @@ function renderCase(){
      <div class="row"><button class="btn sm ghost" data-act="caseai" title="اقتراحات" aria-label="اقتراحات" style="min-width:36px">✦</button><button class="btn sm primary" data-act="casereport">التقرير الشامل</button><button class="btn sm" data-act="newfollow">+ جلسة جديدة</button><button class="btn sm" data-act="m-wa" style="border-color:#1F8A4C;color:#1F8A4C">📲 ولي الأمر</button></div></div>
    <div class="sheetbody">
      ${c.desc?`<div class="panel"><h3>وصف الحالة</h3><p style="margin-top:6px;white-space:pre-wrap">${esc(c.desc)}</p><p class="small muted" style="margin-top:6px">مصدر الإحالة: ${esc(c.source||'—')}</p></div>`:''}
-     <div class="panel"><div class="sechead" style="margin-bottom:10px"><h3>الخطة العلاجية</h3><span class="small muted num">نُفّذ ${N(pd.d)} من ${N(pd.t)}</span></div>
+     <div class="panel"><div class="sechead" style="margin-bottom:10px"><h3>الخطة العلاجية</h3></div>
        <div class="plan">${(c.plan||[]).map((p,i)=>`<label class="${p.done?'done':''}"><input type="checkbox" data-act="toggle" data-i="${i}" ${p.done?'checked':''}><span>${esc(p.t)}</span><button class="rm" data-act="rmplan" data-i="${i}" aria-label="حذف التدخل">×</button></label>`).join('')||'<p class="small muted">لا توجد تدخلات بعد.</p>'}</div>
        <form class="row" data-form="addplan" style="margin-top:10px;flex-wrap:nowrap"><input id="np" class="inp" placeholder="أضيفي تدخلاً خاصاً…" aria-label="تدخل جديد"><button class="btn sm">إضافة</button></form>
        ${sugg.length?`<details style="margin-top:10px"><summary class="small">تدخلات الخطة لهذه الفئة (${N(sugg.length)})</summary><div class="ideas" style="margin-top:8px">${sugg.map(i=>`<button class="btn sm ghost" data-act="addsugg" data-t="${esc(i)}">+ ${esc(i)}</button>`).join('')}</div></details>`:''}</div>
@@ -1006,8 +1006,8 @@ function modelCase(c){
   return {onePage:true,titles,title:titles[0],subtitle:catNames(c.cats),lead:{l:'اسم الطالبة',v:c.name.replace(/^مثال:\s*/,'')},
     info:[{l:'الصف',v:gradeText(c)},{l:'تاريخ فتح الحالة',v:DH(c.date)},{l:'مصدر الإحالة',v:c.source},{l:'الوضع الحالي',v:ST[c.status]},{l:'اتجاه التقدم',v:tr?PG[tr]:''}].filter(i=>i.v),
     sections:[{h:'وصف الحالة',t:c.desc},
-      {h:`الخطة العلاجية (نُفّذ ${N(pd.d)} من ${N(pd.t)})`,rows:(c.plan||[]).length?[['التدخل','التنفيذ'],...(c.plan||[]).map(p=>[p.t,p.done?'منفّذ':'متبقٍ'])]:null},
-      {h:`سجل المتابعة (${N(f.length)})`,rows:f.length?[['التاريخ','النوع','الملخص','التقدم'],...f.map(x=>[DH(x.date),x.type,x.topic||x.goal||x.note||'—',x.prog?PG[x.prog]:'—'])]:null},
+      {h:'الخطة العلاجية',rows:(c.plan||[]).length?[['م','التدخل'],...(c.plan||[]).map((p,i)=>[N(i+1),p.t])]:null},
+      {h:`سجل المتابعة (${N(f.length)})`,rows:f.length?[['التاريخ','النوع','الملخص'],...f.map(x=>[DH(x.date),x.type,x.topic||x.goal||x.note||'—'])]:null},
       {h:'التوصيات',t:c.rec}].filter(s=>s.rows||String(s.t||'').trim()),
     photos:f.flatMap(x=>(x.photos||[]).map(p=>({id:p.id,cap:p.cap||(x.type+' · '+DH(x.date))})))};
 }
@@ -1024,7 +1024,7 @@ function modelCat(k){
   return {titles:['تقرير فئة '+c.t,'تقرير رعاية فئة '+c.t,'تقرير إنجاز خطة فئة '+c.t],title:'تقرير فئة '+c.t,subtitle:'التوجيه الطلابي · '+c.t,lead:null,info:[{l:'تاريخ التقرير',v:DH(todayISO())},{l:'عدد الحالات',v:N(cs.length)},{l:'النشطة',v:N(cs.filter(isOpen).length)},{l:'البرامج المنفذة',v:N(rs.length)}],
     sections:[{h:'هدف الفئة في الخطة',t:c.goal},
       cs.length?{h:'الحالات',rows:[['الطالبة','الصف','الوضع','المتابعات','الخطة'],...cs.map(x=>{const p=planDone(x);return [x.name.replace(/^مثال:\s*/,''),x.grade||'—',ST[x.status]||'',N((x.follow||[]).length),`${N(p.d)}/${N(p.t)}`]})]}:null,
-      {h:'تنفيذ تدخلات الخطة',rows:[['التدخل','الشاهد','التنفيذ'],...c.iv.map(([ty,t,sh])=>{const w=cs.filter(x=>(x.plan||[]).some(p=>p.t===t));const d=w.filter(x=>(x.plan||[]).some(p=>p.t===t&&p.done)).length;return [t,sh,w.length?`${N(d)} من ${N(w.length)}`:'—']})]},
+      {h:'تدخلات الخطة',rows:[['التدخل','الشاهد','عدد الحالات'],...c.iv.map(([ty,t,sh])=>{const w=cs.filter(x=>(x.plan||[]).some(p=>p.t===t));return [t,sh,w.length?N(w.length):'—']})]},
       rs.length?{h:'البرامج المنفذة',rows:[['البرنامج','التاريخ','المستفيدات'],...rs.map(r=>[r.title,DH(r.date),benef(r)?N(benef(r)):'—'])]}:null].filter(Boolean),
     photos:rs.flatMap(r=>(r.photos||[]).map(p=>({id:p.id,cap:p.cap||r.title}))).slice(0,8)};
 }
@@ -1202,7 +1202,7 @@ document.addEventListener('click',async e=>{
       const cats=(c.cats||[]).map(k=>CAT[k]?CAT[k].t:k).join('، ');
       const fol=[...(c.follow||[])].sort((a,b)=>a.date<b.date?-1:1);
       const ctx=[`الطالبة: ${c.name}، الصف ${c.grade||'—'}${c.section?' / '+c.section:''}`, cats?'فئة الحالة: '+cats:'', 'وضع الحالة: '+(ST[c.status]||''), c.source?'مصدر الإحالة: '+c.source:'', c.desc?'وصف الحالة: '+c.desc:'',
-        (c.plan||[]).length?'الخطة العلاجية:\n'+c.plan.map(p=>'- '+(p.done?'[نُفّذ] ':'[لم يُنفّذ] ')+p.t).join('\n'):'لا توجد خطة علاجية بعد',
+        (c.plan||[]).length?'الخطة العلاجية:\n'+c.plan.map(p=>'- '+p.t).join('\n'):'لا توجد خطة علاجية بعد',
         fol.length?'الجلسات والمتابعات:\n'+fol.map(f=>'- '+D(f.date)+' — '+f.type+(f.topic?': '+f.topic:'')+(f.goal?' | الهدف: '+f.goal:'')+(f.note?' | المحاور: '+String(f.note).replace(/\n/g,'؛ '):'')+(f.prog?' | التقدم: '+PG[f.prog]:'')).join('\n'):'لا توجد جلسات بعد',
         c.rec?'التوصيات الحالية: '+c.rec:''].filter(Boolean).join('\n');
       AIHelp.open({title:'اقتراحات',name:c.name,context:ctx,tasks:[
@@ -1775,11 +1775,11 @@ async function buildHarvest(o, onImg) {
     const fl = [...c.follow].sort((a, b) => a.date.localeCompare(b.date));
     return `<details class="case" style="--c:${col}" id="c-${esc(c.id)}">
       <summary><span class="cn">${esc(c.label)}</span><span class="cm">الصف ${esc(c.grade || '—')}${c.section && !o.anon ? ' / ' + esc(c.section) : ''} · ${esc(catNames(c.cats))}</span>
-        <span class="pills"><span class="pill">${esc(ST[c.status] || '')}</span>${t ? `<span class="pill" style="color:${HV_PROG[t][1]}">${HV_PROG[t][0]}</span>` : ''}<span class="pill">${N(fl.length)} جلسة</span>${pd.t ? `<span class="pill">الخطة ${N(pd.d)}/${N(pd.t)}</span>` : ''}</span></summary>
+        <span class="pills"><span class="pill">${esc(ST[c.status] || '')}</span>${t ? `<span class="pill" style="color:${HV_PROG[t][1]}">${HV_PROG[t][0]}</span>` : ''}<span class="pill">${N(fl.length)} جلسة</span></span></summary>
       <div class="cb">
         <dl class="meta"><div><dt>بداية المتابعة</dt><dd>${D(c.date)}</dd></div><div><dt>مصدر الإحالة</dt><dd>${esc(c.source || '—')}</dd></div><div><dt>الأولوية</dt><dd>${esc(PRI[c.priority] || '—')}</dd></div></dl>
         ${c.desc ? `<h4>وصف الحالة</h4><p class="pre">${esc(scrub(c.desc, c))}</p>` : ''}
-        ${pd.t ? `<h4>الخطة العلاجية</h4><ul class="plan">${c.plan.map(p => `<li class="${p.done ? 'ok' : ''}">${esc(p.t)}${p.done && p.doneAt ? `<small>${D(p.doneAt)}</small>` : ''}</li>`).join('')}</ul>` : ''}
+        ${pd.t ? `<h4>الخطة العلاجية</h4><ul class="plan">${c.plan.map(p => `<li>${esc(p.t)}</li>`).join('')}</ul>` : ''}
         ${fl.length ? `<h4>سجل الجلسات والمتابعات</h4><ol class="tl">${fl.map(f => `<li><div class="th"><b>${esc(f.type)}</b><span>${D(f.date)}</span>${f.prog ? `<span class="pr" style="color:${HV_PROG[f.prog][1]}">${HV_PROG[f.prog][0]}</span>` : ''}</div>
             ${f.topic ? `<p><b>الموضوع:</b> ${esc(scrub(f.topic, c))}</p>` : ''}${f.goal ? `<p><b>الهدف:</b> ${esc(scrub(f.goal, c))}</p>` : ''}
             ${f.note ? `<ul class="nt">${lines(scrub(f.note, c))}</ul>` : ''}${f.plan ? `<p class="muted"><b>المتابعة:</b> ${esc(scrub(f.plan, c))}</p>` : ''}${ph(f.photos)}</li>`).join('')}</ol>` : ''}
@@ -1989,7 +1989,7 @@ function mbCase(c, d) {
   return `<div class="a4">${mbHead('تقرير حالة إرشادية')}<div class="pband" style="border-color:${MB_COL};background:#EFECFD"><small style="color:${MB_COL}">${esc(mbCats(c) || 'حالة إرشادية')}</small><b>${esc(d.nm(c.name))}</b></div>
     <table class="pinfo-t"><tbody>${rows.map(rw => `<tr>${rw.map(([k, v]) => `<th>${k}</th><td${rw.length === 1 ? ' colspan="3"' : ''}>${esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table>
     <div class="boxes"><div class="box full"><h4>وصف الحالة</h4><p>${esc((c.desc || '—').replace(/\nالمعلمة المحيلة:.*$/s, ''))}</p></div>
-    <div class="box full"><h4>الخطة العلاجية</h4>${plan.length ? `<table><thead><tr><th style="width:28px">م</th><th>الإجراء</th><th style="width:96px">تاريخ التنفيذ</th><th style="width:44px">التنفيذ</th></tr></thead><tbody>${plan.map((p, i) => `<tr><td>${mbAr(i + 1)}</td><td>${esc(p.t)}</td><td>${p.doneAt ? esc(DH(p.doneAt)) : ''}</td><td style="text-align:center">${p.done ? '✔' : ''}</td></tr>`).join('')}</tbody></table>` : '<p>—</p>'}</div>
+    <div class="box full"><h4>الخطة العلاجية</h4>${plan.length ? `<table><thead><tr><th style="width:28px">م</th><th>الإجراء</th></tr></thead><tbody>${plan.map((p, i) => `<tr><td>${mbAr(i + 1)}</td><td>${esc(p.t)}</td></tr>`).join('')}</tbody></table>` : '<p>—</p>'}</div>
     <div class="box full"><h4>الجلسات والمتابعة (${mbAr(fol.length)})</h4>${fol.length ? `<table><thead><tr><th style="width:90px">التاريخ</th><th style="width:110px">النوع</th><th>ما تم</th><th style="width:56px">الأثر</th></tr></thead><tbody>${fol.map(f => `<tr><td>${esc(DH(f.date))}</td><td>${esc(f.type || '')}</td><td>${esc([f.topic, f.note].filter(Boolean).join(' — ').replace(/\n/g, '، '))}</td><td>${esc(progT(f.prog))}</td></tr>`).join('')}</tbody></table>` : '<p>—</p>'}</div>
     ${c.rec ? `<div class="box full"><h4>التوصيات</h4><p>${esc(c.rec)}</p></div>` : ''}</div>${mbSigHTML()}</div>`;
 }

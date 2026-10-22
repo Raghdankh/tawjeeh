@@ -604,7 +604,7 @@ function render(){
 function addNames(txt){
   var CR=/^(.*?)\s*(?:[-–|\t،,]\s*)?((?:الصف\s+)?(?:ال)?(?:أول|اول|ثاني|ثالث|رابع|خامس|سادس)(?:\s+[أاب])?)\s*$/;
   var clsAll=document.getElementById('fCls').value.trim();var key=document.getElementById('fKey').value;
-  var rows=txt.split(/\r?\n/).map(function(s){return s.trim();}).filter(Boolean).map(function(l){var m=CR.exec(l);
+  var rows=String(txt||'').split(/[\r\n\u2028\u2029\u0085\v\f]+/).map(function(s){return s.trim();}).filter(Boolean).map(function(l){var m=CR.exec(l);
     if(m&&m[1].trim().split(/\s+/).length>=2){var c=m[2].replace(/^الصف\s+/,'').replace(/^(?!ال)/,'ال').replace(/\sا$/,' أ');return {name:m[1].trim(),cls:c};}return {name:l,cls:clsAll};});
   var long=rows.filter(function(r){return r.name.split(/\s+/).length>9;});
   if(long.length){ui.status='يبدو أن عدة أسماء لُصقت في سطر واحد. اجعلي كل اسم في سطر مستقل ثم أعيدي الإضافة.';render();return;}
@@ -642,7 +642,7 @@ app.addEventListener('submit',function(e){
 });
 app.addEventListener('paste',function(e){
   if(e.target.id!=='fName')return;var txt=e.clipboardData?e.clipboardData.getData('text'):'';
-  if(txt&&/\n/.test(txt.trim())){e.preventDefault();addNames(txt);}
+  if(txt&&/[\r\n\u2028\u2029\u0085\v\f]/.test(txt.trim())){e.preventDefault();addNames(txt);}
 });
 app.addEventListener('input',function(e){
   if(e.target.id!=='q')return;ui.q=e.target.value;var r=document.getElementById('results');if(r)r.innerHTML=searchHtml(ui.q);

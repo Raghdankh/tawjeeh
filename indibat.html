@@ -291,6 +291,7 @@ footer .wrap{padding-block:22px;display:flex;flex-wrap:wrap;gap:12px 32px;justif
 footer b{color:var(--on-brand);font-weight:600}
 .survbn{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 16px;margin-bottom:14px;border-radius:16px;background:var(--paper,#fff);border:1.5px solid var(--mint,#2E7A72);color:inherit;text-decoration:none}.survbn span{font-weight:700;font-size:.85rem;opacity:.75}.survbn b{flex:1;min-width:160px}.survbn em{font-style:normal;font-weight:700;color:var(--mint,#2E7A72)}
 @media (prefers-reduced-motion:no-preference){.tab,.chip,.btn,a.cert{transition:background .15s,border-color .15s,color .15s}}
+.formstatus{margin:8px 0 0;padding:8px 12px;border-radius:8px;background:#EAF4EE;color:#1F5F3F;font-weight:700}
 </style>
 </head>
 <body>
@@ -353,7 +354,7 @@ async function reload(keepKey){
   ui.month=i>-1?i:Math.max(0,S.months.length-1);
 }
 async function act(fn,okMsg,keepKey){
-  if(ui.busy)return;ui.busy=true;ui.status='جارٍ الحفظ…';render();
+  if(ui.busy&&Date.now()-(ui.busyAt||0)<20000){ui.status='جارٍ الحفظ… انتظري لحظة';render();return;}ui.busy=true;ui.busyAt=Date.now();ui.status='جارٍ الحفظ…';render();
   try{await fn();await reload(keepKey);ui.status=okMsg||'تم الحفظ ✓';}
   catch(e){ui.status=errMsg(e);}
   ui.busy=false;render();
@@ -570,7 +571,7 @@ function panel(){
     '<form id="addForm" class="row"><label>اسم الطالبة (أو عدة أسماء، كل اسم في سطر)<textarea id="fName" required rows="3" autocomplete="off" style="min-height:0"></textarea></label>'+
     '<label>الصف (اختياري)<input id="fCls" autocomplete="off" placeholder="مثال: الرابع أ"></label>'+
     '<label>القائمة<select id="fKey"><option value="regular">المواظبات</option><option value="excellent">المتميزات سلوكياً</option></select></label>'+
-    '<button class="btn" type="submit">إضافة</button></form>'+
+    '<button class="btn" type="submit">إضافة</button></form>'+(ui.status?'<p class="formstatus" role="status">'+esc(ui.status)+'</p>':'')+
     '<p class="hint">لإضافة قائمة كاملة: الصقي الأسماء في خانة الاسم، كل اسم في سطر. وإذا كتبتي الصف بعد الاسم بشرطة (مثال: ريم أحمد سعيد - الرابع أ) ينحفظ صف كل طالبة لحالها.</p>'+
     '<h3>شهر جديد</h3>'+monthForm()+
     '<h3>النصوص</h3><label>رسالة أولياء الأمور<textarea id="fNote">'+esc(S.note)+'</textarea></label>'+
@@ -642,7 +643,7 @@ app.addEventListener('submit',function(e){
 });
 app.addEventListener('paste',function(e){
   if(e.target.id!=='fName')return;var txt=e.clipboardData?e.clipboardData.getData('text'):'';
-  if(txt&&/[\r\n\u2028\u2029\u0085\v\f]/.test(txt.trim())){e.preventDefault();addNames(txt);}
+  /* اللصق يدخل الخانة عادي، والإضافة بزر «إضافة» */
 });
 app.addEventListener('input',function(e){
   if(e.target.id!=='q')return;ui.q=e.target.value;var r=document.getElementById('results');if(r)r.innerHTML=searchHtml(ui.q);

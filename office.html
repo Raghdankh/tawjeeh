@@ -830,7 +830,7 @@ function absContacts(id, a) { return list('contact').filter(c => c.absId === id 
 function absTimeline(id, a) {
   const c = absContacts(id, a).map(r => ({ date: r.date || '', cid: r.id, text: (r.type || 'تواصل') + (r.guardian ? ' مع ' + r.guardian : ' مع ولي الأمر') + (r.summary ? ': ' + r.summary : '') + (r.outcome ? ' — ' + r.outcome : '') }));
   const l = (a.log || []).map((r, i) => ({ date: r.date || '', li: i, ses: r.type === 'session', text: r.text + (r.type === 'session' && r.note ? ' — ' + r.note : '') }));
-  return c.concat(l).sort((p, q) => String(q.date).localeCompare(String(p.date)));
+  return c.concat(l).sort((p, q) => String(p.date).localeCompare(String(q.date)));
 }
 /* أسباب غياب الطالبة من ملفها: الخطة العلاجية + الكشوف الشهرية + التواصل مع ولي الأمر */
 function absCauses(id, a) {
@@ -1155,7 +1155,7 @@ function stuBulk() {
 /* ═════════ view: family ═════════ */
 function vFamily() {
   const k = S.sub.family || 'council'; const cfg = FAM[k];
-  const rows = list(k).sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')) || String(b.id).localeCompare(String(a.id)));
+  const rows = list(k).sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')) || String(b.id).localeCompare(String(a.id))); if (k === 'contact') rows.reverse();
   const qv = norm(S.filter.fam || ''); const shown = qv ? rows.filter(r => norm(JSON.stringify(r)).includes(qv)) : rows;
   return `<div class="head"><h1><span class="dot"></span>علاقة الأسرة بالمدرسة</h1><span class="sp"></span><button class="btn" data-binder="family">📁 الملف الشامل</button></div>
     <p class="lede">إدارة التواصل والشراكة مع الأسر، مع الشواهد والتقارير الجاهزة للطباعة.</p>
@@ -1198,7 +1198,7 @@ function vAbsence() {
   if (S.sub.abs === 'monthly') return vAbsMonthly();
   const rows = list('absence').map(a => ({ ...a, n: unex(a), x: exc(a), p: pending(a), st: maxStreak(a) })).sort((a, b) => b.n - a.n || b.x - a.x || a.studentName.localeCompare(b.studentName, 'ar'));
   const f = S.filter.abs || 'all';
-  const shown = rows.filter(a => f === 'all' ? !a.closed : f === 'closed' ? a.closed : f === 'pending' ? !a.closed && a.p > 0 : f === 'consec' ? !a.closed && a.st >= 3 : f[0] === 'e' ? !a.closed && a.x >= +f.slice(1) : !a.closed && a.n >= +f);
+  const shown = rows.filter(a => f === 'low' ? !a.closed && a.n < 3 && a.x < 3 : f === 'all' ? !a.closed : f === 'closed' ? a.closed : f === 'pending' ? !a.closed && a.p > 0 : f === 'consec' ? !a.closed && a.st >= 3 : f[0] === 'e' ? !a.closed && a.x >= +f.slice(1) : !a.closed && a.n >= +f);
   const cnt = fn => rows.filter(a => !a.closed && fn(a)).length;
   return `<div class="head"><h1><span class="dot"></span>التعامل مع حالات الغياب</h1><span class="sp"></span><button class="btn" data-binder="absence">📁 الملف الشامل</button><button class="btn wa" data-act="absWA">📲 مراسلة أولياء الأمور</button><button class="btn" data-act="absFill">✓ تعبئة الإجراءات</button><button class="btn" data-act="absSesAll">＋ جلسات فردية</button><button class="btn" data-act="absRefs">تواريخ الإجراءات</button><button class="btn primary" data-act="absAdd">＋ ملف غياب</button></div>
     ${absSubtabs('files')}
@@ -1210,13 +1210,13 @@ function vAbsence() {
       <div class="tile" style="--tc:var(--good)"><b class="num">${ar(cnt(a => a.x >= 3))}</b><span>٣ أيام فأكثر بعذر</span></div>
       <div class="tile" style="--tc:var(--bad)"><b class="num">${ar(cnt(a => a.st >= 3))}</b><span>غياب متصل ٣ أيام فأكثر</span></div>
       <div class="tile" style="--tc:var(--abs)"><b class="num">${ar(cnt(a => a.p > 0))}</b><span>ملفات فيها إجراءات ناقصة</span></div></div>
-    <div class="subtabs">${[['all', 'المفتوحة'], ['pending', 'إجراءات ناقصة'], ['consec', 'غياب متصل'], ['3', 'بدون عذر ٣+'], ['5', 'بدون عذر ٥+'], ['10', 'بدون عذر ١٠+'], ['e3', 'بعذر ٣+'], ['closed', 'المغلقة']].map(([k, t]) => `<button data-absf="${k}" aria-selected="${f === k}">${t}</button>`).join('')}</div>
+    <div class="subtabs">${[['all', 'المفتوحة'], ['pending', 'إجراءات ناقصة'], ['consec', 'غياب متصل'], ['3', 'بدون عذر ٣+'], ['5', 'بدون عذر ٥+'], ['10', 'بدون عذر ١٠+'], ['e3', 'بعذر ٣+'], ['low', 'أقل من ٣ أيام'], ['closed', 'المغلقة']].map(([k, t]) => `<button data-absf="${k}" aria-selected="${f === k}">${t}</button>`).join('')}</div>
     ${shown.length ? (() => { const card = a => { const [pc, ps] = levelColors(a.n); const grp = a.n >= 3 ? 'u' : a.x >= 3 ? 'e' : '';
         return `<a class="rec" href="#absence/${a.id}" style="text-decoration:none;color:inherit;--c:${grp === 'u' ? pc : grp === 'e' ? 'var(--good)' : 'var(--muted)'}"><div class="t"><b>${esc(a.studentName)}</b></div>
       <div class="meta"><span class="chip">${esc(a.grade || '')} ${esc(a.section || '')}</span><span class="pill" style="--pc:${a.n ? pc : 'var(--muted)'};--ps:${a.n ? ps : 'var(--sunk)'};${grp === 'u' ? 'font-weight:800' : ''}">بدون عذر: ${ar(a.n)}</span><span class="pill" style="--pc:${a.x ? 'var(--good)' : 'var(--muted)'};--ps:${a.x ? 'var(--good-soft)' : 'var(--sunk)'};${grp === 'e' ? 'font-weight:800' : ''}">بعذر: ${ar(a.x)}</span>${a.st >= 3 ? `<span class="pill" style="--pc:var(--bad);--ps:var(--bad-soft)">غياب متصل</span>` : ''}</div>
       <div class="meta">${a.p ? `<span class="chip" style="color:var(--bad)">${ar(a.p)} إجراء ناقص</span>` : '<span class="chip" style="color:var(--good)">الإجراءات مكتملة</span>'}</div></a>`; };
       if (!['all', 'pending', 'closed'].includes(f)) return `<div class="list">${shown.map(card).join('')}</div>`;
-      const G = [['u', 'الغياب بدون عذر', 'المادة (٣٤) · ٣ أيام فأكثر بدون عذر', 'var(--z3)', shown.filter(a => a.n >= 3)], ['e', 'الغياب بعذر', 'المادة (٣٣) · ٣ أيام فأكثر بعذر', 'var(--good)', shown.filter(a => a.n < 3 && a.x >= 3).sort((p, q) => q.x - p.x)], ['l', 'أقل من ٣ أيام', 'ما وصلت ٣ أيام لا بعذر ولا بدون عذر', 'var(--muted)', shown.filter(a => a.n < 3 && a.x < 3)]];
+      const G = [['u', 'الغياب بدون عذر', 'المادة (٣٤) · ٣ أيام فأكثر بدون عذر', 'var(--z3)', shown.filter(a => a.n >= 3)], ['e', 'الغياب بعذر', 'المادة (٣٣) · ٣ أيام فأكثر بعذر', 'var(--good)', shown.filter(a => a.n < 3 && a.x >= 3).sort((p, q) => q.x - p.x)], ['l', 'أقل من ٣ أيام', 'ما وصلت ٣ أيام لا بعذر ولا بدون عذر', 'var(--muted)', f === 'closed' ? shown.filter(a => a.n < 3 && a.x < 3) : []]];
       return G.filter(g => g[4].length).map(([k, t, sub, c, L]) => `<div class="absgrp" style="--gc:${c}"><h3>${t} <span class="n">${ar(L.length)}</span></h3><span class="tiny muted">${sub}</span></div><div class="list">${L.map(card).join('')}</div>`).join(''); })()
       : `<div class="empty"><b>لا توجد ملفات هنا</b><span>افتحي ملفاً لأي طالبة تكرر غيابها.</span><button class="btn primary" data-act="absAdd">＋ ملف غياب</button></div>`}${stuDatalist()}`;
 }
@@ -3363,7 +3363,7 @@ function aiAbsence(id) {
   const a = DB.docs[id].data; const n = unex(a), x = exc(a), done = a.done || {};
   const doneL = [], todo = [];
   ['u', 'e'].forEach(k => { const c = k === 'u' ? n : x; TRACKS[k].steps.forEach(s => { if (c >= s.d) s.items.forEach((it, ii) => (done[k + '-' + s.d + '-' + ii] ? doneL : todo).push(it)); }); });
-  const tl = absTimeline(id, a).slice().reverse().map(r => '- ' + hij(r.date) + ': ' + r.text);
+  const tl = absTimeline(id, a).map(r => '- ' + hij(r.date) + ': ' + r.text);
   const ctx = [`الطالبة: ${a.studentName}، الصف ${a.grade || '—'} ${a.section || ''}`, `أيام الغياب بدون عذر: ${n}`, `أيام الغياب بعذر: ${x}`, maxStreak(a) >= 3 ? 'الغياب بدون عذر متصل ٣ أيام أو أكثر' : '',
     doneL.length ? 'الإجراءات المنفذة حسب قواعد السلوك والمواظبة:\n' + doneL.map(t => '- ' + t).join('\n') : '', todo.length ? 'إجراءات مطلوبة لم تُنفذ بعد:\n' + todo.map(t => '- ' + t).join('\n') : '',
     tl.length ? 'سجل المتابعة والتواصل:\n' + tl.join('\n') : '', a.plan ? 'الخطة العلاجية الحالية: الأسباب (' + (a.plan.causes || []).join('، ') + ')، الإجراءات: ' + (a.plan.steps || []).map(s => (s.done ? '[نُفّذ] ' : '') + s.t).join('؛ ') : ''].filter(Boolean).join('\n');

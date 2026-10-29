@@ -535,6 +535,7 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .a4 .artb td,.a4 .artb th{white-space:normal;word-break:break-word;overflow-wrap:anywhere;vertical-align:top}
 .homesig{display:block;color:var(--good);font-weight:700;font-size:.8rem}.homebox{background:var(--good-soft);border-radius:12px;padding:10px 12px}.homebox small{display:block;color:var(--muted);font-weight:400}
 .xsns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.xsn{display:inline-flex;align-items:center;gap:6px;background:#eef4f2;border-radius:999px;padding:4px 10px;font-size:.9rem}.xsn button{border:0;background:none;cursor:pointer;color:#a33;font-size:.8rem}
+.gsug .presets{margin-top:6px}.gsug .presets button{text-align:start;white-space:normal}.gsug .presets button[aria-pressed=true]{background:var(--prg,#0E7F7B);color:#fff;border-color:transparent}
 </style>
 </head>
 <body>
@@ -932,10 +933,11 @@ function openSheet(title, inner, onSubmit, color) {
     catch (er) { msg.textContent = errT(er); if (btn) btn.disabled = false; }
   });
   hydratePhotos(bg);
-  const f = bg.querySelector('input:not([type=hidden]),textarea,select'); if (f && window.innerWidth > 760) f.focus();
+  const f = bg.querySelector('input:not([type=hidden]),textarea,select'); if (f && window.innerWidth > 760 && !matchMedia('(pointer: coarse)').matches && !('ontouchstart' in window)) f.focus();
   return bg;
 }
 function closeSheet() { const b = $('#sheetbg'); if (b) b.remove(); document.body.style.overflow = ''; }
+document.addEventListener('change', e => { if (e.target.id !== 'g_topic') return; const i = G_TOPICS.findIndex(t => norm(t[0]) === norm(e.target.value)); const b = i >= 0 && document.querySelector('[data-gtopic="' + i + '"]'); if (b) b.click(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { if ($('#repbg')) $('#repbg').remove(); else closeSheet(); } });
 
 function fieldHTML(f, v) {
@@ -1789,8 +1791,8 @@ function groupCard(g) {
 function groupForm(id, pre) {
   const g = id ? DB.docs[id].data : { date: todayH(), term: gTerm() !== 'all' ? gTerm() : (list('group').sort((a, b) => String(b.date).localeCompare(String(a.date)))[0] || {}).term || PTERM[0], classes: [], methods: [], photos: [], ...(pre || {}) };
   const cls = [...new Set(allClasses().concat(g.classes || []))]; const progs = list('program').sort((a, b) => String(a.title).localeCompare(String(b.title), 'ar'));
-  openSheet(id ? 'تعديل اللقاء' : 'لقاء توجيه جمعي', `<div class="form">
-    <label class="f full"><span>الموضوع</span><input id="g_topic" list="gTopics" required value="${esc(g.topic || '')}" placeholder="اختاري من تحت أو اكتبي"></label>
+  const bg = openSheet(id ? 'تعديل اللقاء' : 'لقاء توجيه جمعي', `<div class="form">
+    <label class="f full"><span>الموضوع</span><input id="g_topic" required autocomplete="off" value="${esc(g.topic || '')}" placeholder="اختاري من تحت أو اكتبي"></label>
     <div class="presets full">${G_TOPICS.map((t, i) => `<button type="button" data-gtopic="${i}">${t[0]}</button>`).join('')}</div>
     <div class="f"><span>التاريخ</span>${hdInput('g_date', g.date)}</div><label class="f"><span>الفصل الدراسي</span><select id="g_term">${PTERM.map(t => `<option${t === g.term ? ' selected' : ''}>${t}</option>`).join('')}</select></label>
     <div class="f full"><span>الفصل أو الفصول</span><div class="clpick" id="g_cls">${cls.map(c => `<label><input type="checkbox" value="${esc(c)}"${(g.classes || []).includes(c) ? ' checked' : ''}><span>${esc(c)}</span></label>`).join('') || '<span class="tiny muted">أضيفي الفصل من تحت</span>'}</div>
@@ -1798,8 +1800,10 @@ function groupForm(id, pre) {
     <label class="f"><span>عدد الحاضرات</span><input id="g_count" type="number" min="0" inputmode="numeric" value="${esc(g.count || '')}"></label>
     <label class="f"><span>ضمن برنامج (اختياري)</span><select id="g_prog"><option value="">بدون</option>${progs.map(p => `<option value="${p.id}"${p.id === g.progId ? ' selected' : ''}>${esc(p.title)}</option>`).join('')}</select></label>
     <label class="f full"><span>الهدف</span><textarea id="g_goal" style="min-height:64px">${esc(g.goal || '')}</textarea></label>
+    <div class="f full gsug" id="g_gsug"></div>
     <div class="f full"><span>الأسلوب</span><div class="clpick">${G_METHODS.map(m => `<label><input type="checkbox" data-gm value="${m}"${(g.methods || []).includes(m) ? ' checked' : ''}><span>${m}</span></label>`).join('')}</div></div>
     <label class="f full"><span>ما تم في اللقاء <small class="muted" style="font-weight:500">(يتعبى تلقائياً عند اختيار الموضوع، وعدّليه حسب لقائك)</small></span><textarea id="g_sum" style="min-height:130px" placeholder="مثال: بدأت بقصة قصيرة، ثم نقاش، ثم نشاط بطاقات المواقف">${esc(g.summary || '')}</textarea></label>
+    <div class="f full gsug" id="g_ssug"></div>
     ${fieldHTML({ k: 'photos', t: 'الشواهد', type: 'photos' }, g.photos || [])}</div>
     <datalist id="gTopics">${G_TOPICS.map(t => `<option value="${esc(t[0])}"></option>`).join('')}</datalist>
     <div class="toolbar"><button class="btn primary" type="submit">حفظ</button></div>`,
@@ -1810,6 +1814,26 @@ function groupForm(id, pre) {
       const data = { ...g, topic, date: readHD(f, 'g_date'), term: f.querySelector('#g_term').value, classes, count: n === '' ? '' : Math.max(0, +n), progId: f.querySelector('#g_prog').value, goal: f.querySelector('#g_goal').value.trim(), methods: [...f.querySelectorAll('[data-gm]:checked')].map(x => x.value), summary: f.querySelector('#g_sum').value.trim(), photos: JSON.parse(f.querySelector('#f_photos').dataset.photos || '[]') };
       await saveDoc(id || uid('group'), 'group', data); toast('حُفظ اللقاء');
     }, `--c:var(--prg);--cs:var(--prg-soft)`);
+  const sug = () => gProgSug(bg, bg.querySelector('#g_prog').value);
+  bg.querySelector('#g_prog').addEventListener('change', sug); sug();
+  bg.addEventListener('click', e => { const b = e.target.closest('[data-gsg]'); if (!b) return; e.preventDefault();
+    const ta = bg.querySelector(b.dataset.gsg === 'g' ? '#g_goal' : '#g_sum'); const v = b.dataset.v; const L = ta.value.split('\n').map(x => x.trim()).filter(Boolean);
+    const k = L.indexOf(v); if (k >= 0) L.splice(k, 1); else L.push(v); ta.value = L.join('\n'); b.setAttribute('aria-pressed', String(k < 0)); });
+}
+/* اقتراحات الأهداف وما تم في اللقاء حسب البرنامج المختار */
+function gProgSug(bg, pid) {
+  const gs = bg.querySelector('#g_gsug'), ss = bg.querySelector('#g_ssug'); const p = pid && DB.docs[pid] ? DB.docs[pid].data : null;
+  if (!p) { gs.innerHTML = ''; ss.innerHTML = ''; return; }
+  const G = String(p.goals || '').split('\n').map(x => x.trim()).filter(Boolean);
+  const T = String((bg.querySelector('#g_topic') || {}).value || '').trim();
+  const st = (p.steps || []).map(x => String(x.t || x).trim()).filter(Boolean)
+    .map(x => x.replace(/^لقاءات? توجيه جمعي في الفصول عن /, 'حوار مع الطالبات عن ').replace(/^لقاءات? توجيه جمعي /, 'لقاء '));
+  const more = ['افتتاح اللقاء بسؤال يثير اهتمام الطالبات عن «' + (T || p.title) + '»', 'مناقشة الطالبات وإتاحة الفرصة لهن للتعبير عن آرائهن', 'ختام اللقاء بتلخيص أهم ما تعلمته الطالبات وتعزيز المشاركات'];
+  const cur = sel => bg.querySelector(sel).value.split('\n').map(x => x.trim());
+  const chip = (k, v, on) => `<button type="button" data-gsg="${k}" data-v="${esc(v)}" aria-pressed="${on}">${esc(v)}</button>`;
+  const cg = cur('#g_goal'), cs = cur('#g_sum');
+  gs.innerHTML = G.length ? `<span class="tiny muted">اقتراحات أهداف من «${esc(p.title)}» — اضغطي لإضافتها أو إزالتها</span><div class="presets">${G.map(v => chip('g', v, cg.includes(v))).join('')}</div>` : '';
+  ss.innerHTML = `<span class="tiny muted">اقتراحات لما تم في اللقاء</span><div class="presets">${more.slice(0, 2).concat(st, more.slice(2)).map(v => chip('s', v, cs.includes(v))).join('')}</div>`;
 }
 function gInfo(g) {
   const pr = g.progId && DB.docs[g.progId] ? DB.docs[g.progId].data.title : '';

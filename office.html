@@ -536,6 +536,7 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .homesig{display:block;color:var(--good);font-weight:700;font-size:.8rem}.homebox{background:var(--good-soft);border-radius:12px;padding:10px 12px}.homebox small{display:block;color:var(--muted);font-weight:400}
 .xsns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.xsn{display:inline-flex;align-items:center;gap:6px;background:#eef4f2;border-radius:999px;padding:4px 10px;font-size:.9rem}.xsn button{border:0;background:none;cursor:pointer;color:#a33;font-size:.8rem}
 .gsug .presets{margin-top:6px}.gsug .presets button{text-align:start;white-space:normal}.gsug .presets button[aria-pressed=true]{background:var(--prg,#0E7F7B);color:#fff;border-color:transparent}
+.fx-rows.act>div{grid-template-columns:130px minmax(0,1fr) minmax(0,1.4fr) auto;align-items:center}.fx-rows.act .pacts{margin:0!important}@media(max-width:600px){.fx-rows.act>div{grid-template-columns:1fr auto}}
 </style>
 </head>
 <body>
@@ -3021,9 +3022,9 @@ async function loadMasar() {
 }
 const anonN = (n, o) => !o || !o.anon ? n : String(n || '').replace(/^مثال:\s*/, '').split(/\s+/).slice(0, 2).map(x => x.charAt(0) + '.').join(' ');
 function mSessions(type) {
-  const ab = type === 'جلسة فردية' ? list('absence').flatMap(a => (a.log || []).filter(l => l.type === 'session').map(l => ({ date: l.date, name: a.studentName, grade: a.grade, section: a.section, cats: ['الغياب'], topic: l.topic, goal: l.goal, prog: l.prog, note: l.note }))) : [];
+  const ab = type === 'جلسة فردية' ? list('absence').flatMap(a => (a.log || []).filter(l => l.type === 'session').map(l => ({ date: l.date, name: a.studentName, grade: a.grade, section: a.section, cats: ['الغياب'], topic: l.topic, goal: l.goal, prog: l.prog, note: l.note, acts: l.acts || '', type }))) : [];
   const xs = (myFile(type === 'جلسة فردية' ? 'ind' : 'grp').sessions || []).map(x => ({ ...x }));
-  return ab.concat(xs, (S.mcases || []).flatMap(c => (c.follow || []).filter(f => f.type === type).map(f => ({ date: f.date, name: c.name, grade: c.grade, section: c.section, cats: c.cats || [], topic: f.topic, goal: f.goal, prog: f.prog, note: f.note }))))
+  return ab.concat(xs, (S.mcases || []).flatMap(c => (c.follow || []).filter(f => f.type === type).map(f => ({ date: f.date, name: c.name, grade: c.grade, section: c.section, cats: c.cats || [], topic: f.topic, goal: f.goal, prog: f.prog, note: f.note, acts: f.acts || '', plan: f.plan || '', type }))))
     .sort((a, b) => hKey(a.date).localeCompare(hKey(b.date)));
 }
 const catT = cs => (cs || []).map(k => MCATS[k] || (k === 'absence' ? 'الغياب' : k === 'other' ? 'أخرى' : k)).join('، ');
@@ -3075,12 +3076,27 @@ const XS_TOP = {
   gifted: [['رعاية الموهبة', 'التعرف على موهبة الطالبة وتشجيعها على تنميتها'], ['تنمية الطموح', 'مساعدة الطالبة على وضع أهداف مستقبلية']],
   other: [['التكيف مع البيئة المدرسية', 'مساعدة الطالبة على التكيف مع المدرسة وزميلاتها'], ['العلاقة مع الزميلات', 'تنمية مهارات التواصل والتعامل الإيجابي مع الزميلات'], ['حل المشكلات', 'تدريب الطالبة على خطوات حل المشكلات بهدوء']]
 };
+const XS_ACT = {
+  absence: ['مناقشة أسباب الغياب مع الطالبة', 'توضيح أثر الغياب على التحصيل الدراسي', 'الاتفاق مع الطالبة على الانتظام في الحضور', 'التواصل مع ولي الأمر لمتابعة الحضور', 'إشعار رائدة الفصل بمتابعة حضورها', 'تعزيز الطالبة عند التزامها بالحضور'],
+  separation: ['الاستماع للطالبة واحتواء مشاعرها', 'تعزيز شعور الطالبة بالأمان والاستقرار', 'رسالة لولي الأمر للتعاون في دعم الطالبة', 'التنسيق مع المعلمات لمراعاة وضع الطالبة', 'إشراك الطالبة في الأنشطة المدرسية'],
+  orphan: ['احتواء الطالبة وتقديم الدعم النفسي لها', 'التنسيق مع المعلمات لمراعاة ظروف الطالبة', 'إشراك الطالبة في الأنشطة المدرسية', 'التواصل مع أسرة الطالبة لدعمها'],
+  economic: ['التعرف على احتياجات الطالبة الدراسية', 'توفير الأدوات المدرسية للطالبة بسرية', 'التنسيق مع إدارة المدرسة لتقديم الدعم', 'التنسيق مع الجهات الداعمة (مؤسسة تكافل)', 'المحافظة على سرية الحالة'],
+  health: ['التعرف على الحالة الصحية وأثرها على الدراسة', 'إشعار المعلمات بوضع الطالبة الصحي لمراعاته', 'التنسيق مع الموجهة الصحية', 'التواصل مع ولي الأمر لمتابعة الحالة', 'تعويض الطالبة عن الدروس الفائتة'],
+  delayed: ['التعرف على أسباب التأخر الدراسي', 'تدريب الطالبة على مهارات المذاكرة وتنظيم الوقت', 'التنسيق مع معلمة المادة لإعداد خطة علاجية', 'رسالة لولي الأمر لمتابعة الطالبة في البيت', 'تعزيز أي تحسن في مستوى الطالبة'],
+  psych: ['الاستماع للطالبة ومساعدتها على التعبير عن مشاعرها', 'تدريب الطالبة على تمارين التنفس والاسترخاء', 'التواصل مع ولي الأمر', 'التنسيق مع المعلمات لملاحظة الطالبة', 'التحويل لجهة مختصة عند الحاجة'],
+  behavior: ['مناقشة السلوك وأثره مع الطالبة', 'الاتفاق مع الطالبة على سلوك بديل', 'عقد اتفاق سلوكي مع الطالبة', 'تعزيز السلوك الإيجابي', 'التواصل مع ولي الأمر', 'إشعار رائدة الفصل بمتابعة السلوك'],
+  excellent: ['تشجيع الطالبة وتعزيز تفوقها', 'مساعدة الطالبة على وضع أهداف مستقبلية', 'إشراك الطالبة في المسابقات والأنشطة', 'رسالة شكر لولي الأمر'],
+  gifted: ['التعرف على مجال موهبة الطالبة', 'ترشيح الطالبة لبرامج رعاية الموهوبات', 'التنسيق مع المعلمات لتنمية موهبتها', 'رسالة لولي الأمر لدعم موهبة الطالبة'],
+  other: ['الاستماع للطالبة', 'تقديم التوجيه والإرشاد المناسب', 'التواصل مع ولي الأمر', 'التنسيق مع رائدة الفصل']
+};
+const XS_ACT_GEN = ['تقديم التوجيه والإرشاد المناسب', 'تعزيز الطالبة وتشجيعها', 'التواصل مع ولي الأمر'];
 const XS_GEN = [['تنظيم الوقت', 'مساعدة الطالبة على تنظيم وقتها بين الدراسة والراحة'], ['الثقة بالنفس', 'تعزيز ثقة الطالبة بنفسها وقدراتها'], ['حل المشكلات', 'تدريب الطالبة على خطوات حل المشكلات بهدوء']];
 function xsForm(k, idx) {
   const grp = k === 'grp'; const arr = myFile(k).sessions || []; const x = idx != null ? arr[idx] : { date: todayH(), cats: [], names: [] };
   let names = grp ? (x.names || (x.name ? String(x.name).split('، ') : [])).slice() : [];
   const nameChips = () => names.map((n, i) => `<span class="xsn">${esc(n)}<button type="button" data-xsnrm="${i}" aria-label="حذف">✕</button></span>`).join('') || '<span class="tiny muted">ما أضفتي طالبات بعد</span>';
   const topBtns = cats => { const seen = new Set(); return cats.flatMap(c => XS_TOP[c] || []).concat(XS_GEN).filter(t => !seen.has(t[0]) && seen.add(t[0])).map(t => `<button type="button" data-xstop="${esc(t[0])}" data-xsgoal="${esc(t[1])}">${esc(t[0])}</button>`).join(''); };
+  const actBtns = (cats, cur) => { const L = String(cur || '').split('\n').map(z => z.trim()); const seen = new Set(); return (cats.length ? cats : ['other']).flatMap(c => XS_ACT[c] || []).concat(XS_ACT_GEN).filter(t => !seen.has(t) && seen.add(t)).map(t => `<button type="button" data-xsact="${esc(t)}" aria-pressed="${L.includes(t)}">${esc(t)}</button>`).join(''); };
   const bg = openSheet(idx != null ? 'تعديل الجلسة' : (grp ? 'إضافة جلسة جماعية' : 'إضافة جلسة فردية'), `<div class="form">
     ${grp ? `<div class="f full"><span>الطالبات</span><div style="display:flex;gap:8px"><input id="xs_n" list="stuList" placeholder="اكتبي اسم الطالبة واختاري" style="flex:1"><button type="button" class="btn sm" data-xsnadd="1">＋ إضافة</button></div><div class="xsns" id="xs_ns">${nameChips()}</div></div>`
       : `<label class="f full"><span>الطالبة</span><input id="xs_n" list="stuList" required placeholder="اكتبي اسم الطالبة واختاري" value="${esc(x.name ? x.name + (x.grade ? ' — ' + x.grade + (x.section ? ' ' + x.section : '') : '') : '')}"></label>`}
@@ -3089,6 +3105,8 @@ function xsForm(k, idx) {
     <label class="f full"><span>موضوع الجلسة</span><input id="xs_t" required value="${esc(x.topic || '')}" placeholder="اختاري من تحت أو اكتبي"></label>
     <div class="presets full" id="xs_tb">${topBtns(x.cats || [])}</div>
     <label class="f full"><span>الهدف</span><textarea id="xs_g" style="min-height:60px">${esc(x.goal || '')}</textarea></label>
+    <label class="f full"><span>الإجراءات المتخذة</span><textarea id="xs_a" style="min-height:70px">${esc(x.acts || '')}</textarea></label>
+    <div class="f full gsug"><span class="tiny muted">اقتراحات حسب التصنيف — اضغطي لإضافتها أو إزالتها</span><div class="presets" id="xs_ab">${actBtns(x.cats || [], x.acts)}</div></div>
     <label class="f full"><span>ملاحظات <small class="muted" style="font-weight:500">(اختياري)</small></span><textarea id="xs_o" style="min-height:50px">${esc(x.note || '')}</textarea></label></div>
     ${stuDatalist()}
     <div class="toolbar"><button class="btn primary" type="submit">حفظ</button></div>`,
@@ -3100,28 +3118,39 @@ function xsForm(k, idx) {
         const st = names.map(n => students().find(s => s.name === n)).filter(Boolean); const one = st.length === names.length && new Set(st.map(s => clsKey(s.grade, s.section))).size === 1;
         row = { names, name: names.join('، '), grade: one ? st[0].grade : '', section: one ? st[0].section || '' : '' }; }
       else { const r = resolveStudent(f.querySelector('#xs_n').value); if (!r.studentName) throw new Error('اكتبي اسم الطالبة'); row = { name: r.studentName, grade: r.grade || '', section: r.section || '' }; }
-      Object.assign(row, { date: readHD(f, 'xs_d'), cats, topic, goal: f.querySelector('#xs_g').value.trim(), note: f.querySelector('#xs_o').value.trim(), type: grp ? 'جلسة جماعية' : 'جلسة فردية' });
+      Object.assign(row, { date: readHD(f, 'xs_d'), cats, topic, goal: f.querySelector('#xs_g').value.trim(), note: f.querySelector('#xs_o').value.trim(), acts: f.querySelector('#xs_a').value.trim(), type: grp ? 'جلسة جماعية' : 'جلسة فردية' });
       const d = JSON.parse(JSON.stringify(myFile(k))); d.sessions = d.sessions || []; if (idx != null) d.sessions[idx] = row; else d.sessions.push(row);
       await saveDoc('myfile-' + k, 'myfile', d); toast('حُفظت الجلسة');
     }, `--c:${FX[k].c};--cs:#f4f7f6`);
   const addName = () => { const i = bg.querySelector('#xs_n'); const v = i.value.trim(); if (!v) return; const n = resolveStudent(v).studentName || v; if (!names.includes(n)) names.push(n); i.value = ''; bg.querySelector('#xs_ns').innerHTML = nameChips(); };
   bg.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const d = b.dataset;
+    if (d.xsact) { const ta = bg.querySelector('#xs_a'); const L = ta.value.split('\n').map(z => z.trim()).filter(Boolean); const k = L.indexOf(d.xsact); if (k >= 0) L.splice(k, 1); else L.push(d.xsact); ta.value = L.join('\n'); b.setAttribute('aria-pressed', String(k < 0)); return; }
     if (d.xsnadd) addName();
     else if (d.xsnrm != null) { names.splice(+d.xsnrm, 1); bg.querySelector('#xs_ns').innerHTML = nameChips(); }
     else if (d.xstop) { const t = bg.querySelector('#xs_t'), g = bg.querySelector('#xs_g'); const old = t.value; t.value = d.xstop; const known = [...bg.querySelectorAll('[data-xsgoal]')].map(z => z.dataset.xsgoal); if (!g.value.trim() || known.includes(g.value.trim()) || old !== d.xstop) g.value = d.xsgoal; bg.querySelectorAll('[data-xstop]').forEach(z => z.setAttribute('aria-pressed', String(z === b))); } });
-  bg.addEventListener('change', e => { if (e.target.closest('#xs_c')) bg.querySelector('#xs_tb').innerHTML = topBtns([...bg.querySelectorAll('#xs_c input:checked')].map(i => i.value));
+  bg.addEventListener('change', e => { if (e.target.closest('#xs_c')) { const cs = [...bg.querySelectorAll('#xs_c input:checked')].map(i => i.value); bg.querySelector('#xs_tb').innerHTML = topBtns(cs); bg.querySelector('#xs_ab').innerHTML = actBtns(cs, bg.querySelector('#xs_a').value); }
     if (grp && e.target.id === 'xs_n') addName(); });
+}
+function sesReport(r) {
+  const grp = r.type === 'جلسة جماعية'; const ttl = grp ? 'تقرير جلسة توجيه جمعي' : 'تقرير جلسة توجيه فردي';
+  const info = [[grp ? 'الطالبات' : 'اسم الطالبة', r.name], ['الصف', ((r.grade || '') + ' ' + (r.section || '')).trim()], ['التاريخ', hij(r.date)], ['التصنيف', catT(r.cats)], ['نوع الجلسة', grp ? 'توجيه جمعي (جماعية)' : 'توجيه فردي'], ['المنفذة', 'الموجهة الطلابية']].filter(x => x[1]);
+  const rows = []; for (let i = 0; i < info.length; i += 2) rows.push(info.slice(i, i + 2));
+  const box = (h, v) => v && String(v).trim() ? `<div class="box full"><h4>${h}</h4>${pList(v, 'ul')}</div>` : '';
+  return `<div class="a4 prep-a4">${repHead(ttl)}<div class="pband"><small>${grp ? 'جلسة جماعية' : 'جلسة فردية'}${r.cats && r.cats.length ? ' · ' + esc(catT(r.cats)) : ''}</small><b>${esc(r.topic || 'جلسة توجيه')}</b></div>
+    <table class="pinfo-t"><tbody>${rows.map(rw => `<tr>${rw.map(([k, v]) => `<th>${k}</th><td${rw.length === 1 ? ' colspan="3"' : ''}>${esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table>
+    <div class="boxes">${box('هدف الجلسة', r.goal)}${box('الإجراءات المتخذة', r.acts)}${box('خطة المتابعة', r.plan)}${box('ملاحظات', r.note)}</div>${repSigs()}</div>`;
 }
 function xsPanel(k) {
   const arr = myFile(k).sessions || []; const grp = k === 'grp';
   return `<section class="panel" style="--c:${FX[k].c}"><div class="head"><h3>${grp ? 'الجلسات الجماعية' : 'الجلسات الفردية'} المضافة هنا</h3><span class="tiny muted">${ar(arr.length)}</span><span class="sp"></span>
     ${grp ? `<button class="btn sm" data-xsgrp="1">＋ لقاء توجيه جمعي</button>` : ''}<button class="btn sm primary" data-xsadd="${k}" style="background:${FX[k].c};border-color:${FX[k].c}">＋ ${grp ? 'جلسة جماعية' : 'جلسة فردية'}</button></div>
     <p class="tiny muted">أي جلسة تضيفينها هنا تطلع في السجل مع جلسات مسار والغياب.</p>
-    ${arr.length ? `<div class="fx-rows">${arr.map((x, i) => [x, i]).sort((a, b) => hKey(b[0].date).localeCompare(hKey(a[0].date))).map(([x, i]) => `<div><small>${esc(hij(x.date))}</small><b>${esc(x.name || '')}</b><span>${esc([catT((x.cats || []).map(c => c === 'absence' ? 'الغياب' : c === 'other' ? 'أخرى' : c)), x.topic].filter(Boolean).join(' · '))}</span><span class="pacts" style="position:static;display:inline-flex;gap:4px;margin-inline-start:auto"><button class="btn sm ghost" data-xsed="${k}:${i}">تعديل</button><button class="btn sm ghost" data-xsdel="${k}:${i}" aria-label="حذف">✕</button></span></div>`).join('')}</div>` : ''}</section>`;
+    ${arr.length ? `<div class="fx-rows act">${arr.map((x, i) => [x, i]).sort((a, b) => hKey(b[0].date).localeCompare(hKey(a[0].date))).map(([x, i]) => `<div><small>${esc(hij(x.date))}</small><b>${esc(x.name || '')}</b><span>${esc([catT((x.cats || []).map(c => c === 'absence' ? 'الغياب' : c === 'other' ? 'أخرى' : c)), x.topic].filter(Boolean).join(' · '))}</span><span class="pacts" style="position:static;display:inline-flex;gap:4px;margin-inline-start:auto"><button class="btn sm" data-xsrep="${k}:${i}">التقرير</button><button class="btn sm ghost" data-xsed="${k}:${i}">تعديل</button><button class="btn sm ghost" data-xsdel="${k}:${i}" aria-label="حذف">✕</button></span></div>`).join('')}</div>` : ''}</section>`;
 }
 document.addEventListener('click', async e => {
-  const b = e.target.closest('[data-xsadd],[data-xsed],[data-xsdel],[data-xsgrp]'); if (!b || b.closest('#sheetbg')) return; e.preventDefault(); const d = b.dataset;
+  const b = e.target.closest('[data-xsadd],[data-xsed],[data-xsdel],[data-xsgrp],[data-xsrep]'); if (!b || b.closest('#sheetbg')) return; e.preventDefault(); const d = b.dataset;
   if (d.xsadd) return xsForm(d.xsadd);
+  if (d.xsrep) { const [k, i] = d.xsrep.split(':'); let r; if (k === 'm') r = (S.fxR || [])[+i]; else r = { ...(myFile(k).sessions || [])[+i] }; if (!r) return; r.type = r.type || (k === 'grp' ? 'جلسة جماعية' : 'جلسة فردية'); return openReport(sesReport(r), (r.type === 'جلسة جماعية' ? 'جلسة-جماعية-' : 'جلسة-فردية-') + String(r.name || '').split(/[،\s]/)[0], FX[k === 'grp' || r.type === 'جلسة جماعية' ? 'grp' : 'ind'].c); }
   if (d.xsgrp) return groupForm();
   if (d.xsed) { const [k, i] = d.xsed.split(':'); return xsForm(k, +i); }
   if (d.xsdel) { const [k, i] = d.xsdel.split(':'); const f = JSON.parse(JSON.stringify(myFile(k))); f.sessions.splice(+i, 1); await saveDoc('myfile-' + k, 'myfile', f); toast('حُذفت الجلسة'); return rerender(); }
@@ -3173,11 +3202,11 @@ function fxPreview(k) {
   let rows = [], head = '';
   if (k === 'ind' || k === 'grp') { const R = mSessions(k === 'ind' ? 'جلسة فردية' : 'جلسة جماعية').slice().reverse(); const G = k === 'grp' ? list('group').sort((a, b) => String(b.date).localeCompare(String(a.date))) : [];
     head = k === 'ind' ? `${ar(R.length)} جلسة فردية لـ ${ar(new Set(R.map(r => norm(r.name))).size)} طالبة` : `${ar(G.length)} لقاء توجيه جمعي · ${ar(R.length)} جلسة جماعية في مسار`;
-    rows = G.slice(0, 12).map(g => [hij(g.date), g.topic, (g.classes || []).join('، ')]).concat(R.slice(0, 15).map(r => [hij(r.date), r.name, [catT(r.cats), r.topic].filter(Boolean).join(' · ')])); }
+    S.fxR = R; rows = G.map(g => [hij(g.date), g.topic, (g.classes || []).join('، '), `data-grep="${g.id}"`]).concat(R.map((r, i) => [hij(r.date), r.name, [catT(r.cats), r.topic].filter(Boolean).join(' · '), `data-xsrep="m:${i}"`])); }
   else if (k === 'ach') { const cs = (S.mcases || []).filter(c => (c.cats || []).some(x => ['delayed', 'excellent', 'gifted'].includes(x)));
     head = `${ar(cs.length)} حالة في مسار`; rows = cs.map(c => [catT((c.cats || []).filter(x => ['delayed', 'excellent', 'gifted'].includes(x))), c.name, (c.grade || '') + ' ' + (c.section || '') + ' · ' + (MSTAT[c.status] || '') + ' · ' + ar((c.follow || []).length) + ' متابعة']); }
   else return '';
-  return `<section class="panel" style="--c:${FX[k].c}"><div class="head"><h3>${esc(head)}</h3></div>${rows.length ? `<div class="fx-rows">${rows.map(r => `<div><small>${esc(r[0])}</small><b>${esc(r[1] || '')}</b><span>${esc(r[2] || '')}</span></div>`).join('')}</div>` : '<p class="small muted">ما فيه شي مسجل بعد.</p>'}</section>`;
+  return `<section class="panel" style="--c:${FX[k].c}"><div class="head"><h3>${esc(head)}</h3></div>${rows.length ? `<div class="fx-rows${rows[0][3] ? ' act' : ''}">${rows.map(r => `<div><small>${esc(r[0])}</small><b>${esc(r[1] || '')}</b><span>${esc(r[2] || '')}</span>${r[3] ? `<button class="btn sm" ${r[3]}>التقرير</button>` : ''}</div>`).join('')}</div>` : '<p class="small muted">ما فيه شي مسجل بعد.</p>'}</section>`;
 }
 function fxBinder(sec) {
   const anonOpt = sec === 'ind' || sec === 'ach' || sec === 'disc';

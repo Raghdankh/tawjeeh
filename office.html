@@ -534,6 +534,7 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .sescard,.sesdone{border:1.5px dashed var(--abs);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}.sesdone{border-style:solid;border-color:var(--line);gap:2px}.sescard .head,.sesdone .head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .a4 .artb td,.a4 .artb th{white-space:normal;word-break:break-word;overflow-wrap:anywhere;vertical-align:top}
 .homesig{display:block;color:var(--good);font-weight:700;font-size:.8rem}.homebox{background:var(--good-soft);border-radius:12px;padding:10px 12px}.homebox small{display:block;color:var(--muted);font-weight:400}
+.xsns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.xsn{display:inline-flex;align-items:center;gap:6px;background:#eef4f2;border-radius:999px;padding:4px 10px;font-size:.9rem}.xsn button{border:0;background:none;cursor:pointer;color:#a33;font-size:.8rem}
 </style>
 </head>
 <body>
@@ -2997,10 +2998,11 @@ async function loadMasar() {
 const anonN = (n, o) => !o || !o.anon ? n : String(n || '').replace(/^مثال:\s*/, '').split(/\s+/).slice(0, 2).map(x => x.charAt(0) + '.').join(' ');
 function mSessions(type) {
   const ab = type === 'جلسة فردية' ? list('absence').flatMap(a => (a.log || []).filter(l => l.type === 'session').map(l => ({ date: l.date, name: a.studentName, grade: a.grade, section: a.section, cats: ['الغياب'], topic: l.topic, goal: l.goal, prog: l.prog, note: l.note }))) : [];
-  return ab.concat((S.mcases || []).flatMap(c => (c.follow || []).filter(f => f.type === type).map(f => ({ date: f.date, name: c.name, grade: c.grade, section: c.section, cats: c.cats || [], topic: f.topic, goal: f.goal, prog: f.prog, note: f.note }))))
-    .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  const xs = (myFile(type === 'جلسة فردية' ? 'ind' : 'grp').sessions || []).map(x => ({ ...x }));
+  return ab.concat(xs, (S.mcases || []).flatMap(c => (c.follow || []).filter(f => f.type === type).map(f => ({ date: f.date, name: c.name, grade: c.grade, section: c.section, cats: c.cats || [], topic: f.topic, goal: f.goal, prog: f.prog, note: f.note }))))
+    .sort((a, b) => hKey(a.date).localeCompare(hKey(b.date)));
 }
-const catT = cs => (cs || []).map(k => MCATS[k] || k).join('، ');
+const catT = cs => (cs || []).map(k => MCATS[k] || (k === 'absence' ? 'الغياب' : k === 'other' ? 'أخرى' : k)).join('، ');
 function tablePages(title, tiles, head, rows, per, row) {
   const pages = []; for (let i = 0; i < Math.max(rows.length, 1); i += per) pages.push(rows.slice(i, i + per));
   return pages.map((ch, pi) => `<div class="a4">${repHead(title)}${pi ? '' : tiles}<table class="wrapall"><thead><tr><th style="width:26px">م</th>${head.map(h => `<th${h[1] ? ` style="width:${h[1]}px"` : ''}>${h[0]}</th>`).join('')}</tr></thead><tbody>${ch.map((r, i) => `<tr><td>${ar(pi * per + i + 1)}</td>${row(r).map(v => `<td>${v}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="${head.length + 1}" style="text-align:center">لا توجد بيانات مسجلة بعد</td></tr>`}</tbody></table>${pi === pages.length - 1 ? repSigs() : ''}</div>`).join('');
@@ -3030,6 +3032,76 @@ function discStats() {
     ${repSigs()}</div>`;
 }
 const myFile = k => DB.docs['myfile-' + k] ? DB.docs['myfile-' + k].data : { k, photos: [] };
+/* تاريخ موحّد للترتيب: الميلادي يتحول هجري */
+const HKF = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', { day: 'numeric', month: 'numeric', year: 'numeric' });
+function hKey(v) { const m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(v || ''); if (!m) return String(v || ''); if (+m[1] < 1600) return m[1] + '-' + pad2(m[2]) + '-' + pad2(m[3]);
+  try { const p = HKF.formatToParts(new Date(v + 'T12:00:00')); const g = t => parseInt((p.find(x => x.type === t) || {}).value, 10); return g('year') + '-' + pad2(g('month')) + '-' + pad2(g('day')); } catch (e) { return String(v); } }
+/* ═════════ إضافة جلسة حرة في ملف التوجيه الفردي / الجمعي ═════════ */
+const XS_CATS = [['absence', 'الغياب']].concat(Object.entries(MCATS)).concat([['other', 'أخرى']]);
+const XS_TOP = {
+  absence: [['أهمية المواظبة والحضور', 'تعزيز الانتظام في الحضور، ومعرفة أسباب الغياب ومساعدة الطالبة على تجاوزها'], ['الحضور المبكر والانضباط', 'تنمية قيمة الانضباط والحرص على الحضور في الوقت المحدد']],
+  separation: [['الدعم النفسي والتكيف', 'تقديم الدعم النفسي للطالبة ومساعدتها على التكيف والاستقرار'], ['التعبير عن المشاعر', 'مساعدة الطالبة على التعبير عن مشاعرها بطريقة صحية']],
+  orphan: [['الدعم النفسي والاحتواء', 'احتواء الطالبة وتقديم الدعم النفسي لها وتعزيز شعورها بالأمان'], ['تعزيز الثقة بالنفس', 'تعزيز ثقة الطالبة بنفسها وتشجيعها على المشاركة']],
+  economic: [['التكيف مع الظروف', 'دعم الطالبة نفسياً وتعزيز رضاها وثقتها بنفسها'], ['متابعة احتياجات الطالبة', 'التعرف على احتياجات الطالبة الدراسية والمعيشية والعمل على تلبيتها']],
+  health: [['التكيف مع الظرف الصحي', 'مساعدة الطالبة على التكيف مع ظرفها الصحي داخل المدرسة'], ['متابعة الحالة الصحية', 'متابعة وضع الطالبة الصحي وأثره على حضورها وتحصيلها']],
+  delayed: [['مهارات المذاكرة وتنظيم الوقت', 'تدريب الطالبة على طرق المذاكرة الصحيحة وتنظيم وقتها'], ['رفع الدافعية للتعلم', 'تعزيز دافعية الطالبة للتعلم وثقتها بقدرتها على التحسن']],
+  psych: [['التعبير عن المشاعر', 'مساعدة الطالبة على التعبير عن مشاعرها بطريقة صحية'], ['التعامل مع القلق', 'تدريب الطالبة على مهارات بسيطة للتعامل مع القلق والتوتر']],
+  behavior: [['تعديل السلوك', 'مساعدة الطالبة على إدراك أثر سلوكها واستبداله بسلوك إيجابي'], ['إدارة الغضب', 'تدريب الطالبة على طرق تهدئة النفس عند الغضب']],
+  excellent: [['المحافظة على التفوق', 'تشجيع الطالبة على الاستمرار في تفوقها وتنظيم وقتها'], ['تنمية الطموح', 'مساعدة الطالبة على وضع أهداف مستقبلية']],
+  gifted: [['رعاية الموهبة', 'التعرف على موهبة الطالبة وتشجيعها على تنميتها'], ['تنمية الطموح', 'مساعدة الطالبة على وضع أهداف مستقبلية']],
+  other: [['التكيف مع البيئة المدرسية', 'مساعدة الطالبة على التكيف مع المدرسة وزميلاتها'], ['العلاقة مع الزميلات', 'تنمية مهارات التواصل والتعامل الإيجابي مع الزميلات'], ['حل المشكلات', 'تدريب الطالبة على خطوات حل المشكلات بهدوء']]
+};
+const XS_GEN = [['تنظيم الوقت', 'مساعدة الطالبة على تنظيم وقتها بين الدراسة والراحة'], ['الثقة بالنفس', 'تعزيز ثقة الطالبة بنفسها وقدراتها'], ['حل المشكلات', 'تدريب الطالبة على خطوات حل المشكلات بهدوء']];
+function xsForm(k, idx) {
+  const grp = k === 'grp'; const arr = myFile(k).sessions || []; const x = idx != null ? arr[idx] : { date: todayH(), cats: [], names: [] };
+  let names = grp ? (x.names || (x.name ? String(x.name).split('، ') : [])).slice() : [];
+  const nameChips = () => names.map((n, i) => `<span class="xsn">${esc(n)}<button type="button" data-xsnrm="${i}" aria-label="حذف">✕</button></span>`).join('') || '<span class="tiny muted">ما أضفتي طالبات بعد</span>';
+  const topBtns = cats => { const seen = new Set(); return cats.flatMap(c => XS_TOP[c] || []).concat(XS_GEN).filter(t => !seen.has(t[0]) && seen.add(t[0])).map(t => `<button type="button" data-xstop="${esc(t[0])}" data-xsgoal="${esc(t[1])}">${esc(t[0])}</button>`).join(''); };
+  const bg = openSheet(idx != null ? 'تعديل الجلسة' : (grp ? 'إضافة جلسة جماعية' : 'إضافة جلسة فردية'), `<div class="form">
+    ${grp ? `<div class="f full"><span>الطالبات</span><div style="display:flex;gap:8px"><input id="xs_n" list="stuList" placeholder="اكتبي اسم الطالبة واختاري" style="flex:1"><button type="button" class="btn sm" data-xsnadd="1">＋ إضافة</button></div><div class="xsns" id="xs_ns">${nameChips()}</div></div>`
+      : `<label class="f full"><span>الطالبة</span><input id="xs_n" list="stuList" required placeholder="اكتبي اسم الطالبة واختاري" value="${esc(x.name ? x.name + (x.grade ? ' — ' + x.grade + (x.section ? ' ' + x.section : '') : '') : '')}"></label>`}
+    <div class="f"><span>التاريخ</span>${hdInput('xs_d', x.date)}</div>
+    <div class="f full"><span>التصنيف</span><div class="clpick" id="xs_c">${XS_CATS.map(([c, t]) => `<label><input type="checkbox" value="${c}"${(x.cats || []).includes(c) ? ' checked' : ''}><span>${t}</span></label>`).join('')}</div></div>
+    <label class="f full"><span>موضوع الجلسة</span><input id="xs_t" required value="${esc(x.topic || '')}" placeholder="اختاري من تحت أو اكتبي"></label>
+    <div class="presets full" id="xs_tb">${topBtns(x.cats || [])}</div>
+    <label class="f full"><span>الهدف</span><textarea id="xs_g" style="min-height:60px">${esc(x.goal || '')}</textarea></label>
+    <label class="f full"><span>ملاحظات <small class="muted" style="font-weight:500">(اختياري)</small></span><textarea id="xs_o" style="min-height:50px">${esc(x.note || '')}</textarea></label></div>
+    ${stuDatalist()}
+    <div class="toolbar"><button class="btn primary" type="submit">حفظ</button></div>`,
+    async f => {
+      const cats = [...f.querySelectorAll('#xs_c input:checked')].map(i => i.value);
+      const topic = f.querySelector('#xs_t').value.trim(); if (topic.length < 2) throw new Error('اختاري موضوع الجلسة');
+      let row;
+      if (grp) { const pend = f.querySelector('#xs_n').value.trim(); if (pend) names.push(resolveStudent(pend).studentName || pend); if (!names.length) throw new Error('أضيفي الطالبات');
+        const st = names.map(n => students().find(s => s.name === n)).filter(Boolean); const one = st.length === names.length && new Set(st.map(s => clsKey(s.grade, s.section))).size === 1;
+        row = { names, name: names.join('، '), grade: one ? st[0].grade : '', section: one ? st[0].section || '' : '' }; }
+      else { const r = resolveStudent(f.querySelector('#xs_n').value); if (!r.studentName) throw new Error('اكتبي اسم الطالبة'); row = { name: r.studentName, grade: r.grade || '', section: r.section || '' }; }
+      Object.assign(row, { date: readHD(f, 'xs_d'), cats, topic, goal: f.querySelector('#xs_g').value.trim(), note: f.querySelector('#xs_o').value.trim(), type: grp ? 'جلسة جماعية' : 'جلسة فردية' });
+      const d = JSON.parse(JSON.stringify(myFile(k))); d.sessions = d.sessions || []; if (idx != null) d.sessions[idx] = row; else d.sessions.push(row);
+      await saveDoc('myfile-' + k, 'myfile', d); toast('حُفظت الجلسة');
+    }, `--c:${FX[k].c};--cs:#f4f7f6`);
+  const addName = () => { const i = bg.querySelector('#xs_n'); const v = i.value.trim(); if (!v) return; const n = resolveStudent(v).studentName || v; if (!names.includes(n)) names.push(n); i.value = ''; bg.querySelector('#xs_ns').innerHTML = nameChips(); };
+  bg.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const d = b.dataset;
+    if (d.xsnadd) addName();
+    else if (d.xsnrm != null) { names.splice(+d.xsnrm, 1); bg.querySelector('#xs_ns').innerHTML = nameChips(); }
+    else if (d.xstop) { const t = bg.querySelector('#xs_t'), g = bg.querySelector('#xs_g'); const old = t.value; t.value = d.xstop; const known = [...bg.querySelectorAll('[data-xsgoal]')].map(z => z.dataset.xsgoal); if (!g.value.trim() || known.includes(g.value.trim()) || old !== d.xstop) g.value = d.xsgoal; bg.querySelectorAll('[data-xstop]').forEach(z => z.setAttribute('aria-pressed', String(z === b))); } });
+  bg.addEventListener('change', e => { if (e.target.closest('#xs_c')) bg.querySelector('#xs_tb').innerHTML = topBtns([...bg.querySelectorAll('#xs_c input:checked')].map(i => i.value));
+    if (grp && e.target.id === 'xs_n') addName(); });
+}
+function xsPanel(k) {
+  const arr = myFile(k).sessions || []; const grp = k === 'grp';
+  return `<section class="panel" style="--c:${FX[k].c}"><div class="head"><h3>${grp ? 'الجلسات الجماعية' : 'الجلسات الفردية'} المضافة هنا</h3><span class="tiny muted">${ar(arr.length)}</span><span class="sp"></span>
+    ${grp ? `<button class="btn sm" data-xsgrp="1">＋ لقاء توجيه جمعي</button>` : ''}<button class="btn sm primary" data-xsadd="${k}" style="background:${FX[k].c};border-color:${FX[k].c}">＋ ${grp ? 'جلسة جماعية' : 'جلسة فردية'}</button></div>
+    <p class="tiny muted">أي جلسة تضيفينها هنا تطلع في السجل مع جلسات مسار والغياب.</p>
+    ${arr.length ? `<div class="fx-rows">${arr.map((x, i) => [x, i]).sort((a, b) => hKey(b[0].date).localeCompare(hKey(a[0].date))).map(([x, i]) => `<div><small>${esc(hij(x.date))}</small><b>${esc(x.name || '')}</b><span>${esc([catT((x.cats || []).map(c => c === 'absence' ? 'الغياب' : c === 'other' ? 'أخرى' : c)), x.topic].filter(Boolean).join(' · '))}</span><span class="pacts" style="position:static;display:inline-flex;gap:4px;margin-inline-start:auto"><button class="btn sm ghost" data-xsed="${k}:${i}">تعديل</button><button class="btn sm ghost" data-xsdel="${k}:${i}" aria-label="حذف">✕</button></span></div>`).join('')}</div>` : ''}</section>`;
+}
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-xsadd],[data-xsed],[data-xsdel],[data-xsgrp]'); if (!b || b.closest('#sheetbg')) return; e.preventDefault(); const d = b.dataset;
+  if (d.xsadd) return xsForm(d.xsadd);
+  if (d.xsgrp) return groupForm();
+  if (d.xsed) { const [k, i] = d.xsed.split(':'); return xsForm(k, +i); }
+  if (d.xsdel) { const [k, i] = d.xsdel.split(':'); const f = JSON.parse(JSON.stringify(myFile(k))); f.sessions.splice(+i, 1); await saveDoc('myfile-' + k, 'myfile', f); toast('حُذفت الجلسة'); return rerender(); }
+});
 function attPages(k) {
   const ph = myFile(k).photos || []; const out = []; for (let i = 0; i < ph.length; i += 2) out.push(ph.slice(i, i + 2));
   return out.map(ch => `<div class="a4">${repHead('مرفقات ' + FX[k].t)}<div class="att">${ch.map(x => `<figure><img data-img="${esc(x)}" alt=""></figure>`).join('')}</div></div>`).join('');
@@ -3064,6 +3136,7 @@ function vFile(k) {
     <p class="lede">${esc(v.d)} السجل كامل يطلع بغلاف وفهرس وأرقام صفحات.</p>
     ${needM && S.mloading ? '<p class="small muted">جارٍ تحميل بيانات مسار…</p>' : ''}
     ${needM && !S.mloading && !(S.mcases || []).length ? '<p class="small muted">ما لقيت حالات في مسار. إذا عندك حالات، افتحي مسار مرة وارجعي هنا.</p>' : ''}
+    ${k === 'ind' || k === 'grp' ? xsPanel(k) : ''}
     ${fxPreview(k)}
     <section class="panel" style="--c:${v.c}"><div class="head"><h3>محتوى السجل</h3><span class="tiny muted">${ar(parts.length)} جزء</span></div>
       <div class="fx-parts">${parts.map((p, i) => `<div class="${p.sub ? 'sub' : ''}"><span>${esc(p.t)}</span><button class="btn sm" data-fxpart="${k}:${i}">عرض وطباعة</button></div>`).join('')}</div></section>

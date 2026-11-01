@@ -1682,7 +1682,7 @@ function progReport(p, full) {
   const st0 = p.steps || []; const st = st0.some(x => x.done) ? st0.filter(x => x.done) : st0; const gs = p.id ? progGroups(p.id) : []; const photos = (p.photos || []).concat(...gs.map(g => g.photos || []));
   const page1 = `<div class="a4 prep-a4">${repHead('تقرير تنفيذ برنامج', p.end || p.start)}<div class="pband"><small>${esc([p.form, p.domain].filter(Boolean).join(' · '))}</small><b>${esc(p.title)}</b></div>${pInfoTable(p)}
     <div class="boxes"><div class="box${p.tools || p.evalm ? '' : ' full'}"><h4>الأهداف</h4>${pList(p.goals)}</div>${p.tools || p.evalm ? `<div class="box">${p.tools ? `<h4>الوسائل والأدوات</h4><p>${esc(p.tools)}</p>` : ''}${p.evalm ? `<h4${p.tools ? ' style="margin-top:6px"' : ''}>أساليب التقويم</h4><p>${esc(p.evalm)}</p>` : ''}</div>` : ''}
-    <div class="box full"><h4>آلية التنفيذ</h4>${st.length ? `<table><thead><tr><th style="width:28px">م</th><th>النشاط / الإجراء</th><th style="width:130px">المسؤولة</th><th style="width:44px">التنفيذ</th></tr></thead><tbody>${st.map((s, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(s.t)}</td><td>${esc(s.who || '')}</td><td style="text-align:center">${s.done ? '✔' : ''}</td></tr>`).join('')}</tbody></table>` : '<p>—</p>'}</div>
+    <div class="box full"><h4>آلية التنفيذ</h4>${st.length ? `<table><thead><tr><th style="width:28px">م</th><th>النشاط / الإجراء</th><th style="width:130px">المسؤولة</th></tr></thead><tbody>${st.map((s, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(s.t)}</td><td>${esc(s.who || '')}</td></tr>`).join('')}</tbody></table>` : '<p>—</p>'}</div>
     ${gs.length ? `<div class="box full"><h4>لقاءات التوجيه الجمعي (${ar(gs.length)})</h4><table><thead><tr><th style="width:28px">م</th><th>الموضوع</th><th style="width:120px">التاريخ</th><th>الفصل</th><th style="width:70px">الحاضرات</th></tr></thead><tbody>${gs.map((g, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(g.topic)}</td><td>${esc(hij(g.date))}</td><td>${esc((g.classes || []).join('، '))}</td><td>${g.count ? ar(g.count) : '—'}</td></tr>`).join('')}</tbody></table></div>` : ''}
     <div class="box"><h4>النتائج والأثر${p.achieve ? ` <span style="font-weight:500">(تحقق الأهداف ${ar(p.achieve)}٪)</span>` : ''}</h4>${pList(p.results, 'ul')}</div>
     <div class="box"><h4>التوصيات</h4>${pList(p.recs, 'ul')}</div></div>${photos.length ? `<div class="evid"><h4>الشواهد</h4><div class="thumbs">${photos.slice(0, 12).map(x => `<figure><img data-img="${esc(x)}" alt=""></figure>`).join('')}</div></div>` : ''}${repSigs()}</div>`;
@@ -1884,9 +1884,9 @@ function lpHTML(a) {
     <p class="small muted">خطة تعوّض فيها الطالبة ما فاتها من دروس أيام الغياب: المواد، وطريقة التعويض، والمعلمة المسؤولة، ودور ولي الأمر.</p>
     <button class="btn primary" data-act="lpEdit" style="align-self:flex-start">＋ إعداد خطة التعلم</button></section>`;
   const rows = p.rows || []; const dn = rows.filter(r => r.done).length;
-  return `<section class="panel" style="border-color:var(--abs)"><div class="head"><h3>خطة التعلم في أيام الغياب</h3><span class="tiny muted">${ar(dn)} من ${ar(rows.length)} مادة</span><span class="sp"></span><button class="btn sm" data-act="lpEdit">تعديل</button><button class="btn sm danger" data-act="lpDel">حذف</button></div>
+  return `<section class="panel" style="border-color:var(--abs)"><div class="head"><h3>خطة التعلم في أيام الغياب</h3><span class="sp"></span><button class="btn sm" data-act="lpEdit">تعديل</button><button class="btn sm danger" data-act="lpDel">حذف</button></div>
     <p class="small muted">${p.from ? 'أيام الغياب: ' + esc(hij(p.from)) + (p.to && p.to !== p.from ? ' إلى ' + esc(hij(p.to)) : '') + ' · ' : ''}${p.date ? 'إعداد الخطة: ' + esc(hij(p.date)) : ''}</p>
-    ${rows.length ? `<div class="pbar" style="--c:var(--abs)"><i style="width:${Math.round(100 * dn / rows.length)}%"></i></div>
+    ${rows.length ? `
     <div class="lprows">${rows.map((r, i) => `<label class="chk" style="--sc:var(--abs)"><input type="checkbox" data-lpdone="${i}" ${r.done ? 'checked' : ''}><span><b>${esc(r.sub)}</b>${r.lessons ? ': ' + esc(r.lessons) : ''}<small>${[r.who, r.done && r.doneAt ? 'تم: ' + hij(r.doneAt) : ''].filter(Boolean).map(esc).join(' · ')}</small></span></label>`).join('')}</div>` : ''}
     ${(p.methods || []).length ? `<div><b class="small">طريقة التعويض</b><div class="meta" style="margin-top:4px">${p.methods.map(m => `<span class="chip c">${esc(m)}</span>`).join('')}</div></div>` : ''}
     ${lines(p.parent).length ? `<div><b class="small">دور ولي الأمر</b><ul class="goals">${lines(p.parent).map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
@@ -1919,7 +1919,7 @@ function lpReportBox(a) {
   const p = a.lp; if (!p) return '';
   const rows = p.rows || [];
   return `<div class="box full"><h4>خطة التعلم في أيام الغياب${p.from ? ` <span style="font-weight:500">(${esc(hij(p.from))}${p.to && p.to !== p.from ? ' إلى ' + esc(hij(p.to)) : ''})</span>` : ''}</h4>
-    <table><thead><tr><th style="width:26px">م</th><th style="width:150px">المادة</th><th>الدروس الفائتة</th><th style="width:110px">المعلمة</th><th style="width:44px">التعويض</th></tr></thead><tbody>${rows.map((r, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(r.sub)}</td><td>${esc(r.lessons || '')}</td><td>${esc(r.who || '')}</td><td style="text-align:center">${r.done ? '✔' : ''}</td></tr>`).join('')}</tbody></table>
+    <table><thead><tr><th style="width:26px">م</th><th style="width:150px">المادة</th><th>الدروس الفائتة</th><th style="width:110px">المعلمة</th></tr></thead><tbody>${rows.map((r, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(r.sub)}</td><td>${esc(r.lessons || '')}</td><td>${esc(r.who || '')}</td></tr>`).join('')}</tbody></table>
     ${(p.methods || []).length ? `<p style="margin-top:4px"><b>طريقة التعويض:</b> ${p.methods.map(esc).join('، ')}</p>` : ''}
     ${lines(p.parent).length ? `<p><b>دور ولي الأمر:</b> ${lines(p.parent).map(esc).join('، ')}</p>` : ''}${p.follow ? `<p><b>المتابعة والتقويم:</b> ${esc(p.follow)}</p>` : ''}</div>`;
 }
@@ -2393,7 +2393,7 @@ function vValueOne(k) {
       <div class="toolbar"><button class="btn hint" data-act="vAI" title="اقتراحات" aria-label="اقتراحات">✦</button><button class="btn primary" data-act="vRep">تقرير التنفيذ</button></div></div>
     <section class="panel"><div class="head"><h3>بيانات التنفيذ</h3><span class="sp"></span><button class="btn sm" data-act="vEdit">${valDoc(k) ? 'تعديل' : 'تعبئة البيانات'}</button></div>${info.length ? `<dl class="pinfo">${info.map(([a, b]) => `<div><dt>${a}</dt><dd>${esc(b)}</dd></div>`).join('')}</dl>` : '<p class="small muted">اكتبي فترة التنفيذ والفئة المستهدفة وعدد المستفيدات.</p>'}
       <div><b class="small">الأهداف</b><ol class="goals">${lines(d.goals).map(g => `<li>${esc(g)}</li>`).join('')}</ol></div></section>
-    <section class="panel"><div class="head"><h3>الأنشطة والفعاليات</h3><span class="tiny muted">${ar(steps.filter(s => s.done).length)} من ${ar(steps.length)} نُفّذ</span><span class="sp"></span><button class="btn sm primary" data-act="vStep">＋ نشاط</button></div>
+    <section class="panel"><div class="head"><h3>الأنشطة والفعاليات</h3><span class="sp"></span><button class="btn sm primary" data-act="vStep">＋ نشاط</button></div>
       <p class="tiny muted">أنشطة مقترحة للقيمة: أشّري على اللي نفذتيه، واحذفي اللي ما يناسب، وأضيفي أنشطتك.</p>
       <ol class="steps">${steps.map((s, i) => `<li class="${s.done ? 'done' : ''}"><label class="chk" style="--sc:${v.c}"><input type="checkbox" data-vdone="${i}" ${s.done ? 'checked' : ''}><span>${esc(s.t)}${s.who ? `<small>${esc(s.who)}</small>` : ''}</span></label><span class="sbtn"><button class="btn sm ghost" data-vstep="${i}" aria-label="تعديل">✎</button><button class="btn sm ghost" data-vdel="${i}" aria-label="حذف">✕</button></span></li>`).join('')}</ol></section>
     <section class="panel"><div class="head"><h3>الشواهد</h3><span class="tiny muted">${ar((d.photos || []).length)} صورة</span><span class="sp"></span><label class="btn primary sm" style="cursor:pointer">＋ صور<input type="file" accept="image/*" multiple data-vph hidden></label></div><p class="tiny muted" id="vphMsg">صور تنفيذ القيمة: الإذاعة، والأنشطة، والجداريات، والتكريم.</p>
@@ -2432,7 +2432,7 @@ function valReport(k) {
   const page1 = `<div class="a4 prep-a4">${repHead('تقرير تنفيذ قيمة')}<div class="pband" style="border-color:${v.c};background:color-mix(in srgb,${v.c} 9%,#fff)"><small style="color:${v.c}">تعزيز السلوك الإيجابي · القيمة ${ar(v.n)}</small><b>${esc(v.t)}</b><span style="font-size:12px;color:#3c4a47">${esc(v.def)}</span></div>
     <table class="pinfo-t"><tbody>${rows.map(rw => `<tr>${rw.map(([a, b]) => `<th>${a}</th><td${rw.length === 1 ? ' colspan="3"' : ''}>${esc(b)}</td>`).join('')}</tr>`).join('')}</tbody></table>
     <div class="boxes"><div class="box"><h4>الأهداف</h4>${pList(d.goals)}</div><div class="box"><h4>مؤشرات الأثر</h4>${pList(d.ind, 'ul')}</div>
-    <div class="box full"><h4>الأنشطة والفعاليات المنفذة</h4><table><thead><tr><th style="width:28px">م</th><th>النشاط</th><th style="width:140px">المنفذة</th><th style="width:44px">التنفيذ</th></tr></thead><tbody>${(done.length ? done : steps).map((s, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(s.t)}</td><td>${esc(s.who || '')}</td><td style="text-align:center">${s.done ? '✔' : ''}</td></tr>`).join('') || '<tr><td colspan="4">—</td></tr>'}</tbody></table></div>
+    <div class="box full"><h4>الأنشطة والفعاليات المنفذة</h4><table><thead><tr><th style="width:28px">م</th><th>النشاط</th><th style="width:140px">المنفذة</th></tr></thead><tbody>${(done.length ? done : steps).map((s, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(s.t)}</td><td>${esc(s.who || '')}</td></tr>`).join('') || '<tr><td colspan="3">—</td></tr>'}</tbody></table></div>
     <div class="box"><h4>أساليب التقويم</h4>${pList(d.evalm, 'ul')}</div><div class="box"><h4>التوصيات</h4>${pList(d.recs, 'ul')}</div>
     ${d.honored ? `<div class="box full"><h4>المتميزات في القيمة</h4><p>${lines(d.honored).map(esc).join('، ')}</p></div>` : ''}</div>${evidHTML(photos)}${repSigs()}</div>`;
   return page1;
@@ -2875,7 +2875,7 @@ function vFiles() {
     ach: ar(cs.filter(c => (c.cats || []).some(k => ['delayed', 'excellent', 'gifted'].includes(k))).length) + ' حالة', ind: ar(ind) + ' جلسة', grp: ar(list('group').length + mSessions('جلسة جماعية').length) + ' لقاء' };
   return `<div class="head"><h1><span class="dot"></span>ملفاتي</h1></div>
     <p class="lede">سجلاتك الرسمية في مكان واحد. كل سجل يتجمع لحاله من بيانات المنصة ومسار، وتقدرين تضيفين له صور أوراقك، وتطبعينه بغلاف وفهرس.</p>
-    ${cur ? `<a class="fx-now" href="#files/${cur.p.id}/${cur.w.i}" style="--c:${FX.plans.c}"><span>هذا الأسبوع</span><b>الأسبوع ${ORD[cur.w.n]}: ${esc(cur.w.s.title || (cur.w.s.items || [])[0] || '')}</b><small>${ar(wkDone(cur.w.s))} من ${ar(wkTotal(cur.w.s))} منفذ · فتح الخطة الأسبوعية ←</small></a>` : ''}
+    ${cur ? `<a class="fx-now" href="#files/${cur.p.id}/${cur.w.i}" style="--c:${FX.plans.c}"><span>هذا الأسبوع</span><b>الأسبوع ${ORD[cur.w.n]}: ${esc(cur.w.s.title || (cur.w.s.items || [])[0] || '')}</b><small>فتح الخطة الأسبوعية ←</small></a>` : ''}
     <div class="fx-grid">${Object.entries(FX).map(([k, v]) => `<a class="fx-card" href="#files/${k}" style="--c:${v.c}"><span class="fx-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${v.ic}</svg></span>
       <div><b>${esc(v.t)}</b><p>${esc(v.d)}</p><small>${S.mloading && k !== 'plans' && k !== 'disc' ? 'جارٍ التحميل…' : esc(stat[k])}</small></div></a>`).join('')}</div>`;
 }
@@ -2889,7 +2889,7 @@ function vPlans() {
     ${pl.length ? `<div class="list">${pl.map(p => { const ws = planWeeks(p).filter(w => !w.br); const tot = ws.reduce((s, w) => s + wkTotal(w.s), 0), dn = ws.reduce((s, w) => s + wkDone(w.s), 0); const pct = tot ? Math.round(100 * dn / tot) : 0; const cw = curWeek(p);
       return `<article class="pcard" style="--c:${FX.plans.c}"><a class="pc-main" href="#files/${p.id}"><div class="pc-top"><span class="pc-dom">${esc(p.term || '')} ${p.year ? ar(p.year) + 'هـ' : ''}</span>${cw ? `<span class="pill" style="--pc:${FX.plans.c};--ps:#DDF2F0">الأسبوع ${ORD[cw.n]}</span>` : ''}</div>
         <h3 class="pc-t">${esc(p.title)}</h3><p class="pc-sub">${ar(ws.length)} أسبوع${ws.length ? `<i>•</i>${hShort(ws[0].from)} — ${hShort(ws[ws.length - 1].to)}` : ''}</p>
-        <div class="pc-prog"><div class="pc-bar"><i style="width:${pct}%"></i></div><span>${ar(dn)}/${ar(tot)} نشاط منفذ</span></div></a>
+        </a>
         <div class="pc-acts"><button class="pc-btn" data-fxsem="${p.id}">الخطة الفصلية</button><button class="pc-btn" data-fxweeks="${p.id}">الخطط الأسبوعية</button><a class="pc-open" href="#files/${p.id}">فتح</a></div></article>`; }).join('')}</div>`
       : '<div class="empty"><b>ما فيه خطط بعد</b><span>أضيفي خطة الفصل الأول الجاهزة، أو ابدئي خطة جديدة.</span></div>'}`;
 }
@@ -2905,7 +2905,7 @@ function vPlan() {
     <div class="wk-grid">${ws.map(w => w.br ? `<div class="wk br"><div class="wk-h"><b>${esc(w.s.t)}</b><small>${hNum(w.from)} — ${hNum(w.to)}</small></div><div class="wk-b"><span>إجازة</span></div><button class="wk-x" data-fxbrdel="${w.i}" aria-label="حذف الإجازة">✕</button></div>`
       : `<a class="wk${td >= w.from && td <= w.from + 6 * DAYMS ? ' now' : ''}" href="#files/${S.param}/${w.i}"><div class="wk-h"><b>الأسبوع ${ORD[w.n] || ar(w.n + 1)}</b><small>${hNum(w.from)} — ${hNum(w.to)}</small></div>
         <div class="wk-b">${(w.s.items || []).length ? w.s.items.map(t => `<span>${esc(t)}</span>`).join('') : '<span class="muted">لم تُحدد برامج</span>'}${offNote(w.s) ? `<em>${offNote(w.s)}</em>` : ''}</div>
-        <div class="wk-f"><span>قيمة الأسبوع: <b>${esc(w.s.value || '—')}</b></span><span>${ar(wkDone(w.s))}/${ar(wkTotal(w.s))}</span></div></a>`).join('')}</div>`;
+        <div class="wk-f"><span>قيمة الأسبوع: <b>${esc(w.s.value || '—')}</b></span></div></a>`).join('')}</div>`;
 }
 
 function vWeek() {
@@ -2922,7 +2922,7 @@ function vWeek() {
       ${prog ? `<a class="btn sm" href="#programs/${prog.id}" style="align-self:flex-start">فتح برنامج «${esc(prog.title)}» ←</a>` : ''}</section>
       <section class="panel"><div class="head"><h3>أهداف الأسبوع</h3></div>${(s.goals || []).length ? `<ol class="goals">${s.goals.map(t => `<li>${esc(t)}</li>`).join('')}</ol>` : '<p class="small muted">لم تُكتب.</p>'}</section></div>
     ${prog ? `<div class="wk-ev"><span>${wph.length ? `شواهد برنامج «${esc(prog.title)}»: <b>${ar(wph.length)} ${wph.length >= 3 && wph.length <= 10 ? 'صور' : 'صورة'}</b>` : `ما فيه شواهد في برنامج «${esc(prog.title)}» بعد`}</span><a class="btn sm" href="#programs/${prog.id}">${wph.length ? 'عرضها' : 'أضيفيها'} ←</a></div>` : ''}
-    <section class="panel"><div class="head"><h3>أنشطة الأيام</h3><span class="tiny muted">${ar(wkDone(s))} من ${ar(wkTotal(s))} منفذ</span></div>
+    <section class="panel"><div class="head"><h3>أنشطة الأيام</h3></div>
       <div class="days">${(s.days || []).map((d, i) => `<div class="day${d.off ? ' off' : d.done ? ' done' : ''}"><div class="dn"><b>${WDAYS[i]}</b><small>${hShort(w.from + i * DAYMS)}</small></div>
         ${d.off ? `<div class="da"><b class="offt">${esc(d.off)}</b></div>` : `<div class="da"><p>${esc(d.a || '—')}</p><div class="meta">${d.t ? `<span class="chip">${esc(d.t)}</span>` : ''}${d.w ? `<span class="chip">${esc(d.w)}</span>` : ''}${d.e ? `<span class="chip">الشاهد: ${esc(d.e)}</span>` : ''}</div></div>
         <label class="chk dchk" style="--sc:${c}"><input type="checkbox" data-fxdone="${i}" ${d.done ? 'checked' : ''}><span>تم</span></label>`}</div>`).join('')}</div></section>`;
@@ -3006,8 +3006,8 @@ function weekReport(p, w) {
   return `<div class="a4 wk-a4">${repHead('الخطة الأسبوعية للتوجيه الطلابي')}
     <div class="wkr-band"><div><b>الأسبوع ${ORD[w.n]}${s.title ? ' — ' + esc(s.title) : ''}</b><small>${esc(p.term || '')} ${ar(p.year || '')}هـ</small></div><span>${hShort(w.from)} — ${hShort(w.to)}</span></div>
     <div class="wkr-top"><div class="box"><h4>أهداف الأسبوع</h4>${(s.goals || []).length ? `<ol>${s.goals.map(g => `<li>${esc(g)}</li>`).join('')}</ol>` : '<p>—</p>'}${(s.items || []).length ? `<h4 style="margin-top:6px">برامج الأسبوع</h4><p>${s.items.map(esc).join('، ')}</p>` : ''}</div><div class="wkr-val"><small>قيمة الأسبوع</small><b>${esc(s.value || '—')}</b><small>تعزيز السلوك الإيجابي</small></div></div>
-    <table class="wrapall"><thead><tr><th style="width:62px">اليوم</th><th style="width:78px">التاريخ</th><th>النشاط / الإجراء</th><th style="width:96px">الفئة المستهدفة</th><th style="width:108px">المنفذة</th><th style="width:74px">الشاهد</th><th style="width:40px">التنفيذ</th></tr></thead>
-    <tbody>${(s.days || []).map((d, i) => `<tr><td><b>${WDAYS[i]}</b></td><td>${hShort(w.from + i * DAYMS)}</td>${d.off ? `<td colspan="5" class="offc">${esc(d.off)}</td>` : `<td>${esc(d.a || '')}</td><td>${esc(d.t || '')}</td><td>${esc(d.w || '')}</td><td>${esc(d.e || '')}</td><td style="text-align:center">${d.done ? '✔' : '☐'}</td>`}</tr>`).join('')}</tbody></table>
+    <table class="wrapall"><thead><tr><th style="width:62px">اليوم</th><th style="width:78px">التاريخ</th><th>النشاط / الإجراء</th><th style="width:96px">الفئة المستهدفة</th><th style="width:108px">المنفذة</th><th style="width:74px">الشاهد</th></tr></thead>
+    <tbody>${(s.days || []).map((d, i) => `<tr><td><b>${WDAYS[i]}</b></td><td>${hShort(w.from + i * DAYMS)}</td>${d.off ? `<td colspan="4" class="offc">${esc(d.off)}</td>` : `<td>${esc(d.a || '')}</td><td>${esc(d.t || '')}</td><td>${esc(d.w || '')}</td><td>${esc(d.e || '')}</td>`}</tr>`).join('')}</tbody></table>
     <div class="wkr-notes"><b>ملاحظات المتابعة:</b></div>${repSigs()}</div>`;
 }
 const planPair = id => { const p = { id, ...DB.docs[id].data }; return { p, ws: planWeeks(p).filter(w => !w.br) }; };

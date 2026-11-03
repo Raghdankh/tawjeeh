@@ -1,5 +1,6 @@
 <!doctype html><html lang="ar" dir="rtl"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}button,label,.btn,.clpick,.clpick *,.presets,.presets *,.chip,.chips,.subtabs,nav,[role=tab],[data-gtopic],[data-xstop],[data-xsact],[data-gsg]{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
 [data-tmsg][aria-pressed="true"]{background:#1F6F64;border-color:#1F6F64;color:#fff}
+.case .hlth{color:#1F7A6E;font-weight:700}
 </style></head><body>
 <title>مسار · سجل الحالات</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -684,12 +685,14 @@ function renderMain(){
   if(keepQ!==null){const i=$('#f-q');if(i){i.focus();try{i.setSelectionRange(keepQ,keepQ)}catch(_){}}}
 }
 function catChips(cats){return (cats||[]).map(k=>CAT[k]?`<span class="chip k-${k}"><i class="dot"></i>${esc(CAT[k].t)}</span>`:'').join('')}
+/* الحالة الصحية نفسها من وصف الحالة (مثل: حساسية من الحليب) */
+function healthOf(c){ if(!(c.cats||[]).includes('health')) return ''; const d=String(c.desc||''); const m=/الحالة الصحية\s*:\s*([^.\n]+)/.exec(d); if(m) return m[1].trim(); const f=d.split(/[.\n]/)[0].trim(); return f.length<=60?f:''; }
 function caseRow(c){
   const k=(c.cats||[])[0]||'';const l=lastFollow(c);const late=needsFollow(c);const pd=planDone(c);
   return `<button class="case" data-act="open" data-id="${esc(c.id)}">
     <span class="av k-${k}" aria-hidden="true">${esc(initial(c.name))}</span>
     <span class="body"><span class="nm">${esc(c.name)}</span><span class="meta">${catChips(c.cats)}</span>
-      <span class="small muted">الصف ${esc(c.grade||'—')}${c.section?' / '+esc(c.section):''}</span></span>
+      <span class="small muted">الصف ${esc(c.grade||'—')}${c.section?' / '+esc(c.section):''}</span>${healthOf(c)?`<span class="small hlth">${esc(healthOf(c))}</span>`:''}</span>
     <span class="side"><span class="st st-${c.status}">${ST[c.status]||''}</span></span></button>`;
 }
 function repRow(r){

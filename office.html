@@ -2650,7 +2650,7 @@ function absListHTML(r) {
 }
 function amListReport(r) {
   const L = r.list || []; const per = 26; const pages = []; for (let i = 0; i < Math.max(L.length, 1); i += per) pages.push(L.slice(i, i + per)); const many = L.filter(x => (x.x >= 3 || x.u >= 3));
-  const tbl = (rows, off) => `<table><thead><tr><th style="width:26px">م</th><th>اسم الطالبة</th><th style="width:62px">الصف</th><th style="width:44px">بعذر</th><th style="width:52px">بدون عذر</th><th>أسباب الغياب</th><th>الخدمات الإرشادية</th></tr></thead><tbody>${rows.map((x, i) => `<tr><td>${ar(off + i + 1)}</td><td>${esc(x.name)}</td><td>${esc(x.grade.replace('ال', '') + ' ' + x.section)}</td><td>${x.x ? ar(x.x) : ''}</td><td>${x.u ? ar(x.u) : ''}</td><td>${esc(x.reason)}</td><td>${esc(svcFor(x))}</td></tr>`).join('')}</tbody></table>`;
+  const tbl = (rows, off) => `<table><thead><tr><th style="width:26px">م</th><th>اسم الطالبة</th><th style="width:80px">الصف</th><th style="width:50px">بعذر</th><th style="width:60px">بدون عذر</th><th>أسباب الغياب</th></tr></thead><tbody>${rows.map((x, i) => `<tr><td>${ar(off + i + 1)}</td><td>${esc(x.name)}</td><td>${esc(x.grade.replace('ال', '') + ' ' + x.section)}</td><td>${x.x ? ar(x.x) : ''}</td><td>${x.u ? ar(x.u) : ''}</td><td>${esc(x.reason)}</td></tr>`).join('')}</tbody></table>`;
   return pages.map((ch, pi) => `<div class="a4" style="font-size:11.5px">${repHead('الطالبات الغائبات لشهر ' + amLabel(r))}${tbl(ch, pi * per)}</div>`).join('') +
     `<div class="a4" style="font-size:12px">${repHead('كثيرات الغياب لشهر ' + amLabel(r))}${tbl(many, 0)}<p style="margin-top:8px"><b>عدد الطالبات كثيرات الغياب:</b> ${ar(many.length)} طالبة، وتم تحويلهن إلى الموجهة الطلابية.</p>${repSigs()}</div>`;
 }

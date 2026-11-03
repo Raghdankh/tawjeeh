@@ -1,4 +1,5 @@
 <!doctype html><html lang="ar" dir="rtl"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}button,label,.btn,.clpick,.clpick *,.presets,.presets *,.chip,.chips,.subtabs,nav,[role=tab],[data-gtopic],[data-xstop],[data-xsact],[data-gsg]{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+[data-tmsg][aria-pressed="true"]{background:#1F6F64;border-color:#1F6F64;color:#fff}
 </style></head><body>
 <title>مسار · سجل الحالات</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -814,15 +815,23 @@ async function fillThumbs(root=document){
 function openFollowForm(fid){
   const c=S.docs.get(S.open); PENDING=[]; S.fmode=fid||'new';
   const f=fid?(c.follow||[]).find(z=>z.id===fid):null;
-  S.fprefill=f?{fd:f.date,ft:f.type,ftop:f.topic||'',fg:f.goal||'',fn:f.note||'',fpl:f.plan||''}:{fd:todayISO(),ft:'جلسة فردية',ftop:'',fg:'',fn:'',fpl:''};
+  S.fprefill=f?{fd:f.date,ft:f.type,ftop:f.topic||'',fg:f.goal||'',fn:f.note||'',fpl:f.plan||''}:{fd:sesDefDate(c),ft:'جلسة فردية',ftop:'',fg:'',fn:'',fpl:''};
   PROGSEL=f?f.prog||null:null; renderCase();
   setTimeout(()=>{const el=document.getElementById('followform'); if(el) el.scrollIntoView({behavior:'smooth',block:'start'})},60);
+}
+/* تاريخ الجلسة الافتراضي: أول يوم دراسي بعد تاريخ الإحالة (يتجاوز الجمعة والسبت)، ولا يتعدى اليوم */
+function sesDefDate(c){
+  const today=todayISO(); const hasSes=(c.follow||[]).some(z=>/جلسة/.test(z.type||''));
+  if(hasSes||!/^\d{4}-\d{2}-\d{2}$/.test(c.date||'')) return today;
+  const d=new Date(c.date+'T12:00:00'); do{ d.setDate(d.getDate()+1); }while(d.getDay()===5||d.getDay()===6);
+  const v=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  return v>today?today:v;
 }
 function followFormHTML(c){
   const f=S.fmode&&S.fmode!=='new'?(c.follow||[]).find(z=>z.id===S.fmode):null;
   return `<div class="panel" id="followform" style="border-color:var(--c)"><div class="sechead" style="margin-bottom:10px"><h3>${f?'تعديل الجلسة':'جلسة جديدة'}</h3><button type="button" class="btn sm ghost" data-act="cancelfollow">إلغاء</button></div>
        <form class="form" data-form="follow">
-         <div class="grid2"><label class="field"><span>التاريخ</span><input type="date" id="fd" value="${todayISO()}" required></label>
+         <div class="grid2"><label class="field"><span>التاريخ</span><input type="date" id="fd" value="${sesDefDate(c)}" required></label>
          <label class="field"><span>النوع</span><select id="ft">${FTYPES.map(t=>`<option>${t}</option>`).join('')}</select></label></div>
          <div class="autofill"><span class="small">اختاري العبارات الجاهزة تحت كل حقل، أو عبّئي كل الحقول دفعة واحدة</span><button type="button" class="btn sm primary" data-act="autofill">تعبئة تلقائية</button></div>
          <div class="field"><label for="ftop">موضوع الجلسة (يظهر تحت عنوان التقرير)</label><input id="ftop" placeholder="اختاري من الجاهز أو اكتبي"><div id="o-ftop"></div></div>
@@ -1481,6 +1490,23 @@ function acceptRef(id) {
   toast('فُتحت الحالة، وأصبحت عند المعلمة «تحت المتابعة»');
 }
 
+/* ── رسائل جاهزة للمعلمة حسب تصنيف الحالة ── */
+const TMSG = {
+  delayed: [['متابعة دراسية', 'بدأنا متابعة الطالبة دراسياً، وتم عقد جلسة توجيه فردي معها لمعرفة أسباب التأخر ومساعدتها على تنظيم مذاكرتها. نرجو تزويدها بخطة علاجية في مادتك وتشجيعها على المشاركة، وإفادتنا بأي تحسن تلاحظينه.'], ['تواصلنا مع الأسرة (تحصيل)', 'تم التواصل مع ولي أمر الطالبة لمتابعة واجباتها ومذاكرتها في البيت. نرجو تعزيز أي تقدم تلاحظينه في مستواها، وإفادتنا به.']],
+  behavior: [['تعديل السلوك', 'بدأنا المتابعة، وتم عقد جلسة توجيه فردي مع الطالبة ومناقشتها في أسباب السلوك ومساعدتها على تعديله، وتعهدت بالانضباط داخل الحصص. نرجو تعزيز سلوكها الإيجابي وإفادتنا بأي ملاحظة.'], ['تواصلنا مع الأسرة (سلوك)', 'تم التواصل مع ولي أمر الطالبة للتعاون في تعديل سلوكها. نرجو متابعتها داخل الفصل وإفادتنا بمدى التزامها.']],
+  psych: [['دعم الطالبة', 'بدأنا المتابعة مع الطالبة وتقديم الدعم المناسب لها. نرجو مراعاتها داخل الفصل وتشجيعها، وإفادتنا بأي ملاحظة.']],
+  health: [['مراعاة الحالة الصحية', 'تم الاطلاع على حالة الطالبة ومتابعتها. نرجو مراعاة وضعها الصحي داخل الفصل وتعويضها عما يفوتها، وإشعارنا بأي طارئ.']],
+  economic: [['متابعة بسرية', 'تم الاطلاع على حالة الطالبة، وجارٍ التعامل معها بسرية. شكراً لاهتمامك، ونرجو إفادتنا بأي احتياج تلاحظينه لدى الطالبة.']],
+  separation: [['احتواء الطالبة', 'تم الاطلاع على حالة الطالبة وبدأنا المتابعة معها. نرجو احتواءها وتشجيعها داخل الفصل، وإفادتنا بأي ملاحظة.']],
+  orphan: [['احتواء الطالبة', 'تم الاطلاع على حالة الطالبة وبدأنا المتابعة معها. نرجو احتواءها وتشجيعها داخل الفصل، وإفادتنا بأي ملاحظة.']],
+  excellent: [['رعاية التفوق', 'شكراً لترشيحك، وسيتم تشجيع الطالبة ورعاية تفوقها. نرجو الاستمرار في إثرائها داخل الفصل.']],
+  gifted: [['رعاية الموهبة', 'شكراً لترشيحك، وسيتم التعرف على موهبة الطالبة ورعايتها. نرجو تشجيعها وإتاحة الفرصة لها لإبراز موهبتها.']]
+};
+const TMSG_GEN = [['تم الاستلام', 'تم استلام الإحالة وبدأنا المتابعة مع الطالبة، شكراً لتعاونك.'], ['تحسنت الطالبة', 'تحسنت الطالبة ولله الحمد، شكراً لتعاونك ومتابعتك، ونرجو الاستمرار في تشجيعها.'], ['إغلاق الحالة', 'تم إغلاق الحالة بعد تحسن الطالبة، شكراً لتعاونك واهتمامك.']];
+function tmsgList(c) { const seen = new Set(); return (c.cats || []).flatMap(k => TMSG[k] || []).concat(TMSG_GEN).filter(t => !seen.has(t[1]) && seen.add(t[1])); }
+document.addEventListener('click', e => { const b = e.target.closest('[data-tmsg]'); if (!b) return; e.preventDefault(); const c = S.docs.get(S.open); const ta = document.getElementById('m-msg'); if (!c || !ta) return;
+  const t = tmsgList(c)[+b.dataset.tmsg]; if (!t) return; ta.value = t[1]; if (c.refId) M.msgDraft[c.refId] = ta.value; document.querySelectorAll('[data-tmsg]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); });
+
 /* ── لوحة الإحالة داخل الحالة ── */
 function refPanelHTML(c) {
   const r = M.refs.find(x => x.id === c.refId), st = caseToRef(c.status);
@@ -1490,6 +1516,7 @@ function refPanelHTML(c) {
     <p class="small muted">${r ? esc(r.teacher_name || '') + ' · ' : ''}ما تراه المعلمة الآن: <b class="mpill s-${st}">${REF_ST[st]}</b></p>
     <label class="field"><span class="small">رسالة للمعلمة، تظهر لها تحت محطات الإحالة (بلا تفاصيل سرية)</span>
       <textarea class="inp" id="m-msg" rows="3" placeholder="مثال: بدأنا المتابعة، نرجو تشجيعها على المشاركة.">${esc(v)}</textarea></label>
+    <div class="row" style="gap:6px;flex-wrap:wrap">${tmsgList(c).map((t, i) => `<button type="button" class="btn sm" data-tmsg="${i}">${esc(t[0])}</button>`).join('')}</div>
     <div><button class="btn sm primary" data-act="m-msg" data-id="${c.refId}">إرسال الرسالة</button></div>
     ${fbOf(c.refId).length ? `<div style="display:grid;gap:8px;border-top:1px dashed var(--line);padding-top:10px;margin-top:4px"><b class="small">ملاحظات المعلمة عن تطورها</b>
       ${fbOf(c.refId).slice().reverse().map(f => `<div class="mfb"><span class="mpill ${FBP[f.prog][1]}">${FBP[f.prog][0]}</span><span class="small" style="flex:1 1 200px;white-space:pre-wrap">${esc(f.body || '')}</span><span class="small muted">${D(f.created_at.slice(0, 10))}</span>
@@ -2086,6 +2113,26 @@ const MWA_T = [
   { k: 'check', t: 'اطمئنان ومتابعة', body: 'نطمئن على ابنتكم، ونود التواصل معكم لمتابعة أحوالها. نأمل الاتصال بالموجهة الطلابية في الوقت المناسب لكم.' },
   { k: 'thx', t: 'شكر على التعاون', body: 'نشكر لكم تعاونكم واهتمامكم بمتابعة ابنتكم، ويسعدنا ما لمسناه من تحسن. بارك الله فيكم وفيها.' },
   { k: 'free', t: 'رسالة خاصة', body: '' }];
+/* رسائل جاهزة حسب تصنيف الحالة (تظهر فقط إذا كانت الحالة من هذا التصنيف) */
+const MWA_CAT = {
+  delayed: [
+    { k: 'd1', t: 'متابعة التحصيل الدراسي', body: 'نفيدكم بأن ابنتكم بحاجة إلى متابعة في مستواها الدراسي، وقد بدأنا بالتنسيق مع معلماتها لمساعدتها على التحسن. نأمل تعاونكم في متابعة واجباتها ومذاكرتها اليومية في البيت، وتشجيعها على كل تقدم تحققه، ولكم جزيل الشكر.' },
+    { k: 'd2', t: 'خطة دعم دراسي', body: 'نود إشعاركم بأنه تم إعداد خطة لدعم ابنتكم دراسياً بالتعاون مع معلمات المواد. نأمل مساعدتها في تنظيم وقت المذاكرة في البيت، والتواصل مع الموجهة الطلابية عند الحاجة، ولكم جزيل الشكر.' },
+    { k: 'd3', t: 'تحسن في المستوى', body: 'يسعدنا إبلاغكم بتحسن ملحوظ في مستوى ابنتكم الدراسي، ونشكر لكم تعاونكم ومتابعتكم، ونأمل الاستمرار في تشجيعها. بارك الله فيكم وفيها.' }],
+  behavior: [
+    { k: 'b1', t: 'متابعة السلوك', body: 'نود إشعاركم بأننا نتابع مع ابنتكم بعض الملاحظات السلوكية داخل المدرسة، وقد تم توجيهها ومساعدتها على الالتزام بقواعد السلوك. نأمل تعاونكم في الحوار معها وتعزيز السلوك الإيجابي لديها، ولكم جزيل الشكر.' },
+    { k: 'b2', t: 'تحسن السلوك', body: 'يسعدنا إبلاغكم بتحسن سلوك ابنتكم والتزامها داخل الفصل، ونشكر لكم تعاونكم، ونأمل الاستمرار في تشجيعها. بارك الله فيكم وفيها.' }],
+  psych: [
+    { k: 'p1', t: 'دعم واطمئنان', body: 'نحرص على راحة ابنتكم واستقرارها في المدرسة، ونود التعاون معكم في دعمها وتشجيعها. نأمل الاتصال بالموجهة الطلابية في الوقت المناسب لكم، ولكم جزيل الشكر.' }],
+  health: [
+    { k: 'h1', t: 'متابعة الحالة الصحية', body: 'نحرص على متابعة الحالة الصحية لابنتكم ومراعاتها داخل المدرسة. نأمل تزويدنا بأي تقارير أو تعليمات طبية تخصها، وإشعارنا بأي مستجدات، ولكم جزيل الشكر.' },
+    { k: 'h2', t: 'تعويض الدروس', body: 'حرصاً على ابنتكم، تم التنسيق مع معلماتها لتعويض ما فاتها من دروس. نأمل متابعتها في البيت، ونسأل الله لها الصحة والعافية.' }],
+  excellent: [
+    { k: 'e1', t: 'تهنئة بالتفوق', body: 'يسعدنا أن نهنئكم بتفوق ابنتكم وتميزها الدراسي، ونشكر لكم دعمكم واهتمامكم، ونأمل الاستمرار في تشجيعها. بارك الله فيكم وفيها.' }],
+  gifted: [
+    { k: 'g1', t: 'رعاية الموهبة', body: 'يسعدنا إبلاغكم بأن ابنتكم تتميز بموهبة في ........، ونحرص في المدرسة على رعايتها وتنميتها. نأمل دعمكم وتشجيعكم لها، بارك الله فيكم وفيها.' }]
+};
+const mwaCatT = c => (c.cats || []).flatMap(k => MWA_CAT[k] || []);
 const mwaNorm = s => String(s || '').replace(/\([^)]*\)/g, '').replace(/^مثال:\s*/, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/[ً-ْ]/g, '').replace(/\s+/g, ' ').trim();
 function mwaNum(p) { let d = toLat(String(p || '')).replace(/[^\d+]/g, '').replace(/^\+/, '').replace(/^00/, ''); if (/^05\d{8}$/.test(d)) d = '966' + d.slice(1); else if (/^5\d{8}$/.test(d)) d = '966' + d; return /^\d{10,15}$/.test(d) ? d : ''; }
 function mwaHijri() { try { const p = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', { day: 'numeric', month: 'numeric', year: 'numeric' }).formatToParts(new Date()); const g = t => parseInt((p.find(x => x.type === t) || {}).value, 10); return g('year') + '-' + String(g('month')).padStart(2, '0') + '-' + String(g('day')).padStart(2, '0'); } catch (e) { return todayISO(); } }
@@ -2116,10 +2163,11 @@ async function openMWA() {
   const stu = mwaFind(await mwaStudents(), c);
   const head = `السلام عليكم ورحمة الله وبركاته\nولي أمر الطالبة ${String(c.name || '').replace(/^مثال:\s*/, '')}${c.grade ? ' (' + c.grade + (c.section ? ' ' + c.section : '') + ')' : ''}\n`;
   const tail = '\n' + (settings().school || '');
-  const W = { k: 'check' }; const bodyOf = k => head + ((MWA_T.find(t => t.k === k) || {}).body || '') + tail;
+  const CT = mwaCatT(c); const ALL = CT.concat(MWA_T); const W = { k: CT.length ? CT[0].k : 'check' }; const bodyOf = k => head + ((ALL.find(t => t.k === k) || {}).body || '') + tail;
   $('#layer2').innerHTML = `<div class="overlay top2" data-mwa="bg"><div class="sheet" role="dialog" aria-modal="true" aria-label="رسالة لولي الأمر">
-   <div class="sheethead"><div class="toprow"><div><h2>📲 رسالة لولي الأمر</h2><span class="small muted">${stu && stu.guardian ? 'ولي الأمر: ' + esc(stu.guardian) + ' · ' : ''}الرسالة ما فيها أي تفاصيل عن الحالة، للحفاظ على سريتها</span></div><button class="x" data-mwa="close" aria-label="إغلاق">×</button></div></div>
+   <div class="sheethead"><div class="toprow"><div><h2>📲 رسالة لولي الأمر</h2><span class="small muted">${stu && stu.guardian ? 'ولي الأمر: ' + esc(stu.guardian) + ' · ' : ''}اختاري رسالة جاهزة وعدّلي عليها لو تبين</span></div><button class="x" data-mwa="close" aria-label="إغلاق">×</button></div></div>
    <div class="sheetbody" style="display:grid;gap:12px"><style>[data-mwat][aria-pressed="true"]{background:#1F8A4C;border-color:#1F8A4C;color:#fff}</style>
+     ${CT.length ? `<div style="display:grid;gap:6px"><span class="small muted">رسائل حسب حالة الطالبة</span><div class="row" style="gap:6px;flex-wrap:wrap">${CT.map(t => `<button type="button" class="btn sm" data-mwat="${t.k}" aria-pressed="${t.k === W.k}">${t.t}</button>`).join('')}</div><span class="small muted">رسائل عامة</span></div>` : ''}
      <div class="row" style="gap:6px;flex-wrap:wrap">${MWA_T.map(t => `<button type="button" class="btn sm" data-mwat="${t.k}" aria-pressed="${t.k === W.k}">${t.t}</button>`).join('')}</div>
      <label class="field"><span>نص الرسالة</span><textarea class="inp" id="mwa-body" style="min-height:150px">${esc(bodyOf(W.k))}</textarea></label>
      <label class="field"><span>جوال ولي الأمر</span><input class="inp" id="mwa-ph" inputmode="tel" dir="ltr" placeholder="05xxxxxxxx" value="${esc((stu && stu.phone) || '')}"></label>
@@ -2136,7 +2184,7 @@ async function openMWA() {
     const x = e.target.closest('[data-mwa]'); if (x && (x.dataset.mwa === 'close' || e.target === x)) { L.innerHTML = ''; return; }
     if (e.target.closest('#mwa-go')) {
       if (!mwaNum(L.querySelector('#mwa-ph').value)) { e.preventDefault(); toast('اكتبي رقم جوال صحيح'); return; }
-      const tpl = MWA_T.find(z => z.k === W.k);
+      const tpl = ALL.find(z => z.k === W.k);
       mwaSaveContact(stu, c, tpl);
       if (L.querySelector('#mwa-log').checked) { const cur = clone(S.docs.get(c.id)); cur.follow = cur.follow || []; cur.follow.push({ id: uid(), date: todayISO(), type: 'اتصال بولي الأمر', prog: null, topic: '', goal: '', note: 'رسالة واتساب: ' + tpl.t, plan: '', photos: [] }); persist(cur); }
       setTimeout(() => { L.innerHTML = ''; S.lastRendered = null; renderCase(); toast('سُجّلت الرسالة'); }, 400);

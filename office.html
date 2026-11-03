@@ -1203,11 +1203,22 @@ function famForm(k, id) {
 }
 
 /* ═════════ view: absence ═════════ */
+const noRef = a => !a.ref && !(a.refs && Object.keys(a.refs).length) && (unex(a) >= 3 || exc(a) >= 3);
+/* ملاحظات النواقص في ملف الغياب: الإحالة، الجلسة الفردية، الخطة العلاجية، التواصل مع ولي الأمر */
+const ABS_MISS = [['noref', 'ما دخل لها تاريخ إحالة', 'بدون تاريخ إحالة'], ['noses', 'ما لها جلسة فردية', 'بدون جلسة فردية'], ['noplan', 'ما لها خطة علاجية', 'بدون خطة علاجية'], ['nocon', 'ما فيه تواصل مع ولي الأمر', 'بدون تواصل']];
+function absMiss(a) {
+  if (a.closed || !(unex(a) >= 3 || exc(a) >= 3)) return [];
+  const m = []; if (noRef(a)) m.push('noref');
+  if (sesMilestones(a).some(x => !x.had)) m.push('noses');
+  if (!a.plan) m.push('noplan');
+  if (!a.home && !absContacts(a.id, a).length) m.push('nocon');
+  return m;
+}
 function vAbsence() {
   if (S.sub.abs === 'monthly') return vAbsMonthly();
-  const rows = list('absence').map(a => ({ ...a, n: unex(a), x: exc(a), p: pending(a), st: maxStreak(a) })).sort((a, b) => b.n - a.n || b.x - a.x || a.studentName.localeCompare(b.studentName, 'ar'));
+  const rows = list('absence').map(a => ({ ...a, n: unex(a), x: exc(a), p: pending(a), st: maxStreak(a), miss: absMiss(a) })).sort((a, b) => b.n - a.n || b.x - a.x || a.studentName.localeCompare(b.studentName, 'ar'));
   const f = S.filter.abs || 'all';
-  const shown = rows.filter(a => f === 'low' ? !a.closed && a.n < 3 && a.x < 3 : f === 'all' ? !a.closed : f === 'closed' ? a.closed : f === 'pending' ? !a.closed && a.p > 0 : f === 'consec' ? !a.closed && a.st >= 3 : f[0] === 'e' ? !a.closed && a.x >= +f.slice(1) : !a.closed && a.n >= +f);
+  const shown = rows.filter(a => f === 'low' ? !a.closed && a.n < 3 && a.x < 3 : f === 'all' ? !a.closed : f === 'closed' ? a.closed : f === 'pending' ? !a.closed && a.p > 0 : f === 'consec' ? !a.closed && a.st >= 3 : ABS_MISS.some(z => z[0] === f) ? a.miss.includes(f) : f[0] === 'e' ? !a.closed && a.x >= +f.slice(1) : !a.closed && a.n >= +f);
   const cnt = fn => rows.filter(a => !a.closed && fn(a)).length;
   return `<div class="head"><h1><span class="dot"></span>التعامل مع حالات الغياب</h1><span class="sp"></span><button class="btn" data-binder="absence">📁 الملف الشامل</button><button class="btn wa" data-act="absWA">📲 مراسلة أولياء الأمور</button><button class="btn" data-act="absFill">✓ تعبئة الإجراءات</button><button class="btn" data-act="absSesAll">＋ جلسات فردية</button><button class="btn" data-act="absRefs">تواريخ الإجراءات</button><button class="btn primary" data-act="absAdd">＋ ملف غياب</button></div>
     ${absSubtabs('files')}
@@ -1219,11 +1230,11 @@ function vAbsence() {
       <div class="tile" style="--tc:var(--good)"><b class="num">${ar(cnt(a => a.x >= 3))}</b><span>٣ أيام فأكثر بعذر</span></div>
       <div class="tile" style="--tc:var(--bad)"><b class="num">${ar(cnt(a => a.st >= 3))}</b><span>غياب متصل ٣ أيام فأكثر</span></div>
       <div class="tile" style="--tc:var(--abs)"><b class="num">${ar(cnt(a => a.p > 0))}</b><span>ملفات فيها إجراءات ناقصة</span></div></div>
-    <div class="subtabs">${[['all', 'المفتوحة'], ['pending', 'إجراءات ناقصة'], ['consec', 'غياب متصل'], ['3', 'بدون عذر ٣+'], ['5', 'بدون عذر ٥+'], ['10', 'بدون عذر ١٠+'], ['e3', 'بعذر ٣+'], ['low', 'أقل من ٣ أيام'], ['closed', 'المغلقة']].map(([k, t]) => `<button data-absf="${k}" aria-selected="${f === k}">${t}</button>`).join('')}</div>
+    <div class="subtabs">${[['all', 'المفتوحة'], ['pending', 'إجراءات ناقصة'], ['consec', 'غياب متصل'], ...ABS_MISS.map(z => [z[0], z[2], cnt(a => a.miss.includes(z[0]))]).filter(z => z[2]).map(z => [z[0], z[1] + ' (' + ar(z[2]) + ')']), ['3', 'بدون عذر ٣+'], ['5', 'بدون عذر ٥+'], ['10', 'بدون عذر ١٠+'], ['e3', 'بعذر ٣+'], ['low', 'أقل من ٣ أيام'], ['closed', 'المغلقة']].map(([k, t]) => `<button data-absf="${k}" aria-selected="${f === k}">${t}</button>`).join('')}</div>
     ${shown.length ? (() => { const card = a => { const [pc, ps] = levelColors(a.n); const grp = a.n >= 3 ? 'u' : a.x >= 3 ? 'e' : '';
         return `<a class="rec" href="#absence/${a.id}" style="text-decoration:none;color:inherit;--c:${grp === 'u' ? pc : grp === 'e' ? 'var(--good)' : 'var(--muted)'}"><div class="t"><b>${esc(a.studentName)}</b></div>
       <div class="meta"><span class="chip">${esc(a.grade || '')} ${esc(a.section || '')}</span><span class="pill" style="--pc:${a.n ? pc : 'var(--muted)'};--ps:${a.n ? ps : 'var(--sunk)'};${grp === 'u' ? 'font-weight:800' : ''}">بدون عذر: ${ar(a.n)}</span><span class="pill" style="--pc:${a.x ? 'var(--good)' : 'var(--muted)'};--ps:${a.x ? 'var(--good-soft)' : 'var(--sunk)'};${grp === 'e' ? 'font-weight:800' : ''}">بعذر: ${ar(a.x)}</span>${a.st >= 3 ? `<span class="pill" style="--pc:var(--bad);--ps:var(--bad-soft)">غياب متصل</span>` : ''}</div>
-      <div class="meta">${a.p ? `<span class="chip" style="color:var(--bad)">${ar(a.p)} إجراء ناقص</span>` : '<span class="chip" style="color:var(--good)">الإجراءات مكتملة</span>'}</div></a>`; };
+      <div class="meta">${a.miss.map(k => `<span class="pill" style="--pc:var(--bad);--ps:var(--bad-soft);font-weight:800">${ABS_MISS.find(z => z[0] === k)[1]}</span>`).join('')}${a.p ? `<span class="chip" style="color:var(--bad)">${ar(a.p)} إجراء ناقص</span>` : '<span class="chip" style="color:var(--good)">الإجراءات مكتملة</span>'}</div></a>`; };
       if (!['all', 'pending', 'closed'].includes(f)) return `<div class="list">${shown.map(card).join('')}</div>`;
       const G = [['u', 'الغياب بدون عذر', 'المادة (٣٤) · ٣ أيام فأكثر بدون عذر', 'var(--z3)', shown.filter(a => a.n >= 3)], ['e', 'الغياب بعذر', 'المادة (٣٣) · ٣ أيام فأكثر بعذر', 'var(--good)', shown.filter(a => a.n < 3 && a.x >= 3).sort((p, q) => q.x - p.x)], ['l', 'أقل من ٣ أيام', 'ما وصلت ٣ أيام لا بعذر ولا بدون عذر', 'var(--muted)', f === 'closed' ? shown.filter(a => a.n < 3 && a.x < 3) : []]];
       return G.filter(g => g[4].length).map(([k, t, sub, c, L]) => `<div class="absgrp" style="--gc:${c}"><h3>${t} <span class="n">${ar(L.length)}</span></h3><span class="tiny muted">${sub}</span></div><div class="list">${L.map(card).join('')}</div>`).join(''); })()
@@ -1261,7 +1272,7 @@ function vAbsenceOne() {
   const a = doc.data; const n = unex(a), x = exc(a), st = maxStreak(a); const [pc, ps] = levelColors(n); const done = a.done || {};
   return `<a class="btn ghost" href="#absence" style="align-self:flex-start">→ كل ملفات الغياب</a>
     <div class="stu-head"><div class="bigcount" style="--pc:${pc};--ps:${ps}"><div><b class="num">${ar(n)}</b><small>بدون عذر</small></div></div>
-      <div style="flex:1;min-width:200px"><h1 style="font-size:1.4rem">${esc(a.studentName)}</h1><p class="muted">${esc(a.grade || '')} ${esc(a.section || '')} · بعذر: <b class="num">${ar(x)}</b> · درجة المواظبة المتوقعة: <b class="num">${ar(Math.max(0, 100 - n))}</b> من ١٠٠</p><p class="small" style="margin-top:4px">تاريخ التحويل: <b>${a.ref ? esc(hij(a.ref)) : '—'}</b> <button class="btn sm ghost" data-act="absRef">✎ تعديل</button></p></div>
+      <div style="flex:1;min-width:200px"><h1 style="font-size:1.4rem">${esc(a.studentName)}</h1><p class="muted">${esc(a.grade || '')} ${esc(a.section || '')} · بعذر: <b class="num">${ar(x)}</b> · درجة المواظبة المتوقعة: <b class="num">${ar(Math.max(0, 100 - n))}</b> من ١٠٠</p><p class="small" style="margin-top:4px">تاريخ التحويل: <b>${a.ref ? esc(hij(a.ref)) : '—'}</b> <button class="btn sm ghost" data-act="absRef">✎ ${a.ref ? 'تعديل' : 'إضافة'}</button></p>${(() => { const m = absMiss({ ...a, id }); return m.length ? `<p class="small" style="margin-top:6px;background:var(--bad-soft);color:var(--bad);border-radius:10px;padding:6px 10px;font-weight:700">ملاحظة: ${m.map(k => ABS_MISS.find(z => z[0] === k)[1]).join('، ')}.</p>` : ''; })()}</div>
       <div class="toolbar"><button class="btn hint" data-act="absAI" title="اقتراحات" aria-label="اقتراحات">✦</button><button class="btn wa" data-act="absWA1">📲 واتساب</button><button class="btn" data-act="absRep">التقرير</button><button class="btn" data-act="absClose">${a.closed ? 'إعادة فتح' : 'إغلاق الملف'}</button><button class="btn danger" data-del="${id}" data-back="#absence">حذف</button></div></div>
     <section class="panel"><div class="head"><h3>عدد أيام الغياب</h3><span class="sp"></span><span class="tiny muted">${a.upd ? 'آخر تحديث: ' + esc(hij(a.upd)) : ''}</span></div>
       <div class="ctrs">${counterHTML('cu', 'بدون عذر', n, 'var(--z3)')}${counterHTML('cx', 'بعذر', x, 'var(--good)')}</div>

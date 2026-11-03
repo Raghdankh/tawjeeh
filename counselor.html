@@ -687,12 +687,13 @@ function renderMain(){
 function catChips(cats){return (cats||[]).map(k=>CAT[k]?`<span class="chip k-${k}"><i class="dot"></i>${esc(CAT[k].t)}</span>`:'').join('')}
 /* الحالة الصحية نفسها من وصف الحالة (مثل: حساسية من الحليب) */
 function healthOf(c){ if(!(c.cats||[]).includes('health')) return ''; const d=String(c.desc||''); const m=/الحالة الصحية\s*:\s*([^.\n]+)/.exec(d); if(m) return m[1].trim(); const f=d.split(/[.\n]/)[0].trim(); return f.length<=60?f:''; }
+function hasNewFb(c){ try{ return !!c.refId && (M.fb||[]).some(f=>f.referral_id===c.refId&&!f.seen); }catch(e){ return false; } }
 function caseRow(c){
   const k=(c.cats||[])[0]||'';const l=lastFollow(c);const late=needsFollow(c);const pd=planDone(c);
   return `<button class="case" data-act="open" data-id="${esc(c.id)}">
     <span class="av k-${k}" aria-hidden="true">${esc(initial(c.name))}</span>
     <span class="body"><span class="nm">${esc(c.name)}</span><span class="meta">${catChips(c.cats)}</span>
-      <span class="small muted">الصف ${esc(c.grade||'—')}${c.section?' / '+esc(c.section):''}</span>${healthOf(c)?`<span class="small hlth">${esc(healthOf(c))}</span>`:''}</span>
+      <span class="small muted">الصف ${esc(c.grade||'—')}${c.section?' / '+esc(c.section):''}</span>${healthOf(c)?`<span class="small hlth">${esc(healthOf(c))}</span>`:''}${hasNewFb(c)?'<span class="small" style="color:#B4472B;font-weight:800">ملاحظة جديدة من المعلمة</span>':''}</span>
     <span class="side"><span class="st st-${c.status}">${ST[c.status]||''}</span></span></button>`;
 }
 function repRow(r){
@@ -1395,7 +1396,7 @@ async function loadTeachers() {
   try { M.teachers = await sbq(M.sb.from('masar_teachers').select('id,name').order('name')); } catch (e) { M.teachers = []; }
 }
 async function loadRefs() {
-  await loadTeachers();
+  refLastLoad = Date.now(); await loadTeachers();
   try { M.refs = await sbq(M.sb.from('masar_referrals').select('*').order('created_at', { ascending: false })); } catch (e) { M.refs = []; }
   try { M.fb = await sbq(M.sb.from('masar_feedback').select('*').order('created_at', { ascending: false })); } catch (e) { M.fb = []; }
   updBadge();
@@ -1526,8 +1527,31 @@ function refPanelHTML(c) {
         ${f.used ? '<span class="small muted">✓ في السجل</span>' : `<button class="btn sm" data-act="m-fbuse" data-id="${f.id}">إضافة لسجل الجلسات</button>`}</div>`).join('')}</div>` : ''}
     </div>`;
 }
+/* ربط الحالة بإحالتها تلقائياً إذا انفتحت الحالة بدون ربط (مثلاً حالة مستوردة لنفس الطالبة) */
+function autoLinkRef(c) {
+  if (!c || c.refId || !(M.refs || []).length) return;
+  let r = M.refs.find(x => x.case_id === c.id);
+  if (!r) { const n = mwaNorm(c.name); const hits = M.refs.filter(x => mwaNorm(x.student_name) === n && (!x.case_id || !S.docs.has(x.case_id))); if (hits.length === 1) r = hits[0]; }
+  if (!r) return; c.refId = r.id; c.refCode = r.code; try { persist(c, { quiet: true }); } catch (e) {}
+}
+function refreshRefPanel() {
+  const c = S.open && S.docs.get(S.open); if (!c) return; autoLinkRef(c); if (!c.refId) return;
+  const body = document.querySelector('#layer .sheetbody'); if (!body) return; const old = body.querySelector('[data-mref]');
+  if (old) { const ta = old.querySelector('#m-msg'); if (ta && document.activeElement === ta) return; old.outerHTML = refPanelHTML(c); }
+  else { const seg = body.querySelector('.seg'); const anchor = seg ? seg.closest('.panel') : body.firstElementChild; if (anchor) anchor.insertAdjacentHTML('afterend', refPanelHTML(c)); }
+  const unseen = fbOf(c.refId).filter(f => !f.seen);
+  if (unseen.length) { unseen.forEach(f => f.seen = true); updBadge(); sbq(M.sb.from('masar_feedback').update({ seen: true }).eq('referral_id', c.refId)).catch(() => {}); }
+}
+/* تحديث الإحالات وملاحظات المعلمات تلقائياً: عند الرجوع للصفحة، وكل دقيقة ونص */
+let refLastLoad = 0;
+async function refAuto(force) { if (!M.sb || document.hidden) return; if (!force && Date.now() - refLastLoad < 20000) return; refLastLoad = Date.now();
+  const before = (M.fb || []).length + ':' + (M.refs || []).length; await loadRefs(); const after = (M.fb || []).length + ':' + (M.refs || []).length;
+  if (before !== after) { refreshRefPanel(); if (TAB === 'cases' && !S.open) renderMain(); } }
+document.addEventListener('visibilitychange', () => { if (!document.hidden) refAuto(); });
+addEventListener('focus', () => refAuto()); setInterval(() => refAuto(true), 90000);
 renderCase = (orig => function () {
   orig();
+  const c0 = S.open && S.docs.get(S.open); autoLinkRef(c0);
   const c = S.open && S.docs.get(S.open); if (!c || !c.refId) return;
   const body = document.querySelector('#layer .sheetbody'); if (!body || body.querySelector('[data-mref]')) return;
   const seg = body.querySelector('.seg'); const anchor = seg ? seg.closest('.panel') : body.firstElementChild;

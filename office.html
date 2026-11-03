@@ -1224,7 +1224,7 @@ function vAbsence() {
   const f = S.filter.abs || 'all';
   const shown = rows.filter(a => f === 'low' ? !a.closed && a.n < 3 && a.x < 3 : f === 'all' ? !a.closed : f === 'closed' ? a.closed : f === 'pending' ? !a.closed && a.p > 0 : f === 'consec' ? !a.closed && a.st >= 3 : ABS_MISS.some(z => z[0] === f) ? a.miss.includes(f) : f[0] === 'e' ? !a.closed && a.x >= +f.slice(1) : !a.closed && a.n >= +f);
   const cnt = fn => rows.filter(a => !a.closed && fn(a)).length;
-  return `<div class="head"><h1><span class="dot"></span>التعامل مع حالات الغياب</h1><span class="sp"></span><button class="btn" data-binder="absence">📁 الملف الشامل</button><button class="btn wa" data-act="absWA">📲 مراسلة أولياء الأمور</button><button class="btn" data-act="absFill">✓ تعبئة الإجراءات</button><button class="btn" data-act="absSesAll">＋ جلسات فردية</button><button class="btn" data-sesfix="1">ضبط تواريخ الجلسات</button><button class="btn" data-act="absRefs">تواريخ الإجراءات</button><button class="btn primary" data-act="absAdd">＋ ملف غياب</button></div>
+  return `<div class="head"><h1><span class="dot"></span>التعامل مع حالات الغياب</h1><span class="sp"></span><button class="btn" data-binder="absence">📁 الملف الشامل</button><button class="btn wa" data-act="absWA">📲 مراسلة أولياء الأمور</button><button class="btn" data-act="absFill">✓ تعبئة الإجراءات</button><button class="btn" data-act="absSesAll">＋ جلسات فردية</button><button class="btn" data-sesfix="1">ضبط تواريخ الجلسات</button><button class="btn" data-planall="1">اعتماد الخطط المقترحة</button><button class="btn" data-act="absRefs">تواريخ الإجراءات</button><button class="btn primary" data-act="absAdd">＋ ملف غياب</button></div>
     ${absSubtabs('files')}
     <p class="lede">حسب قواعد السلوك والمواظبة: المادة (٣٣) للغياب بعذر، والمادة (٣٤) للغياب بدون عذر. اكتبي عدد الأيام فقط، وتظهر إجراءات اليوم ٣ و٥ و١٠ تلقائياً.</p>
     <div class="tiles">
@@ -1318,6 +1318,9 @@ function stRefForm(st) {
       absSesFix(d); if (S.sd) Object.keys(S.sd).forEach(x => { if (x === id + '|' + st) delete S.sd[x]; });
       await saveDoc(id, 'absence', d); toast('تم حفظ تاريخ التحويل'); }, `--c:var(--abs);--cs:var(--abs-soft)`);
 }
+document.addEventListener('click', async e => { const b = e.target.closest('[data-planall]'); if (!b || b.closest('#sheetbg')) return; e.preventDefault(); e.stopPropagation();
+  const writes = list('absence').filter(a => !a.closed && !a.plan && (unex(a) >= 3 || exc(a) >= 3)).map(a => { const d = JSON.parse(JSON.stringify(DB.docs[a.id].data)); d.plan = apSuggest(a.id, d); return { id: a.id, kind: 'absence', data: d }; });
+  if (!writes.length) { toast('كل الطالبات لهن خطة علاجية'); return; } try { await saveMany(writes); toast('اعتُمدت الخطة المقترحة لـ' + ar(writes.length) + ' ' + (writes.length > 2 && writes.length < 11 ? 'طالبات' : 'طالبة') + '، حسب غياب كل وحدة وأسبابه'); } catch (er) { toast(errT(er)); } rerender(); }, true);
 document.addEventListener('click', async e => { const b = e.target.closest('[data-sesfix]'); if (!b || b.closest('#sheetbg')) return; e.preventDefault(); e.stopPropagation();
   const writes = []; let n = 0; list('absence').forEach(a => { const d = JSON.parse(JSON.stringify(DB.docs[a.id].data)); const c = absSesFix(d); if (c) { n += c; writes.push({ id: a.id, kind: 'absence', data: d }); } });
   if (!n) { toast('كل الجلسات تاريخها بعد الإحالة مباشرة'); return; } try { await saveMany(writes); toast('تعدّل تاريخ ' + ar(n) + ' جلسة في ' + ar(writes.length) + ' ملف، وصارت أول يوم دوام بعد الإحالة'); } catch (er) { toast(errT(er)); } rerender(); }, true);

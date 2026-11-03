@@ -539,6 +539,7 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .fx-rows.act>div{grid-template-columns:130px minmax(0,1fr) minmax(0,1.4fr) auto;align-items:center}.fx-rows.act .pacts{margin:0!important}@media(max-width:600px){.fx-rows.act>div{grid-template-columns:1fr auto}}
 button,label,.btn,.clpick,.clpick *,.presets,.presets *,.chip,.chips,.subtabs,nav,[role=tab],[data-gtopic],[data-xstop],[data-xsact],[data-gsg]{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
 .sesdate{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.sesdate .hd select{padding:4px 6px;font-size:.85rem}
+.stage h4 .stref{margin-inline-start:auto;font-size:.78rem;font-weight:600}.stage h4{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -735,11 +736,13 @@ function levelColors(n) { const l = trackLevel(n); return l ? STEP_C[l] : n ? ['
 /* إجراءات مشروطة («في حال…») ما تُحسب ناقصة ولا تتعبى تلقائياً */
 const COND_STEPS = new Set(['e-5-0', 'e-10-0', 'e-10-1']);
 const LEGAL_STEPS = new Set(['u-10-0', 'u-10-1', 'c-0']);
+/* تاريخ التحويل لكل محطة (٣ أو ٥ أيام...) وإذا ما فيه يرجع لتاريخ التحويل العام */
+const refFor = (a, key) => { const st = String(key || '').split('-').slice(0, 2).join('-'); return (a.refs && a.refs[st]) || a.ref || ''; };
 function dueSteps(a) { const out = []; ['u', 'e'].forEach(k => { const n = k === 'u' ? unex(a) : exc(a); TRACKS[k].steps.forEach(s => { if (n >= s.d) s.items.forEach((_, ii) => { const key = k + '-' + s.d + '-' + ii; if (!COND_STEPS.has(key)) out.push(key); }); }); }); if (maxStreak(a) >= 3) out.push('c-0'); return out; }
 async function absFill(ids, o) {
   const writes = []; let n = 0;
   ids.forEach(id => { const d = JSON.parse(JSON.stringify(DB.docs[id].data)); d.done = d.done || {}; let ch = 0;
-    dueSteps(d).forEach(k => { if (d.done[k] || LEGAL_STEPS.has(k) && !o.legal || roleOf(d, k) === 'a' && !o.admin) return; d.done[k] = o.date || d.ref || todayH(); ch++; });
+    dueSteps(d).forEach(k => { if (d.done[k] || LEGAL_STEPS.has(k) && !o.legal || roleOf(d, k) === 'a' && !o.admin) return; d.done[k] = o.date || refFor(d, k) || todayH(); ch++; });
     if (ch) { d.upd = todayH(); writes.push({ id, kind: 'absence', data: d }); n += ch; } });
   if (writes.length) await saveMany(writes); return { files: writes.length, steps: n };
 }
@@ -855,7 +858,7 @@ const MS_T = { 'u-3': '٣ أيام بدون عذر', 'e-3': '٣ أيام بعذ�
 function sesMilestones(a) {
   const u = unex(a), x = exc(a), done = a.done || {}; const had = new Set((a.log || []).filter(l => l.type === 'session' && l.ms).map(l => l.ms));
   let legacy = (a.log || []).filter(l => l.type === 'session' && !l.ms).length;
-  return SES_MS.filter(([tr, lv]) => (tr === 'u' ? u : x) >= lv).map(([tr, lv]) => { const k = tr + '-' + lv; let h = had.has(k); if (!h && legacy > 0) { h = true; legacy--; } return { k, tr, lv, base: done[k + '-0'] || a.ref || '', had: h }; });
+  return SES_MS.filter(([tr, lv]) => (tr === 'u' ? u : x) >= lv).map(([tr, lv]) => { const k = tr + '-' + lv; let h = had.has(k); if (!h && legacy > 0) { h = true; legacy--; } return { k, tr, lv, base: done[k + '-0'] || refFor(a, k) || '', had: h }; });
 }
 function absSesFill(id, a, ms) {
   if (!ms) { const L = sesMilestones(a); ms = L.find(m => !m.had) || L[L.length - 1] || null; }
@@ -1250,7 +1253,7 @@ function absAdd() {
 function trackHTML(a, k) {
   const tr = TRACKS[k]; const n = k === 'u' ? unex(a) : exc(a); const done = a.done || {};
   return `<section class="panel" style="gap:10px"><div class="head"><h3>${tr.t} <span class="tiny muted">${tr.art}</span></h3><span class="sp"></span><span class="pill" style="--pc:${levelColors(n)[0]};--ps:${levelColors(n)[1]}">${ar(n)} ${n === 1 ? 'يوم' : 'أيام'}</span></div>
-    <div class="stages">${tr.steps.map(s => `<div class="stage${n >= s.d ? ' on' : ''}" style="--sc:${STEP_C[s.d][0]}"><h4><span class="d">${ar(s.d)}</span>عند ${ar(s.d)} أيام${n >= s.d ? '' : ` <span class="tiny muted">(لم تصل، باقي ${ar(s.d - n)})</span>`}</h4>
+    <div class="stages">${tr.steps.map(s => `<div class="stage${n >= s.d ? ' on' : ''}" style="--sc:${STEP_C[s.d][0]}"><h4><span class="d">${ar(s.d)}</span>عند ${ar(s.d)} أيام${n >= s.d ? '' : ` <span class="tiny muted">(لم تصل، باقي ${ar(s.d - n)})</span>`}${n >= s.d ? `<button type="button" class="btn sm ghost stref" data-stref="${k}-${s.d}">تاريخ التحويل: ${refFor(a, k + '-' + s.d) ? esc(hij(refFor(a, k + '-' + s.d))) : '—'} ✎</button>` : ''}</h4>
       ${s.items.map((it, ii) => { const key = k + '-' + s.d + '-' + ii, dn = done[key]; return `<div class="steprow"><label class="chk"><input type="checkbox" data-step="${key}" ${dn ? 'checked' : ''} ${n >= s.d || dn ? '' : 'disabled'}><span>${it}${a.home && HOME_KEYS.has(key) ? `<small class="homesig">${homeNote(key)}</small>` : ''}</span></label>${roleTag(a, key)}</div>`; }).join('')}</div>`).join('')}</div></section>`;
 }
 function vAbsenceOne() {
@@ -1286,10 +1289,21 @@ function setCount(id, val) {
 }
 function stepDate_(k) {
   const a = DB.docs[S.param].data; const done = a.done || {}; const last = Object.values(done).sort().slice(-1)[0];
-  const def = done[k] || S.lastStepDate || last || a.ref || todayH();
+  const def = done[k] || (a.refs && a.refs[k.split('-').slice(0, 2).join('-')]) || S.lastStepDate || last || a.ref || todayH();
   openSheet('تاريخ تنفيذ الإجراء', `<p class="small muted">اختاري اليوم اللي نفّذتي فيه هذا الإجراء.</p><div class="f"><span>التاريخ</span>${hdInput('sd_d', def)}</div><div class="toolbar"><button class="btn primary" type="submit">حفظ</button></div>`,
     async f => { const dt = readHD(f, 'sd_d'); S.lastStepDate = dt; const id = S.param; const d = JSON.parse(JSON.stringify(DB.docs[id].data)); d.done = d.done || {}; d.done[k] = dt; await saveDoc(id, 'absence', d); toast('تم تسجيل الإجراء'); }, `--c:var(--abs);--cs:var(--abs-soft)`);
 }
+function stRefForm(st) {
+  const a = DB.docs[S.param].data; const [k, dd] = st.split('-'); const old = refFor(a, st);
+  openSheet('تاريخ التحويل عند ' + ar(+dd) + ' أيام ' + (k === 'u' ? 'بدون عذر' : 'بعذر'), `<p class="small muted">إذا تحولت الطالبة أكثر من مرة، حطي تاريخ هذا التحويل. إجراءات هذي المحطة وجلستها تتعدل على هذا التاريخ.</p><div class="f"><span>التاريخ</span>${hdInput('st_d', old || todayH())}</div><div class="toolbar"><button class="btn primary" type="submit">حفظ</button></div>`,
+    async f => { const id = S.param; const d = JSON.parse(JSON.stringify(DB.docs[id].data)); const v = readHD(f, 'st_d'); d.refs = d.refs || {}; d.refs[st] = v; if (!d.ref) d.ref = v;
+      const oldS = old ? nextSchoolH(old) : ''; const newS = nextSchoolH(v);
+      Object.keys(d.done || {}).forEach(key => { if (key.startsWith(st + '-') && (!old || d.done[key] === old)) d.done[key] = v; });
+      (d.log || []).forEach(l => { if (l.type === 'session' && l.ms === st && (!oldS || l.date === oldS)) l.date = newS || l.date; });
+      if (S.sd) Object.keys(S.sd).forEach(x => { if (x === id + '|' + st) delete S.sd[x]; });
+      await saveDoc(id, 'absence', d); toast('تم حفظ تاريخ التحويل'); }, `--c:var(--abs);--cs:var(--abs-soft)`);
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-stref]'); if (!b || b.closest('#sheetbg')) return; e.preventDefault(); e.stopPropagation(); stRefForm(b.dataset.stref); }, true);
 function absRefForm() {
   const a = DB.docs[S.param].data;
   openSheet('تاريخ التحويل للموجهة', `<div class="f"><span>التاريخ</span>${hdInput('rf_d', a.ref || todayH())}</div><div class="toolbar"><button class="btn primary" type="submit">حفظ</button></div>`,
@@ -3835,7 +3849,7 @@ document.addEventListener('change', e => {
   else if (t.dataset && t.dataset.pdone != null) { const i = +t.dataset.pdone, on = t.checked; progUpdate(p => { p.steps[i].done = on; p.steps[i].doneAt = on ? todayH() : ''; if (on && p.status === 'مخطط') p.status = 'قيد التنفيذ'; }, on ? 'تم' : ''); }
   else if (t.dataset && t.dataset.pph != null && t.files && t.files.length) { progAddPhotos([...t.files]); t.value = ''; }
   else if (t.dataset && t.dataset.pcap) { const ph = t.dataset.pcap, v = t.value.trim(); const id = S.param; const dd = JSON.parse(JSON.stringify(DB.docs[id].data)); dd.caps = dd.caps || {}; dd.caps[ph] = v; saveDoc(id, 'program', dd).then(() => toast('حُفظ الوصف'), er => toast(errT(er))); }
-  else if (t.dataset && t.dataset.step) { const k = t.dataset.step, on = t.checked; absUpdate(d => { d.done = d.done || {}; if (on) d.done[k] = d.ref || todayH(); else delete d.done[k]; }, on ? 'تم تسجيل الإجراء' : ''); }
+  else if (t.dataset && t.dataset.step) { const k = t.dataset.step, on = t.checked; absUpdate(d => { d.done = d.done || {}; if (on) d.done[k] = refFor(d, k) || todayH(); else delete d.done[k]; }, on ? 'تم تسجيل الإجراء' : ''); }
 });
 document.addEventListener('click', async e => {
   const b = e.target.closest('button,[data-act]'); if (!b) return; if (b.closest('#sheetbg') && !b.dataset.delstu && !b.dataset.apdel && !b.dataset.ptpl && !b.dataset.ideadel && !b.dataset.ptpldel && !b.dataset.gtopic && !b.dataset.gaddcl && !b.dataset.absrep && !b.dataset.cstep) return;

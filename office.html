@@ -737,6 +737,10 @@ function levelColors(n) { const l = trackLevel(n); return l ? STEP_C[l] : n ? ['
 const COND_STEPS = new Set(['e-5-0', 'e-10-0', 'e-10-1']);
 const LEGAL_STEPS = new Set(['u-10-0', 'u-10-1', 'c-0']);
 /* تاريخ التحويل لكل محطة (٣ أو ٥ أيام...) وإذا ما فيه يرجع لتاريخ التحويل العام */
+/* أساس تاريخ جلسة المحطة: تحويل المحطة نفسها، ثم (لمحطة ٣ أيام) تاريخ التحويل، ثم تاريخ أول إجراء في المحطة */
+const sesBase = (a, ms) => { const [tr, lv] = String(ms).split('-'); const done = a.done || {}; return (a.refs && a.refs[ms]) || (+lv === 3 ? a.ref : '') || done[ms + '-0'] || a.ref || ''; };
+/* تصحيح تواريخ الجلسات: الجلسة اللي تاريخها بعد اليوم الدراسي التالي للإحالة ترجع لأول يوم دوام بعد الإحالة */
+function absSesFix(d) { let n = 0; (d.log || []).forEach(l => { if (l.type !== 'session' || !l.ms) return; const b = sesBase(d, l.ms); if (!b) return; const ex = nextSchoolH(b); if (ex && l.date !== ex && String(l.date) > ex) { l.date = ex; n++; } }); return n; }
 const refFor = (a, key) => { const st = String(key || '').split('-').slice(0, 2).join('-'); return (a.refs && a.refs[st]) || a.ref || ''; };
 function dueSteps(a) { const out = []; ['u', 'e'].forEach(k => { const n = k === 'u' ? unex(a) : exc(a); TRACKS[k].steps.forEach(s => { if (n >= s.d) s.items.forEach((_, ii) => { const key = k + '-' + s.d + '-' + ii; if (!COND_STEPS.has(key)) out.push(key); }); }); }); if (maxStreak(a) >= 3) out.push('c-0'); return out; }
 async function absFill(ids, o) {
@@ -786,7 +790,7 @@ function absRefsBulk(txt) {
       ok.flatMap(g => [g.f].concat(g.dups || []).map(f => ({ ...g, f }))).forEach(g => { const d = JSON.parse(JSON.stringify(DB.docs[g.f.id].data)); d.done = d.done || {}; const ds = Object.values(g.o).concat(g.def ? [g.def] : []).sort(); d.ref = ds[0];
         dueSteps(d).forEach(k => { const [tr, lv] = k.split('-'); if (k === 'c-0') return; const dt = g.o[tr + '-' + lv] || g.o[tr] || g.def || (d.done[k] ? null : ds[0]); if (!dt) return;
           if (LEGAL_STEPS.has(k) && !d.done[k]) return; if (roleOf(d, k) === 'a' && !adm && !d.done[k]) return; if (!d.done[k]) steps++; d.done[k] = dt; });
-        d.upd = todayH(); writes.push({ id: g.f.id, kind: 'absence', data: d }); });
+        absSesFix(d); d.upd = todayH(); writes.push({ id: g.f.id, kind: 'absence', data: d }); });
       await saveMany(writes); toast(`انحفظ لـ${ar(writes.length)} ${writes.length > 2 && writes.length < 11 ? 'طالبات' : 'طالبة'}${steps ? ' · تأشّر ' + ar(steps) + ' إجراء' : ''}`); }, `--c:var(--abs);--cs:var(--abs-soft)`);
   function parse() {
     const [y, m] = readHD(document, 'rf_m').split('-'); const G = [];
@@ -858,7 +862,7 @@ const MS_T = { 'u-3': '٣ أيام بدون عذر', 'e-3': '٣ أيام بعذ�
 function sesMilestones(a) {
   const u = unex(a), x = exc(a), done = a.done || {}; const had = new Set((a.log || []).filter(l => l.type === 'session' && l.ms).map(l => l.ms));
   let legacy = (a.log || []).filter(l => l.type === 'session' && !l.ms).length;
-  return SES_MS.filter(([tr, lv]) => (tr === 'u' ? u : x) >= lv).map(([tr, lv]) => { const k = tr + '-' + lv; let h = had.has(k); if (!h && legacy > 0) { h = true; legacy--; } return { k, tr, lv, base: done[k + '-0'] || refFor(a, k) || '', had: h }; });
+  return SES_MS.filter(([tr, lv]) => (tr === 'u' ? u : x) >= lv).map(([tr, lv]) => { const k = tr + '-' + lv; let h = had.has(k); if (!h && legacy > 0) { h = true; legacy--; } return { k, tr, lv, base: sesBase(a, k), had: h }; });
 }
 function absSesFill(id, a, ms) {
   if (!ms) { const L = sesMilestones(a); ms = L.find(m => !m.had) || L[L.length - 1] || null; }
@@ -1220,7 +1224,7 @@ function vAbsence() {
   const f = S.filter.abs || 'all';
   const shown = rows.filter(a => f === 'low' ? !a.closed && a.n < 3 && a.x < 3 : f === 'all' ? !a.closed : f === 'closed' ? a.closed : f === 'pending' ? !a.closed && a.p > 0 : f === 'consec' ? !a.closed && a.st >= 3 : ABS_MISS.some(z => z[0] === f) ? a.miss.includes(f) : f[0] === 'e' ? !a.closed && a.x >= +f.slice(1) : !a.closed && a.n >= +f);
   const cnt = fn => rows.filter(a => !a.closed && fn(a)).length;
-  return `<div class="head"><h1><span class="dot"></span>التعامل مع حالات الغياب</h1><span class="sp"></span><button class="btn" data-binder="absence">📁 الملف الشامل</button><button class="btn wa" data-act="absWA">📲 مراسلة أولياء الأمور</button><button class="btn" data-act="absFill">✓ تعبئة الإجراءات</button><button class="btn" data-act="absSesAll">＋ جلسات فردية</button><button class="btn" data-act="absRefs">تواريخ الإجراءات</button><button class="btn primary" data-act="absAdd">＋ ملف غياب</button></div>
+  return `<div class="head"><h1><span class="dot"></span>التعامل مع حالات الغياب</h1><span class="sp"></span><button class="btn" data-binder="absence">📁 الملف الشامل</button><button class="btn wa" data-act="absWA">📲 مراسلة أولياء الأمور</button><button class="btn" data-act="absFill">✓ تعبئة الإجراءات</button><button class="btn" data-act="absSesAll">＋ جلسات فردية</button><button class="btn" data-sesfix="1">ضبط تواريخ الجلسات</button><button class="btn" data-act="absRefs">تواريخ الإجراءات</button><button class="btn primary" data-act="absAdd">＋ ملف غياب</button></div>
     ${absSubtabs('files')}
     <p class="lede">حسب قواعد السلوك والمواظبة: المادة (٣٣) للغياب بعذر، والمادة (٣٤) للغياب بدون عذر. اكتبي عدد الأيام فقط، وتظهر إجراءات اليوم ٣ و٥ و١٠ تلقائياً.</p>
     <div class="tiles">
@@ -1311,14 +1315,17 @@ function stRefForm(st) {
       const oldS = old ? nextSchoolH(old) : ''; const newS = nextSchoolH(v);
       Object.keys(d.done || {}).forEach(key => { if (key.startsWith(st + '-') && (!old || d.done[key] === old)) d.done[key] = v; });
       (d.log || []).forEach(l => { if (l.type === 'session' && l.ms === st && (!oldS || l.date === oldS)) l.date = newS || l.date; });
-      if (S.sd) Object.keys(S.sd).forEach(x => { if (x === id + '|' + st) delete S.sd[x]; });
+      absSesFix(d); if (S.sd) Object.keys(S.sd).forEach(x => { if (x === id + '|' + st) delete S.sd[x]; });
       await saveDoc(id, 'absence', d); toast('تم حفظ تاريخ التحويل'); }, `--c:var(--abs);--cs:var(--abs-soft)`);
 }
+document.addEventListener('click', async e => { const b = e.target.closest('[data-sesfix]'); if (!b || b.closest('#sheetbg')) return; e.preventDefault(); e.stopPropagation();
+  const writes = []; let n = 0; list('absence').forEach(a => { const d = JSON.parse(JSON.stringify(DB.docs[a.id].data)); const c = absSesFix(d); if (c) { n += c; writes.push({ id: a.id, kind: 'absence', data: d }); } });
+  if (!n) { toast('كل الجلسات تاريخها بعد الإحالة مباشرة'); return; } try { await saveMany(writes); toast('تعدّل تاريخ ' + ar(n) + ' جلسة في ' + ar(writes.length) + ' ملف، وصارت أول يوم دوام بعد الإحالة'); } catch (er) { toast(errT(er)); } rerender(); }, true);
 document.addEventListener('click', e => { const b = e.target.closest('[data-stref]'); if (!b || b.closest('#sheetbg')) return; e.preventDefault(); e.stopPropagation(); stRefForm(b.dataset.stref); }, true);
 function absRefForm() {
   const a = DB.docs[S.param].data;
   openSheet('تاريخ التحويل للموجهة', `<div class="f"><span>التاريخ</span>${hdInput('rf_d', a.ref || todayH())}</div><div class="toolbar"><button class="btn primary" type="submit">حفظ</button></div>`,
-    async f => { const id = S.param; const d = JSON.parse(JSON.stringify(DB.docs[id].data)); d.ref = readHD(f, 'rf_d'); await saveDoc(id, 'absence', d); toast('تم الحفظ'); }, `--c:var(--abs);--cs:var(--abs-soft)`);
+    async f => { const id = S.param; const d = JSON.parse(JSON.stringify(DB.docs[id].data)); const old = d.ref; d.ref = readHD(f, 'rf_d'); if (old && old !== d.ref) Object.keys(d.done || {}).forEach(k => { if (d.done[k] === old) d.done[k] = d.ref; }); const nf = absSesFix(d); await saveDoc(id, 'absence', d); toast('تم الحفظ' + (nf ? ' · تعدّل تاريخ ' + ar(nf) + ' جلسة' : '')); }, `--c:var(--abs);--cs:var(--abs-soft)`);
 }
 async function absUpdate(fn, msg) { const id = S.param; const d = JSON.parse(JSON.stringify(DB.docs[id].data)); fn(d); try { await saveDoc(id, 'absence', d); if (msg) toast(msg); } catch (e) { toast(errT(e)); } rerender(); }
 function absReport(only) {

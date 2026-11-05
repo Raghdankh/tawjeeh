@@ -512,6 +512,10 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .a4 .sigs{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:30px;padding-top:18px}
 .a4 .sigs div{display:flex;flex-direction:column;gap:8px;font-weight:700;text-align:center}
 .a4 .sigs span{display:none}
+.a4 .sigs{position:relative}.a4 .sigs .sigimg{display:block;height:58px;max-width:190px;margin:-4px auto -6px;object-fit:contain}
+.a4 .sigs .stampimg{position:absolute;left:50%;top:50%;transform:translate(-50%,-42%) rotate(-6deg);height:108px;max-width:170px;object-fit:contain;opacity:.88;pointer-events:none}
+.signgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.signslot{display:flex;flex-direction:column;gap:8px;border:1px dashed var(--line);border-radius:12px;padding:10px}
+.signprev{height:90px;display:grid;place-items:center;background:repeating-conic-gradient(#f2f2f2 0 25%,#fff 0 50%) 0 0/14px 14px;border-radius:8px}.signprev img{max-height:84px;max-width:100%;object-fit:contain}
 .a4 .sigs i{font-style:normal;font-weight:500}
 .a4 .rt{font-size:18px;font-family:"Readex Pro",sans-serif}
 @media print{
@@ -1052,7 +1056,31 @@ async function fitPages(root) {
   }
 }
 function repZoom(bg) { const w = bg.querySelector('.rep-pages'); if (w) w.style.zoom = Math.min(1, (bg.clientWidth - 16) / (210 * MMPX)); }
-const repSigs = () => `<div class="sigs">${SIGS.map(s => `<div>${s[0]}<span></span><i>${s[1]}</i></div>`).join('')}</div>`;
+/* التوقيعان والختم: صور محفوظة في قاعدة البيانات (خاصة بحسابك، ما تنرفع على GitHub) وتطلع في كل التقارير */
+const SIGN = () => (DB.docs['myfile-sign'] && DB.docs['myfile-sign'].data) || {};
+const repSigs = () => { const g = SIGN(); const im = (id, cls) => id ? `<img class="${cls}" data-img="${esc(id)}" alt="">` : '';
+  return `<div class="sigs${g.stamp ? ' has-stamp' : ''}">${SIGS.map((s, i) => `<div>${s[0]}${im(i ? g.sigP : g.sigC, 'sigimg') || '<span></span>'}<i>${s[1]}</i></div>`).join('')}${im(g.stamp, 'stampimg')}</div>`; };
+/* تجهيز صورة التوقيع/الختم: إزالة الخلفية البيضاء وقص الحواف */
+function signPrep(file) {
+  return new Promise((res, rej) => { const r = new FileReader(); r.onerror = rej; r.onload = () => { const im = new Image(); im.onerror = () => rej(new Error('ما قدرت أقرأ الصورة')); im.onload = () => {
+    const m = 600, k = Math.min(1, m / Math.max(im.width, im.height)); const w = Math.round(im.width * k), h = Math.round(im.height * k);
+    const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d'); x.drawImage(im, 0, 0, w, h);
+    const d = x.getImageData(0, 0, w, h), p = d.data; let x0 = w, y0 = h, x1 = 0, y1 = 0;
+    for (let i = 0; i < p.length; i += 4) { const mn = Math.min(p[i], p[i + 1], p[i + 2]); const a = mn > 215 ? 0 : mn > 170 ? Math.round(255 * (215 - mn) / 45) : 255; p[i + 3] = Math.min(p[i + 3], a);
+      if (p[i + 3] > 40) { const px = (i / 4) % w, py = Math.floor(i / 4 / w); if (px < x0) x0 = px; if (px > x1) x1 = px; if (py < y0) y0 = py; if (py > y1) y1 = py; } }
+    x.putImageData(d, 0, 0); if (x1 <= x0 || y1 <= y0) return res(c.toDataURL('image/png'));
+    const pad = 6; x0 = Math.max(0, x0 - pad); y0 = Math.max(0, y0 - pad); x1 = Math.min(w - 1, x1 + pad); y1 = Math.min(h - 1, y1 + pad);
+    const o = document.createElement('canvas'); o.width = x1 - x0 + 1; o.height = y1 - y0 + 1; o.getContext('2d').drawImage(c, x0, y0, o.width, o.height, 0, 0, o.width, o.height); res(o.toDataURL('image/png')); }; im.src = r.result; }; r.readAsDataURL(file); });
+}
+const SIGN_SLOTS = [['sigC', 'توقيع الموجهة الطلابية'], ['sigP', 'توقيع مديرة المدرسة'], ['stamp', 'ختم المدرسة']];
+function signPanel() { const g = SIGN();
+  return `<section class="panel signp"><div class="head"><h3>التواقيع والختم</h3><span class="tiny muted">تطلع تلقائياً في كل التقارير والسجلات</span></div>
+    <div class="signgrid">${SIGN_SLOTS.map(([k, t]) => `<div class="signslot"><b class="small">${t}</b>${g[k] ? `<div class="signprev"><img data-img="${esc(g[k])}" alt=""></div><div class="row" style="gap:6px"><label class="btn sm" style="cursor:pointer">تغيير<input type="file" accept="image/*" data-signup="${k}" hidden></label><button class="btn sm ghost" data-signdel="${k}">حذف</button></div>` : `<label class="addph" style="cursor:pointer">＋ رفع الصورة<input type="file" accept="image/*" data-signup="${k}" hidden></label>`}</div>`).join('')}</div>
+    <p class="tiny muted" id="signMsg">الصور تنحفظ في حسابك بس، وما تنرفع على GitHub. الخلفية البيضاء تنشال لحالها.</p></section>`; }
+document.addEventListener('change', async e => { const k = e.target.dataset && e.target.dataset.signup; if (!k || !e.target.files.length) return; const msg = document.getElementById('signMsg');
+  try { if (msg) msg.textContent = 'جارٍ تجهيز الصورة…'; const id = await putImage(await signPrep(e.target.files[0])); const d = { k: 'sign', ...SIGN() }; d[k] = id; await saveDoc('myfile-sign', 'myfile', d); toast('انحفظت ' + SIGN_SLOTS.find(z => z[0] === k)[1]); rerender(); }
+  catch (er) { if (msg) msg.textContent = errT(er); } });
+document.addEventListener('click', async e => { const b = e.target.closest('[data-signdel]'); if (!b) return; e.preventDefault(); const d = { k: 'sign', ...SIGN() }; delete d[b.dataset.signdel]; await saveDoc('myfile-sign', 'myfile', d); toast('انحذفت'); rerender(); });
 async function openReport(pagesHTML, fileName, color) {
   const bg = document.createElement('div'); bg.className = 'rep-bg'; bg.id = 'repbg'; bg.style.setProperty('--rc', color || (typeof SEC_COL !== 'undefined' && SEC_COL[S.route]) || '#1F5E58');
   bg.innerHTML = `<div class="rep-bar"><button class="btn" data-rp="print">طباعة</button><button class="btn" data-rp="pdf">تنزيل PDF</button><button class="btn" data-rp="close">إغلاق</button></div><div class="rep-pages">${pagesHTML}</div>`;
@@ -2918,6 +2946,7 @@ function vFiles() {
   return `<div class="head"><h1><span class="dot"></span>ملفاتي</h1></div>
     <p class="lede">سجلاتك الرسمية في مكان واحد. كل سجل يتجمع لحاله من بيانات المنصة ومسار، وتقدرين تضيفين له صور أوراقك، وتطبعينه بغلاف وفهرس.</p>
     ${cur ? `<a class="fx-now" href="#files/${cur.p.id}/${cur.w.i}" style="--c:${FX.plans.c}"><span>هذا الأسبوع</span><b>الأسبوع ${ORD[cur.w.n]}: ${esc(cur.w.s.title || (cur.w.s.items || [])[0] || '')}</b><small>فتح الخطة الأسبوعية ←</small></a>` : ''}
+    ${signPanel()}
     <div class="fx-grid">${Object.entries(FX).map(([k, v]) => `<a class="fx-card" href="#files/${k}" style="--c:${v.c}"><span class="fx-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${v.ic}</svg></span>
       <div><b>${esc(v.t)}</b><p>${esc(v.d)}</p><small>${S.mloading && k !== 'plans' && k !== 'disc' ? 'جارٍ التحميل…' : esc(stat[k])}</small></div></a>`).join('')}</div>`;
 }

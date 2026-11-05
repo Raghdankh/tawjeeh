@@ -1068,7 +1068,16 @@ function bodyBlocks(m,imgs){
   }
   return B;
 }
-function signBlock(st){return `<div class="b sg"><div><b>الموجهة الطلابية: ${esc(st.counselor||'')}</b><br><span class="ln">التوقيع: ................................</span></div><div><b>مديرة المدرسة: ${esc(st.principal||'')}</b><br><span class="ln">التوقيع: ................................</span></div></div>`}
+/* التوقيعان والختم من المنصة (تُرفع مرة وحدة في ملفاتي) */
+const SGIMG={};
+async function loadSign(){ try{
+  let g=null, get=null;
+  if(Masar.demo){ const d=JSON.parse(localStorage.getItem('platform.demo.v8')||'null'); g=d&&d.docs&&d.docs['myfile-sign']&&d.docs['myfile-sign'].data; get=async id=>(d.imgs||{})[id]||''; }
+  else if(M.sb){ const r=await sbq(M.sb.from('platform_docs').select('data').eq('id','myfile-sign').maybeSingle()); g=r&&r.data; get=async id=>{ const x=await sbq(M.sb.from('platform_images').select('d').eq('id',id).maybeSingle()); return x?x.d:''; }; }
+  if(!g) return; for(const k of ['sigC','sigP','stamp']) SGIMG[k]=g[k]?await get(g[k]):''; }catch(e){} }
+const sgImg=(k,st)=>SGIMG[k]?`<img src="${SGIMG[k]}" alt="" style="${st}">`:'';
+function signBlock(st){const a=sgImg('sigC','display:block;height:54px;max-width:180px;object-fit:contain'), b=sgImg('sigP','display:block;height:54px;max-width:180px;object-fit:contain');
+  return `<div class="b sg" style="position:relative"><div><b>الموجهة الطلابية: ${esc(st.counselor||'')}</b><br>${a||'<span class="ln">التوقيع: ................................</span>'}</div>${sgImg('stamp','position:absolute;left:50%;top:50%;transform:translate(-50%,-45%) rotate(-6deg);height:100px;max-width:160px;object-fit:contain;opacity:.88')}<div><b>مديرة المدرسة: ${esc(st.principal||'')}</b><br>${b||'<span class="ln">التوقيع: ................................</span>'}</div></div>`}
 async function paginate(m){
   const st=settings(); const imgs={};
   for(const p of (m.photos||[])){const d=await getImage(p.id); if(d) imgs[p.id]=d}
@@ -1365,7 +1374,7 @@ async function initStore() {
     setMode('cloud'); $('#mode').textContent = 'محفوظ · لك وحدك';
   } catch (e) { toast('تعذّر تحميل السجل: ' + errT(e)); S.col = null; S.media = null; setMode('local'); loadLocal(); }
   renderMain();
-  await loadRefs();
+  await loadRefs(); loadSign();
 }
 async function saveFile(name, data) {
   if (S.downloads) { try { await S.downloads.save({ filename: name, data }); toast('تم التنزيل'); return true; } catch (e) { if (e && e.code === 'declined') return false; } }
@@ -2004,7 +2013,7 @@ const mbAr = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
 const mbInit = n => String(n || '').replace(/^مثال:\s*/, '').replace(/\([^)]*\)/g, '').trim().split(/\s+/).filter(w => /^[\u0600-\u06FF]/.test(w)).slice(0, 2).map(w => w[0] + '.').join(' ') || '—';
 function mbYear() { try { const y = +new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', { year: 'numeric' }).format(new Date()).replace(/\D/g, ''); return mbAr(y - 1) + ' - ' + mbAr(y) + 'هـ'; } catch (e) { return ''; } }
 function mbSigs() { const st = settings(); return [['الموجهة الطلابية', st.counselor || ''], ['مديرة المدرسة', st.principal || '']]; }
-const mbSigHTML = () => `<div class="sigs">${mbSigs().map(s => `<div>${s[0]}<span></span><i>${esc(s[1] ? 'أ. ' + s[1].replace(/^أ\.\s*/, '') : '')}</i></div>`).join('')}</div>`;
+const mbSigHTML = () => `<div class="sigs" style="position:relative">${mbSigs().map((s, i) => `<div>${s[0]}${sgImg(i ? 'sigP' : 'sigC', 'display:block;height:56px;max-width:190px;margin:0 auto;object-fit:contain') || '<span></span>'}<i>${esc(s[1] ? 'أ. ' + s[1].replace(/^أ\.\s*/, '') : '')}</i></div>`).join('')}${sgImg('stamp', 'position:absolute;left:50%;top:50%;transform:translate(-50%,-42%) rotate(-6deg);height:104px;max-width:165px;object-fit:contain;opacity:.88')}</div>`;
 const mbHead = t => `<div class="rh"><div class="r">المملكة العربية السعودية<br>وزارة التعليم<br><small>${MB_REGION}</small><br>${esc(settings().school || '')}</div><img class="moe" src="moe-logo.png" alt="وزارة التعليم"><div class="l"><b>التوجيه الطلابي</b><span>مسار</span></div></div><div class="rtitle"><h2>${esc(t)}</h2></div>`;
 const mbPages = h => (h.match(/<div class="a4/g) || []).length;
 const mbChunk = (a, n) => { const r = []; for (let i = 0; i < a.length; i += n) r.push(a.slice(i, i + n)); return r.length ? r : [[]]; };

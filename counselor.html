@@ -1076,8 +1076,8 @@ async function loadSign(){ try{
   else if(M.sb){ const r=await sbq(M.sb.from('platform_docs').select('data').eq('id','myfile-sign').maybeSingle()); g=r&&r.data; get=async id=>{ const x=await sbq(M.sb.from('platform_images').select('d').eq('id',id).maybeSingle()); return x?x.d:''; }; }
   if(!g) return; for(const k of ['sigC','sigP','stamp']) SGIMG[k]=g[k]?await get(g[k]):''; }catch(e){} }
 const sgImg=(k,st)=>SGIMG[k]?`<img src="${SGIMG[k]}" alt="" style="${st}">`:'';
-function signBlock(st){const a=sgImg('sigC','display:block;height:54px;max-width:180px;object-fit:contain'), b=sgImg('sigP','display:block;height:54px;max-width:180px;object-fit:contain');
-  return `<div class="b sg" style="position:relative"><div><b>الموجهة الطلابية: ${esc(st.counselor||'')}</b><br>${a||'<span class="ln">التوقيع: ................................</span>'}</div>${sgImg('stamp','position:absolute;left:50%;top:50%;transform:translate(-50%,-45%) rotate(-6deg);height:100px;max-width:160px;object-fit:contain;opacity:.88')}<div><b>مديرة المدرسة: ${esc(st.principal||'')}</b><br>${b||'<span class="ln">التوقيع: ................................</span>'}</div></div>`}
+function signBlock(st){const a=sgImg('sigC','display:block;height:calc(54px / var(--sk,1));max-width:calc(180px / var(--sk,1));object-fit:contain'), b=sgImg('sigP','display:block;height:calc(54px / var(--sk,1));max-width:calc(180px / var(--sk,1));object-fit:contain');
+  return `<div class="b sg" style="position:relative"><div><b>الموجهة الطلابية: ${esc(st.counselor||'')}</b><br>${a||'<span class="ln">التوقيع: ................................</span>'}</div>${sgImg('stamp','position:absolute;left:50%;top:50%;transform:translate(-50%,-45%) rotate(-6deg);height:calc(100px / var(--sk,1));max-width:calc(160px / var(--sk,1));object-fit:contain;opacity:.88')}<div><b>مديرة المدرسة: ${esc(st.principal||'')}</b><br>${b||'<span class="ln">التوقيع: ................................</span>'}</div></div>`}
 async function paginate(m){
   const st=settings(); const imgs={};
   for(const p of (m.photos||[])){const d=await getImage(p.id); if(d) imgs[p.id]=d}
@@ -1086,9 +1086,8 @@ async function paginate(m){
   if(m.onePage){
     const meas=$('#measure'); meas.innerHTML=`<div class="pg compact" style="position:relative;height:auto"><div class="pg-in"><div class="fit">${first}${blocks.map(b=>b.h).join('')}</div></div></div>`;
     const imgsEl=[...meas.querySelectorAll('img')]; await Promise.all(imgsEl.map(im=>im.complete?0:new Promise(r=>{im.onload=im.onerror=r})));
-    const h=meas.querySelector('.fit').offsetHeight; meas.innerHTML='';
-    const avail=1123-14-22-62; const sc=Math.min(1,avail/h);
-    return [`<div class="pg compact"><div class="pg-bar"></div><div class="pg-in" style="overflow:hidden;height:${avail}px"><div class="fit" style="width:${100/sc}%;transform:scale(${sc});transform-origin:top right">${first}${blocks.map(b=>b.h).join('')}</div></div><div class="pg-foot"><span>${esc(st.school||'')}</span><span></span></div></div>`];
+    const fe=meas.querySelector('.fit'); const avail=1123-14-22-62; let sc=Math.min(1,avail/fe.offsetHeight); for(let it=0;it<3;it++){ fe.style.setProperty('--sk',sc); sc=Math.min(1,avail/fe.offsetHeight); } meas.innerHTML='';
+    return [`<div class="pg compact"><div class="pg-bar"></div><div class="pg-in" style="overflow:hidden;height:${avail}px"><div class="fit" style="width:${100/sc}%;transform:scale(${sc});transform-origin:top right;--sk:${sc}">${first}${blocks.map(b=>b.h).join('')}</div></div><div class="pg-foot"><span>${esc(st.school||'')}</span><span></span></div></div>`];
   }
   const meas=$('#measure'); meas.innerHTML=`<div class="pg" style="position:relative"><div class="pg-in">${[first,cont,...blocks.map(b=>b.h)].join('')}</div></div>`;
   if(st.logo){const lg=meas.querySelector('.logo'); if(lg&&!lg.complete) await new Promise(r=>{lg.onload=lg.onerror=r})}
@@ -2013,7 +2012,7 @@ const mbAr = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
 const mbInit = n => String(n || '').replace(/^مثال:\s*/, '').replace(/\([^)]*\)/g, '').trim().split(/\s+/).filter(w => /^[\u0600-\u06FF]/.test(w)).slice(0, 2).map(w => w[0] + '.').join(' ') || '—';
 function mbYear() { try { const y = +new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', { year: 'numeric' }).format(new Date()).replace(/\D/g, ''); return mbAr(y - 1) + ' - ' + mbAr(y) + 'هـ'; } catch (e) { return ''; } }
 function mbSigs() { const st = settings(); return [['الموجهة الطلابية', st.counselor || ''], ['مديرة المدرسة', st.principal || '']]; }
-const mbSigHTML = () => `<div class="sigs" style="position:relative">${mbSigs().map((s, i) => `<div>${s[0]}${sgImg(i ? 'sigP' : 'sigC', 'display:block;height:56px;max-width:190px;margin:0 auto;object-fit:contain') || '<span></span>'}<i>${esc(s[1] ? 'أ. ' + s[1].replace(/^أ\.\s*/, '') : '')}</i></div>`).join('')}${sgImg('stamp', 'position:absolute;left:50%;top:50%;transform:translate(-50%,-42%) rotate(-6deg);height:104px;max-width:165px;object-fit:contain;opacity:.88')}</div>`;
+const mbSigHTML = () => `<div class="sigs" style="position:relative">${mbSigs().map((s, i) => `<div>${s[0]}${sgImg(i ? 'sigP' : 'sigC', 'display:block;height:calc(56px / var(--sk,1));max-width:calc(190px / var(--sk,1));margin:0 auto;object-fit:contain') || '<span></span>'}<i>${esc(s[1] ? 'أ. ' + s[1].replace(/^أ\.\s*/, '') : '')}</i></div>`).join('')}${sgImg('stamp', 'position:absolute;left:50%;top:50%;transform:translate(-50%,-42%) rotate(-6deg);height:calc(104px / var(--sk,1));max-width:calc(165px / var(--sk,1));object-fit:contain;opacity:.88')}</div>`;
 const mbHead = t => `<div class="rh"><div class="r">المملكة العربية السعودية<br>وزارة التعليم<br><small>${MB_REGION}</small><br>${esc(settings().school || '')}</div><img class="moe" src="moe-logo.png" alt="وزارة التعليم"><div class="l"><b>التوجيه الطلابي</b><span>مسار</span></div></div><div class="rtitle"><h2>${esc(t)}</h2></div>`;
 const mbPages = h => (h.match(/<div class="a4/g) || []).length;
 const mbChunk = (a, n) => { const r = []; for (let i = 0; i < a.length; i += n) r.push(a.slice(i, i + n)); return r.length ? r : [[]]; };
@@ -2080,9 +2079,9 @@ async function mbFit(root) {
     [...p.childNodes].filter(n => !(n.classList && n.classList.contains('pfoot'))).forEach(n => inner.append(n)); p.prepend(inner);
     const cs = getComputedStyle(p); const W = p.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
     const avail = 297 * MB_MM - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - 4;
-    const h = k => { inner.style.width = (W / k) + 'px'; return inner.scrollHeight; }; const fits = k => h(k) * k <= avail;
-    let k = 1; if (!fits(1)) { let lo = .6, hi = 1; for (let i = 0; i < 10; i++) { const m = (lo + hi) / 2; if (fits(m)) lo = m; else hi = m; } k = lo; if (!fits(k)) { inner.style.width = ''; continue; } }
-    inner.style.width = (W / k) + 'px'; inner.style.height = (avail / k) + 'px'; if (k < 1) inner.style.transform = `scale(${k})`; p.classList.add('fitted');
+    const h = k => { inner.style.setProperty('--sk', k); inner.style.width = (W / k) + 'px'; return inner.scrollHeight; }; const fits = k => h(k) * k <= avail;
+    let k = 1; if (!fits(1)) { let lo = .6, hi = 1; for (let i = 0; i < 10; i++) { const m = (lo + hi) / 2; if (fits(m)) lo = m; else hi = m; } k = lo; if (!fits(k)) { inner.style.width = ''; inner.style.setProperty('--sk', 1); continue; } }
+    inner.style.setProperty('--sk', k); inner.style.width = (W / k) + 'px'; inner.style.height = (avail / k) + 'px'; if (k < 1) inner.style.transform = `scale(${k})`; p.classList.add('fitted');
   }
 }
 function mbZoom(bg) { const w = bg.querySelector('.rep-pages'); if (w) w.style.zoom = Math.min(1, (bg.clientWidth - 16) / (210 * MB_MM)); }

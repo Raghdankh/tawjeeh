@@ -512,8 +512,8 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 .a4 .sigs{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:30px;padding-top:18px}
 .a4 .sigs div{display:flex;flex-direction:column;gap:8px;font-weight:700;text-align:center}
 .a4 .sigs span{display:none}
-.a4 .sigs{position:relative}.a4 .sigs .sigimg{display:block;height:58px;max-width:190px;margin:-4px auto -6px;object-fit:contain}
-.a4 .sigs .stampimg{position:absolute;left:50%;top:50%;transform:translate(-50%,-42%) rotate(-6deg);height:108px;max-width:170px;object-fit:contain;opacity:.88;pointer-events:none}
+.a4 .sigs{position:relative}.a4 .sigs .sigimg{display:block;height:calc(58px / var(--sk,1));max-width:calc(190px / var(--sk,1));margin:-4px auto -6px;object-fit:contain}
+.a4 .sigs .stampimg{position:absolute;left:50%;top:50%;transform:translate(-50%,-42%) rotate(-6deg);height:calc(108px / var(--sk,1));max-width:calc(170px / var(--sk,1));object-fit:contain;opacity:.88;pointer-events:none}
 .signgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.signslot{display:flex;flex-direction:column;gap:8px;border:1px dashed var(--line);border-radius:12px;padding:10px}
 .signprev{height:90px;display:grid;place-items:center;background:repeating-conic-gradient(#f2f2f2 0 25%,#fff 0 50%) 0 0/14px 14px;border-radius:8px}.signprev img{max-height:84px;max-width:100%;object-fit:contain}
 .a4 .sigs i{font-style:normal;font-weight:500}
@@ -1043,7 +1043,7 @@ async function fitPages(root) {
     [...p.childNodes].filter(n => !(n.classList && n.classList.contains('pfoot'))).forEach(n => inner.append(n)); p.prepend(inner);
     const cs = getComputedStyle(p); const W = p.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
     const avail = 297 * MMPX - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - 4;
-    const h = k => { inner.style.width = (W / k) + 'px'; return inner.scrollHeight; };
+    const h = k => { inner.style.setProperty('--sk', k); inner.style.width = (W / k) + 'px'; return inner.scrollHeight; };
     const fits = k => h(k) * k <= avail;
     const search = (lo, hi) => { if (fits(hi)) return hi; for (let i = 0; i < 10; i++) { const m = (lo + hi) / 2; if (fits(m)) lo = m; else hi = m; } return lo; };
     const eg = inner.querySelector('.eg'); let k = 1;
@@ -1051,8 +1051,8 @@ async function fitPages(root) {
     if (!fits(1)) k = search(.78, 1);
     if (!fits(k) && eg) { [...eg.children].slice(3).forEach(f => f.remove()); eg.className = 'eg e3 tight'; eg.style.setProperty('--n', 3); k = search(.78, 1); }
     if (!fits(k)) k = search(.6, 1);
-    if (!fits(k)) { inner.style.width = ''; continue; }
-    inner.style.width = (W / k) + 'px'; inner.style.height = (avail / k) + 'px'; if (k < 1) inner.style.transform = `scale(${k})`; p.classList.add('fitted');
+    if (!fits(k)) { inner.style.width = ''; inner.style.setProperty('--sk', 1); continue; }
+    inner.style.setProperty('--sk', k); inner.style.width = (W / k) + 'px'; inner.style.height = (avail / k) + 'px'; if (k < 1) inner.style.transform = `scale(${k})`; p.classList.add('fitted');
   }
 }
 function repZoom(bg) { const w = bg.querySelector('.rep-pages'); if (w) w.style.zoom = Math.min(1, (bg.clientWidth - 16) / (210 * MMPX)); }

@@ -2649,7 +2649,7 @@ function bestStu(pool, r) {
   const sub = g.filter(s => nameMatch(r.name, s.name || s.studentName)); if (sub.length === 1) return sub[0];
   const t = nTok(r.name); const two = g.filter(s => { const u = nTok(s.name || s.studentName); return u[0] === t[0] && u[1] === t[1]; }); return two.length === 1 ? two[0] : null;
 }
-function findFile(r) { return bestStu(list('absence').filter(a => !a.closed), r) || undefined; }
+function findFile(r) { const L = list('absence'); return bestStu(L.filter(a => !a.closed), r) || bestStu(L.filter(a => a.closed), r) || undefined; }
 function findStu(r) { return bestStu(students(), r) || undefined; }
 function cumOther(r, mid) { let x = 0, u = 0; list('absmonth').forEach(m => { if (m.id === mid) return; (m.list || []).forEach(o => { if (o.grade === r.grade && (norm(o.name) === norm(r.name) || nameMatch(o.name, r.name) || looseMatch(o.name, r.name) || looseMatch(r.name, o.name))) { x += o.x; u += o.u; } }); }); return { x, u }; }
 function impForm() {
@@ -2867,7 +2867,7 @@ function binderParts(sec) {
     if (ms.length) { P.push({ t: 'التقارير الشهرية', div: 1 }); ms.forEach(m => { P.push({ t: 'التقرير الشهري — ' + amLabel(m), sub: 1, h: () => amReport(m.id) }); if ((m.list || []).length) P.push({ t: 'كشف الغائبات — ' + amLabel(m), sub: 1, h: () => amListReport(m) }); }); }
     const files = list('absence').sort((a, b) => unex(b) - unex(a) || String(a.studentName).localeCompare(String(b.studentName), 'ar'));
     P.push({ t: 'ملفات الطالبات متكررات الغياب', div: 1 });
-    P.push({ t: 'قائمة الملفات', h: () => `<div class="a4">${repHead('ملفات الطالبات متكررات الغياب')}<table><thead><tr><th>م</th><th>الطالبة</th><th>الصف</th><th>بدون عذر</th><th>بعذر</th><th>خطة علاجية</th><th>الحالة</th></tr></thead><tbody>${files.map((a, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(a.studentName)}</td><td>${esc((a.grade || '') + ' ' + (a.section || ''))}</td><td>${ar(unex(a))}</td><td>${ar(exc(a))}</td><td>${a.plan ? '✔' : ''}</td><td>${a.closed ? 'مغلق' : 'مفتوح'}</td></tr>`).join('') || '<tr><td colspan="7">لا توجد ملفات</td></tr>'}</tbody></table>${repSigs()}</div>` });
+    P.push({ t: 'قائمة الملفات', h: () => `<div class="a4">${repHead('ملفات الطالبات متكررات الغياب')}<table><thead><tr><th>م</th><th>الطالبة</th><th>الصف</th><th>بدون عذر</th><th>بعذر</th><th>خطة علاجية</th></tr></thead><tbody>${files.map((a, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(a.studentName)}</td><td>${esc((a.grade || '') + ' ' + (a.section || ''))}</td><td>${ar(unex(a))}</td><td>${ar(exc(a))}</td><td>${a.plan ? '✔' : ''}</td></tr>`).join('') || '<tr><td colspan="6">لا توجد ملفات</td></tr>'}</tbody></table>${repSigs()}</div>` });
     files.forEach(a => P.push({ t: a.studentName, sub: 1, h: () => { const keep = S.param; S.param = a.id; const h = absReport() + (a.plan ? apReport(DB.docs[a.id].data) : ''); S.param = keep; return h; } }));
   } else if (sec === 'daily') {
     const rows = list('daily').sort((a, b) => String(a.date).localeCompare(String(b.date)) || String(a.time || '').localeCompare(String(b.time || '')));
@@ -4090,7 +4090,7 @@ document.addEventListener('click', async e => {
   if (d.asub) { S.sub.abs = d.asub; rerender(); return; }
   if (d.amopen != null || d.amsync != null) { const ms = amMonths(); const sel = DB.docs[S.filter.absm] ? S.filter.absm : ms[0] && ms[0].id; const m = { id: sel, ...DB.docs[sel].data }; const r = m.list[+(d.amopen != null ? d.amopen : d.amsync)]; const o = cumOther(r, sel); const cx = o.x + r.x, cu = o.u + r.u;
     try { if (d.amopen != null) { const st = findStu(r); await saveDoc(uid('abs'), 'absence', { studentId: st ? st.id : '', studentName: st ? st.name : r.name, grade: r.grade, section: r.section, u: cu, x: cx, consec: false, done: {}, log: [], closed: false, upd: todayH() }); toast('فُتح ملف ' + r.name); }
-      else { const f = findFile(r); const dd = JSON.parse(JSON.stringify(DB.docs[f.id].data)); dd.u = Math.max(unex(f), cu); dd.x = Math.max(exc(f), cx); dd.upd = todayH(); await saveDoc(f.id, 'absence', dd); toast('حُدّث ملف ' + r.name); } } catch (er) { toast(errT(er)); }
+      else { const f = findFile(r); const dd = JSON.parse(JSON.stringify(DB.docs[f.id].data)); const grew = cu > unex(f) || cx > exc(f); dd.u = Math.max(unex(f), cu); dd.x = Math.max(exc(f), cx); dd.upd = todayH(); const reop = dd.closed && grew; if (reop) dd.closed = false; await saveDoc(f.id, 'absence', dd); toast((reop ? 'انفتح ملف ' : 'حُدّث ملف ') + r.name + (reop ? ' من جديد لأن غيابها زاد' : '')); } } catch (er) { toast(errT(er)); }
     rerender(); return; }
   if (d.wagrp) { const all = students(); const items = all.filter(s => ((s.grade || 'بدون صف') + (s.section ? ' ' + s.section : '')) === d.wagrp).map(s => ({ studentId: s.id, name: s.name, grade: s.grade, section: s.section, phone: s.phone })); waQueue(items, 'free', 'مراسلة أولياء أمور ' + d.wagrp); return; }
   if (d.binder) { binderForm(d.binder); return; }

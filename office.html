@@ -544,6 +544,7 @@ select.sel{border:1.5px solid var(--line);background:var(--surface);border-radiu
 button,label,.btn,.clpick,.clpick *,.presets,.presets *,.chip,.chips,.subtabs,nav,[role=tab],[data-gtopic],[data-xstop],[data-xsact],[data-gsg]{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
 .sesdate{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.sesdate .hd select{padding:4px 6px;font-size:.85rem}
 .stage h4 .stref{margin-inline-start:auto;font-size:.78rem;font-weight:600}.stage h4{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.dcol{margin:0;padding-inline-start:22px;line-height:1.9}.dcol li{margin:2px 0}
 </style>
 </head>
 <body>
@@ -1471,6 +1472,26 @@ const PDOM_C = { 'تربوي وتعليمي': '#1F6FB2', 'سلوكي': '#C77700'
 const PSVC = ['نمائي', 'وقائي', 'علاجي'];
 const PFORM = ['برنامج', 'حملة توعوية', 'فعالية', 'يوم عالمي', 'لقاء أو محاضرة', 'مسابقة', 'ورشة عمل'];
 const PTERM = ['الفصل الأول', 'الفصل الثاني', 'الفصل الثالث'];
+/* تكرار تنفيذ البرنامج: نسخة جديدة بنفس المحتوى وتاريخ وشواهد جديدة */
+const RUN_ORD = ['', 'الأولى', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة', 'السادسة'];
+const progBase = t => String(t || '').replace(/\s*\(المرة [^)]*\)\s*$/, '').trim();
+const progRuns = p => list('program').filter(x => norm(progBase(x.title)) === norm(progBase(p.title))).sort((a, b) => (a.runNo || 1) - (b.runNo || 1) || String(a.start || '').localeCompare(String(b.start || '')));
+function progRunsHTML(id, p) { const R = progRuns(p); if (R.length < 2) return '';
+  return `<div class="meta" style="gap:6px;margin-top:8px;flex-wrap:wrap"><span class="tiny muted">مرات التنفيذ:</span>${R.map((x, i) => `<a class="chip${x.id === id ? ' on' : ''}" href="#programs/${x.id}" style="text-decoration:none${x.id === id ? ';font-weight:800;border-color:currentColor' : ''}">المرة ${RUN_ORD[x.runNo || i + 1] || ar(i + 1)}${x.start ? ' · ' + esc(hij(x.start)) : ''}</a>`).join('')}</div>`; }
+function progAgain() {
+  const p = DB.docs[S.param].data; const R = progRuns(p); const n = Math.max(...R.map((x, i) => x.runNo || i + 1)) + 1;
+  openSheet('تنفيذ البرنامج مرة ' + (RUN_ORD[n] || ar(n)), `<p class="small muted">تنسخ البرنامج بأهدافه وخطواته وأدواته، وتبدأ بشواهد وتاريخ جديد. البرنامج الأول يبقى مثل ما هو بتقريره وشواهده.</p>
+    <div class="form"><div class="f"><span>تاريخ البداية</span>${hdInput('pa_s', todayH())}</div><div class="f"><span>تاريخ النهاية</span>${hdInput('pa_e', todayH())}</div>
+    <label class="f"><span>الفصل الدراسي</span><select id="pa_t">${PTERM.map(t => `<option${t === p.term ? ' selected' : ''}>${t}</option>`).join('')}</select></label>
+    <label class="f"><span>الحالة</span><select id="pa_st"><option>مخطط</option><option>قيد التنفيذ</option><option>منفذ</option></select></label></div>
+    <div class="toolbar"><button class="btn primary" type="submit">إنشاء</button></div>`,
+    async f => { const st = f.querySelector('#pa_st').value; const s0 = readHD(f, 'pa_s'); let e0 = readHD(f, 'pa_e'); if (e0 < s0) e0 = s0;
+      if (!p.runNo) { const d0 = JSON.parse(JSON.stringify(p)); d0.runNo = 1; await saveDoc(S.param, 'program', d0); }
+      const d = JSON.parse(JSON.stringify(p)); const id = uid('prog');
+      Object.assign(d, { title: progBase(p.title) + ' (المرة ' + (RUN_ORD[n] || ar(n)) + ')', runNo: n, status: st, start: s0, end: e0, term: f.querySelector('#pa_t').value, photos: [], caps: {}, count: '', achieve: '', results: p.results || '', recs: p.recs || '',
+        steps: (p.steps || []).map(x => ({ t: x.t, who: x.who || '', date: '', done: st === 'منفذ' })) });
+      await saveDoc(id, 'program', d); toast('أُنشئ التنفيذ ' + (RUN_ORD[n] || ar(n)) + ' للبرنامج'); S.after = () => { location.hash = '#programs/' + id; }; }, `--c:var(--prg);--cs:var(--prg-soft)`);
+}
 const PSTAT = { 'مخطط': ['var(--z1)', 'var(--z1s)'], 'قيد التنفيذ': ['var(--z2)', 'var(--z2s)'], 'منفذ': ['var(--good)', 'var(--good-soft)'] };
 const pcol = d => PDOM_C[d] || 'var(--prg)';
 /* ═════════ برامج الموجهة المنفذة هذا العام (جاهزة بمحتواها) ═════════ */
@@ -1690,7 +1711,7 @@ function vProgramOne() {
   return `<a class="btn ghost" href="#programs" style="align-self:flex-start">→ كل البرامج</a>
     <div class="stu-head prg-head" style="--c:${c}">
       <div style="flex:1;min-width:220px"><h1 style="font-size:1.45rem;color:color-mix(in srgb,${c} 60%,#1b2422)">${esc(p.title)}</h1><div class="meta" style="margin-top:6px"><span class="pill" style="--pc:${sc};--ps:${ss}">${esc(p.status || 'مخطط')}</span><span class="chip c" style="--c:${c};--cs:color-mix(in srgb,${c} 13%,var(--surface))">${esc(p.domain || '')}</span>${p.svc ? `<span class="chip">${esc(p.svc)}</span>` : ''}</div></div>
-      <div class="toolbar"><button class="btn hint" data-act="pAI" title="اقتراحات" aria-label="اقتراحات">✦</button><button class="btn primary" data-act="pRep">التقرير</button><button class="btn wa" data-act="pWA">دعوة أولياء الأمور</button><button class="btn" data-act="pTpl" title="يصير من برامجك الجاهزة وتستخدمينه كل سنة">حفظ كبرنامج جاهز</button><button class="btn" data-act="pEdit">تعديل</button><button class="btn danger" data-del="${id}" data-back="#programs">حذف</button></div></div>
+      <div class="toolbar"><button class="btn hint" data-act="pAI" title="اقتراحات" aria-label="اقتراحات">✦</button><button class="btn primary" data-act="pRep">التقرير</button><button class="btn wa" data-act="pWA">دعوة أولياء الأمور</button><button class="btn" data-act="pTpl" title="يصير من برامجك الجاهزة وتستخدمينه كل سنة">حفظ كبرنامج جاهز</button><button class="btn" data-act="pAgain" title="تطبيق نفس البرنامج مرة ثانية بتاريخ وشواهد جديدة">＋ تنفيذ مرة أخرى</button><button class="btn" data-act="pEdit">تعديل</button><button class="btn danger" data-del="${id}" data-back="#programs">حذف</button></div></div>${progRunsHTML(id, p)}
     <div class="pcolrow"><span class="tiny muted">لون البرنامج:</span>${PRG_PAL.map(k => `<button type="button" class="sw" data-pcol="${k}" style="--k:${softC(k)}" aria-label="لون" aria-pressed="${softC(k) === c}"></button>`).join('')}</div>
     ${p.status === 'منفذ' && (!p.start || !(p.photos || []).length) ? `<div class="todo" style="--c:${c}"><b>لإكمال البرنامج:</b>${!p.start ? '<button class="btn sm primary" data-act="pDone">تاريخ التنفيذ وعدد المستفيدات</button>' : ''}${!(p.photos || []).length ? '<label class="btn sm primary" style="cursor:pointer">رفع صور الشواهد<input type="file" accept="image/*" multiple data-pph hidden></label>' : ''}</div>` : ''}
     <section class="panel prep" style="--c:${c}"><div class="head"><h3>التقارير</h3></div><div class="reps">
@@ -2880,10 +2901,11 @@ const FX = {
   disc: { t: 'سجل الانضباط المدرسي', d: 'الغياب والتقارير الشهرية، والحالات السلوكية، والتكريم ولوحة الشرف.', c: '#C9532A', ic: '<path d="M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6z"/><path d="m8.5 12 2.5 2.5 4.5-5"/>' },
   ach: { t: 'سجل التحصيل الدراسي', d: 'حالات التأخر الدراسي والمتفوقات والموهوبات، وبرامج رفع التحصيل.', c: '#1F6FB2', ic: '<path d="M3 9.5 12 5l9 4.5-9 4.5z"/><path d="M7 11.5V16c1.5 1.3 3.2 2 5 2s3.5-.7 5-2v-4.5M21 9.5V15"/>' },
   ind: { t: 'سجل جلسات التوجيه الفردي', d: 'كل الجلسات الفردية المسجلة في حالات مسار، مرتبة بالتاريخ.', c: '#6A4BC4', ic: '<circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7"/>' },
+  council: { t: 'سجل المجلس الطلابي', d: 'تشكيل المجلس وأهدافه ومهامه وأعضاؤه، ومحاضر اجتماعاته.', c: '#B5458A', ic: '<path d="M4 20v-1.5C4 16 6 14.5 8.5 14.5S13 16 13 18.5V20"/><circle cx="8.5" cy="9" r="3"/><path d="M14 4h6v6h-3l-2 2v-2h-1z"/>' },
   grp: { t: 'سجل جلسات التوجيه الجمعي', d: 'لقاءات التوجيه الجمعي في البرامج، والجلسات الجماعية في مسار.', c: '#2E7D4F', ic: '<circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2.5 19c0-3.2 2.5-5.5 5.5-5.5s5.5 2.3 5.5 5.5M10.5 19c0-3.2 2.5-5.5 5.5-5.5s5.5 2.3 5.5 5.5"/>' }
 };
 Object.entries(FX).forEach(([k, v]) => { SEC_COL[k] = v.c; });
-Object.assign(SEC_FILE, { plans: 'سجل خطط التوجيه الطلابي', disc: 'سجل الانضباط المدرسي', ach: 'سجل التحصيل الدراسي', ind: 'سجل جلسات التوجيه الفردي', grp: 'سجل جلسات التوجيه الجمعي' });
+Object.assign(SEC_FILE, { council: 'سجل المجلس الطلابي', plans: 'سجل خطط التوجيه الطلابي', disc: 'سجل الانضباط المدرسي', ach: 'سجل التحصيل الدراسي', ind: 'سجل جلسات التوجيه الفردي', grp: 'سجل جلسات التوجيه الجمعي' });
 const MCATS = { separation: 'انفصال الوالدين', orphan: 'اليتيمات', economic: 'الظروف الاقتصادية', health: 'الظروف الصحية', delayed: 'التأخر الدراسي', psych: 'الملاحظات النفسية', behavior: 'الملاحظات السلوكية', excellent: 'المتفوقات', gifted: 'الموهوبات' };
 const MSTAT = { active: 'قيد المتابعة', open: 'قيد المتابعة', closed: 'مغلقة', done: 'مغلقة' };
 const MPROG = { up: 'تحسن', same: 'ثابت', down: 'تراجع' };
@@ -2942,7 +2964,7 @@ function vFiles() {
   const pl = plans(); const cur = pl.map(x => ({ p: x, w: curWeek(x) })).find(x => x.w);
   const cs = S.mcases || []; const ind = mSessions('جلسة فردية').length;
   const stat = { plans: pl.length ? ar(pl.length) + ' خطة' : 'لا توجد خطط بعد', disc: ar(list('absence').length) + ' ملف غياب · ' + ar(list('daily').filter(r => /سلوك/.test(r.type)).length) + ' حالة سلوكية',
-    ach: ar(cs.filter(c => (c.cats || []).some(k => ['delayed', 'excellent', 'gifted'].includes(k))).length) + ' حالة', ind: ar(ind) + ' جلسة', grp: ar(list('group').length + mSessions('جلسة جماعية').length) + ' لقاء' };
+    ach: ar(cs.filter(c => (c.cats || []).some(k => ['delayed', 'excellent', 'gifted'].includes(k))).length) + ' حالة', council: ar((myFile('council').meets || []).length) + ' اجتماع', ind: ar(ind) + ' جلسة', grp: ar(list('group').length + mSessions('جلسة جماعية').length) + ' لقاء' };
   return `<div class="head"><h1><span class="dot"></span>ملفاتي</h1></div>
     <p class="lede">سجلاتك الرسمية في مكان واحد. كل سجل يتجمع لحاله من بيانات المنصة ومسار، وتقدرين تضيفين له صور أوراقك، وتطبعينه بغلاف وفهرس.</p>
     ${cur ? `<a class="fx-now" href="#files/${cur.p.id}/${cur.w.i}" style="--c:${FX.plans.c}"><span>هذا الأسبوع</span><b>الأسبوع ${ORD[cur.w.n]}: ${esc(cur.w.s.title || (cur.w.s.items || [])[0] || '')}</b><small>فتح الخطة الأسبوعية ←</small></a>` : ''}
@@ -3122,6 +3144,152 @@ function caseTable(title, cs, o) {
     [['الطالبة', 120], ['الصف', 64], ['التصنيف', 96], ['الخطة العلاجية'], ['الجلسات', 54], ['الحالة', 70]], cs, 14,
     c => [esc(anonN(c.name, o)), esc((c.grade || '') + ' ' + (c.section || '')), esc(catT(c.cats)), esc((c.plan || []).map(x => (x.done ? '✔ ' : '') + x.t).join('، ')), ar((c.follow || []).length), esc(MSTAT[c.status] || c.status || '')]);
 }
+/* ═════════ لجنة الانضباط المدرسي: قرار التشكيل، الأهداف والمهام، الاجتماعات، الخطة الإجرائية ═════════ */
+const DC_DEF = {
+  date: '1448-03-03',
+  members: [['هند علي هياس', 'مديرة المدرسة', 'رئيساً'], ['أمل علي محمد', 'الموجهة الطلابية', 'عضواً'], ['أسوار فائز محمد', 'معلمة', 'عضواً'], ['أزهار محمد ابراهيم', 'معلمة', 'عضواً'], ['فاطمه عيسى محمد', 'معلمة', 'عضواً']],
+  goal: 'تحقيق الاستقرار النفسي والدراسي للطالبات وتعزيز السلوكيات المنضبطة الجيدة لديهن، وحمايتهن من الوقوع في السلوكيات الخاطئة.',
+  tasks: ['تتولى اللجنة عمليات الإعداد والتنفيذ والتقويم لخطة الانضباط وإعداد التقارير المرتبطة بذلك ورفعها للجنة الانضباط المدرسي بمكتب التعليم.', 'إعداد تحليل شامل حول البيئة المدرسية واحتياجاتها والسلوك والمواظبة.', 'الحصر اليومي للغياب والتأخر الصباحي مع الرصد في برنامج نور، والتواصل مع ولي الأمر من قبل وكيلة المدرسة لشؤون الطالبات.', 'تفعيل وتطبيق قواعد السلوك والمواظبة على طالبات المدرسة.', 'توقيع الطالبة وولي أمرها على العقد السلوكي وقواعد السلوك والمواظبة سنوياً.', 'تنفيذ الفعاليات والبرامج والحملات الإعلامية على مستوى المدرسة والتواصل مع الجهات ذات العلاقة في كل ما من شأنه تفعيل الانضباط وتعزيز أثره في المدرسة والمجتمع المحلي.', 'تحليل مستوى انتظام الطالبات في الحضور من خلال إحصائيات العام الماضي.', 'متابعة انتظام وسير اليوم الدراسي والتزام المعلمات بالمنهج وتفعيل حصص الانتظار.', 'إحالة الطالبات متكررات الغياب والتأخر وغير المنضبطات سلوكياً إلى الموجهة الطلابية لدراسة حالتهن وتقديم الخدمات التوجيهية اللازمة لهن وفق إجراءات قواعد تنظيم السلوك والمواظبة.', 'إحالة الحالات التي لم تستجب للمعالجة داخل المدرسة لوحدة التوجيه الطلابي بالمكتب.', 'متابعة الحالة بعد تقديم الخدمات لها من قبل وحدة التوجيه ورفع تقرير يوضح مستوى التحسن.', 'تبادل التجارب المتميزة بين المدارس في أساليب تحقيق الانضباط المدرسي، وإبراز المبادرات النوعية.', 'تفعيل دور المجالس وتشكيل مجلس طلابي لمناقشة أساليب وآليات تعزيز قيم الانضباط المدرسي ومناقشة جوانب القصور ومعالجتها والرفع لمكتب التعليم بذلك.', 'تكريم الطالبات المنضبطات وإبرازهن كنموذج مميز يحتذى به بين الطالبات، وإعداد التقارير الدورية ورفعها للمكتب.'],
+  meet: ['تعقد اللجنة اجتماعاتها مرة كل شهر، وتسجل اجتماعاتها في محاضر يوقعها الأعضاء، ولمديرة المدرسة دعوة اللجنة إلى اجتماعات طارئة وفق الحاجة على ألا تتسبب هذه الاجتماعات بإرباك أو تعطيل اليوم الدراسي.', 'توثيق اجتماعات اللجنة بمحاضر تدون في سجل خاص متضمن التوصيات ومتابعة القرارات.', 'يتم اتخاذ التوصية في أي موضوع يطرح للنقاش من خلال التصويت بالأغلبية، وعند تساوي الأصوات يغلب الطرف الذي فيه الرئيسة.'],
+  topics: ['توزيع المهام وإعداد السجلات.', 'إعداد خطة إجرائية للانضباط المدرسي.', 'دراسة حالات التأخر والغياب المتكرر.', 'تفعيل دور الأسرة في الانضباط المدرسي.', 'وضع برامج تحفيزية للطالبات تحثهن على الانضباط المدرسي.', 'تطبيق قواعد السلوك والمواظبة وفق اللوائح والأنظمة.'],
+  plan: [['التعميم على منسوبات المدرسة بالتأكيد على أهمية الانضباط المدرسي.', 'مديرة المدرسة', 'بداية العام الدراسي'], ['الاجتماع بمنسوبات المدرسة بالتأكيد على أهمية الانضباط المدرسي.', 'مديرة المدرسة', 'بداية العام الدراسي'], ['إعداد خطة زيارات صفية للتأكد من السير وفق خطة المنهج المدرسي.', 'مديرة المدرسة', 'بداية العام الدراسي'], ['نشر ثقافة الانضباط المدرسي لمنسوبات المدرسة والمجتمع المحلي.', 'التوجيه الطلابي', 'طوال العام الدراسي'], ['عمل برامج علاجية للحد من الغياب المتكرر والمستمر لبعض الطالبات.', 'التوجيه الطلابي', 'طوال العام الدراسي'], ['تفعيل وسائل التواصل الاجتماعي المختلفة التي تؤكد على أهمية انتظام الدراسة.', 'المنسقة الإعلامية', 'أثناء الأسابيع المستهدفة'], ['متابعة رصد الغياب وتثبيته في برنامج نور بشكل يومي.', 'منسقة نظام نور', 'أثناء الأسابيع المستهدفة'], ['متابعة تطبيق لائحة السلوك والمواظبة.', 'التوجيه الطلابي', 'أثناء الأسابيع المستهدفة'], ['غرس قيمة وأهمية الانضباط المدرسي بداية الحصص الدراسية.', 'المعلمات', 'أثناء الأسابيع المستهدفة'], ['متابعة الانتظام في دخول الحصص الدراسية.', 'المعلمات', 'أثناء الأسابيع المستهدفة'], ['حصر الغياب بداية الحصص الدراسية.', 'المعلمات', 'أثناء الأسابيع المستهدفة'], ['تفعيل مجالس أولياء الأمور.', 'التوجيه الطلابي', 'طوال العام الدراسي'], ['إعداد وتنفيذ برامج وأنشطة جاذبة تضمن انضباط الطالبات.', 'رائدة النشاط', 'أثناء الأسابيع المستهدفة'], ['متابعة المعلمات في تنفيذ الخطة الزمنية للمقرر الدراسي.', 'مديرة المدرسة', 'أثناء الأسابيع المستهدفة']]
+};
+const dcSigId = (c, m, i) => (c.sigs && c.sigs[i]) || (/مدير/.test(m[1]) ? SIGN().sigP : /الموجهة/.test(m[1]) ? SIGN().sigC : '');
+const discCom = () => { const d = myFile('disccom'); return { ...DC_DEF, ...(d.members ? d : {}) }; };
+const dcOl = L => `<ol class="dcol">${L.map(x => `<li>${esc(x)}</li>`).join('')}</ol>`;
+function discComPages() { const c = discCom(); const g = SIGN();
+  const prin = `<div class="sigs" style="grid-template-columns:1fr"><div>مديرة المدرسة${g.sigP ? `<img class="sigimg" data-img="${esc(g.sigP)}" alt="">` : '<span></span>'}<i>${esc(SIGS[1][1])}</i></div>${g.stamp ? `<img class="stampimg" data-img="${esc(g.stamp)}" alt="" style="left:22%">` : ''}</div>`;
+  const p1 = `<div class="a4">${repHead('قرار تشكيل لجنة الانضباط المدرسي')}<p style="margin:0 0 8px"><b>التاريخ:</b> ${esc(hij(c.date))} &nbsp;&nbsp; <b>المدة:</b> عام دراسي</p><p style="margin:0 0 8px">أنا مديرة المدرسة:</p>
+    <table><thead><tr><th style="width:30px">م</th><th>الاسم</th><th>العمل</th><th style="width:80px">الصفة</th><th style="width:120px">التوقيع</th></tr></thead><tbody>${c.members.map((m, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(m[0])}</td><td>${esc(m[1])}</td><td>${esc(m[2])}</td><td style="padding:2px 6px">${(() => { const id = dcSigId(c, m, i); return id ? `<img data-img="${esc(id)}" alt="" style="height:34px;max-width:120px;object-fit:contain;display:block;margin:auto">` : ''; })()}</td></tr>`).join('')}</tbody></table>
+    <p style="margin-top:12px;line-height:2">بناءً على الصلاحيات الممنوحة لنا والواردة بقرار معالي وزير التعليم رقم ٣٧٦١٧١٦٨ وتاريخ ١٤٣٧/٤/١هـ، والقاضي بمنح مديري المدارس الصلاحيات المرفقة بالقرار، واستناداً إلى ما ورد في الدليل التنظيمي لمدارس التعليم العام الصادر ١٤٤٢هـ، وبمقتضى النظام، نقرر بمشيئة الله ما يلي:</p>
+    <p><b>تشكيل لجنة الانضباط المدرسي بالمدرسة على النحو الموضح أعلاه.</b></p><p class="tiny" style="margin-top:10px;line-height:1.9">صورة للوكيلة مع التحية والتقدير · صورة لملف كل عضو · الأصل في ملف القرارات المدرسية</p>${prin}</div>`;
+  const p2 = `<div class="a4">${repHead('أهداف لجنة الانضباط المدرسي ومهامها')}<div class="box full"><h4>هدف اللجنة</h4><p>${esc(c.goal)}</p></div><div class="box full"><h4>مهام اللجنة</h4>${dcOl(c.tasks)}</div>${repSigs()}</div>`;
+  const p3 = `<div class="a4">${repHead('اجتماعات لجنة الانضباط المدرسي')}<div class="box full"><h4>اجتماعات اللجنة</h4>${dcOl(c.meet)}</div>
+    <h4 style="margin:14px 0 6px">مواضيع مقترحة لمناقشتها في اجتماعات اللجنة</h4><table><thead><tr><th style="width:30px">م</th><th>الموضوع</th></tr></thead><tbody>${c.topics.map((t, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(t)}</td></tr>`).join('')}</tbody></table>${repSigs()}</div>`;
+  const p4 = `<div class="a4">${repHead('الخطة الإجرائية لمتابعة الانضباط المدرسي')}<table><thead><tr><th style="width:30px">م</th><th>الإجراءات</th><th style="width:120px">مسؤولة التنفيذ</th><th style="width:160px">موعد التنفيذ</th></tr></thead><tbody>${c.plan.map((r, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('')}</tbody></table>${repSigs()}</div>`;
+  return { p1, p2, p3, p4 };
+}
+function discComForm() { const c = discCom(); const L = a => a.map(r => Array.isArray(r) ? r.join(' | ') : r).join('\n');
+  openSheet('لجنة الانضباط المدرسي', `<p class="small muted">كل سطر بند. في الأعضاء والخطة افصلي بين الخانات بعلامة |</p><div class="form">
+    <div class="f"><span>تاريخ القرار</span>${hdInput('dc_d', c.date)}</div>
+    <label class="f full"><span>الأعضاء (الاسم | العمل | الصفة)</span><textarea id="dc_m" style="min-height:120px">${esc(L(c.members))}</textarea></label>
+    <label class="f full"><span>هدف اللجنة</span><textarea id="dc_g" style="min-height:60px">${esc(c.goal)}</textarea></label>
+    <label class="f full"><span>مهام اللجنة</span><textarea id="dc_t" style="min-height:160px">${esc(L(c.tasks))}</textarea></label>
+    <label class="f full"><span>اجتماعات اللجنة</span><textarea id="dc_e" style="min-height:90px">${esc(L(c.meet))}</textarea></label>
+    <label class="f full"><span>مواضيع مقترحة للاجتماعات</span><textarea id="dc_o" style="min-height:100px">${esc(L(c.topics))}</textarea></label>
+    <label class="f full"><span>الخطة الإجرائية (الإجراء | المسؤولة | الموعد)</span><textarea id="dc_p" style="min-height:200px">${esc(L(c.plan))}</textarea></label></div>
+    <div class="toolbar"><button class="btn primary" type="submit">حفظ</button></div>`,
+    async f => { const lines = id => f.querySelector(id).value.split('\n').map(x => x.trim()).filter(Boolean); const cols = (id, n) => lines(id).map(x => { const a = x.split('|').map(z => z.trim()); while (a.length < n) a.push(''); return a.slice(0, n); });
+      await saveDoc('myfile-disccom', 'myfile', { k: 'disccom', sigs: discCom().sigs || {}, date: readHD(f, 'dc_d'), members: cols('#dc_m', 3), goal: f.querySelector('#dc_g').value.trim(), tasks: lines('#dc_t'), meet: lines('#dc_e'), topics: lines('#dc_o'), plan: cols('#dc_p', 3) }); toast('انحفظت بيانات اللجنة'); }, `--c:#C9532A;--cs:#FBEDE6`);
+}
+function dcSigPanel() { const c = discCom();
+  return `<h4 style="margin:10px 0 6px">تواقيع الأعضاء في قرار التشكيل</h4><div class="signgrid">${c.members.map((m, i) => { const own = c.sigs && c.sigs[i]; const id = dcSigId(c, m, i);
+    return `<div class="signslot"><b class="small">${esc(m[0])}</b>${id ? `<div class="signprev"><img data-img="${esc(id)}" alt=""></div>` : ''}${own ? `<div class="row" style="gap:6px"><label class="btn sm" style="cursor:pointer">تغيير<input type="file" accept="image/*" data-dcsig="${i}" hidden></label><button class="btn sm ghost" data-dcsigdel="${i}">حذف</button></div>` : id ? '<span class="tiny muted">من التواقيع والختم في ملفاتي</span>' : `<label class="addph" style="cursor:pointer">＋ رفع التوقيع<input type="file" accept="image/*" data-dcsig="${i}" hidden></label>`}</div>`; }).join('')}</div>`; }
+const dcSave = async fn => { const d = { k: 'disccom', ...JSON.parse(JSON.stringify(discCom())) }; d.sigs = d.sigs || {}; fn(d); await saveDoc('myfile-disccom', 'myfile', d); rerender(); };
+document.addEventListener('change', async e => { const i = e.target.dataset && e.target.dataset.dcsig; if (i == null || !e.target.files.length) return;
+  try { toast('جارٍ تجهيز التوقيع…'); const id = await putImage(await signPrep(e.target.files[0])); await dcSave(d => { d.sigs[i] = id; }); toast('انحفظ التوقيع'); } catch (er) { toast(errT(er)); } });
+document.addEventListener('click', async e => { const b = e.target.closest('[data-dcsigdel]'); if (!b) return; e.preventDefault(); await dcSave(d => { delete d.sigs[b.dataset.dcsigdel]; }); toast('انحذف التوقيع'); });
+document.addEventListener('click', e => { const b = e.target.closest('[data-dcedit]'); if (!b || b.closest('#sheetbg')) return; e.preventDefault(); discComForm(); });
+/* ═════════ سجل المجلس الطلابي ═════════ */
+const CN_ORD = ['', 'الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس', 'السادس', 'السابع', 'الثامن', 'التاسع', 'العاشر'];
+const CN_DEF = {
+  benef: 'جميع الطالبات', domain: 'تربوي',
+  goal: 'تعزيز مشاركة الطالبات في القرارات التربوية والتعليمية في المدرسة.',
+  goals: ['تعزيز قيمة الانتماء الوطني من خلال المشاركة في القرارات التربوية والتعليمية بالمدرسة.', 'تنمية مهارات القيادة والمسؤولية لدى الطالبات.', 'تعزيز التواصل بين الطالبات ومعلماتهن والقيادات التربوية داخل المدرسة.', 'مشاركة الطالبات في صناعة القرار.', 'تعزيز القدرات الإبداعية والابتكارية لدى الطالبات وتنميتها.', 'تنمية مهارات التفكير الناقد وحل المشكلات.'],
+  tasks: ['إعداد الخطة التنفيذية وفق إطار زمني محدد للبرامج التربوية والمناشط والفعاليات المدرسية الإثرائية ومؤشراتها التنفيذية.', 'رصد الاحتياجات المختلفة بالمدرسة واقتراح الحلول المناسبة لها.', 'اقتراح اللجان التنفيذية العاملة بالمجلس وتكوينها وفقاً لحاجات المدرسة.', 'المساهمة مع لجنة التوجيه الطلابي في اقتراح الحلول المناسبة للمشكلات التي تواجه الطالبات.', 'دراسة ما يرد من الطالبات من مقترحات وتطلعات وتوظيفها في تحسين العملية التربوية والتعليمية مثل (جداول الاختبارات، المناشط المدرسية، البيئة المدرسية).', 'اقتراح الأساليب المناسبة لتحفيز الطالبات المتميزات سلوكياً وتحصيلياً في المدرسة.', 'قياس رضا الطالبات وأولياء الأمور عن العملية التعليمية والتربوية.'],
+  roles: [['رئيسة المجلس', 'الموجهة الطلابية'], ['نائبة الرئيسة', 'طالبة يتم انتخابها'], ['الأعضاء', 'طالبة من كل فصل، وأمينة عامة للمجلس']],
+  criteria: ['أن تكون من المتميزات سلوكياً.', 'أن تكون قيادية ولديها مشاركات متميزة في الحوار وقادرة على تمثيل زميلاتها.'],
+  plan: ['تشكيل المجلس الطلابي.', 'إعداد إطار تنظيمي للمجلس.', 'تفعيل وسائل الاتصال للتعريف بالمجلس.', 'متابعة سير عمل المجلس.'],
+  evalm: ['رفع تقارير بتوصيات المجلس لمديرة المدرسة.', 'دراسة التقارير وإعداد التغذية الراجعة.', 'قياس أثر المجلس الطلابي.'],
+  topics: ['حصر أبرز المشكلات السلوكية في المدرسة والتي تحتاج إلى تدخلات عاجلة.', 'مناقشة الاحتياجات المختلفة بالمدرسة مع اقتراح الحلول المناسبة لها.', 'الاهتمام بالمقصف المدرسي ودراسة أوضاعه.', 'المحافظة على الممتلكات العامة وعدم العبث فيها.', 'الحرص على أن تكون البيئة المدرسية بيئة جاذبة.']
+};
+/* قوالب محاضر جاهزة: الموضوع ← المحاور والتوصيات */
+const CN_TPL = [
+  ['التعريف بالمجلس ومهامه', ['الترحيب بعضوات المجلس الطلابي وبيان أهدافه.', 'التعريف بمهام المجلس وآلية عمله.', 'حصر أبرز المشكلات السلوكية في المدرسة والتي تحتاج إلى تدخلات عاجلة، ومناقشة الاحتياجات المختلفة بالمدرسة مع اقتراح الحلول المناسبة لها.'], ['حصر المشكلات السلوكية المنتشرة بالمدرسة ومناقشة حلها.', 'ضرورة الاهتمام بالبيئة المدرسية.', 'التأكيد على فريق النظام المدرسي بمتابعة عدم العبث بالممتلكات العامة.', 'رفع التوصيات للجنة التوجيه الطلابي.']],
+  ['الانضباط المدرسي', ['مناقشة أسباب الغياب والتأخر.', 'أثر الانضباط على التحصيل الدراسي.', 'دور الطالبات في الالتزام بالأنظمة.'], ['نشر ثقافة الانضباط بين الطالبات.', 'تحفيز الطالبات المنتظمات بالحضور.', 'متابعة حالات الغياب المتكرر.', 'التعاون مع إدارة المدرسة لتعزيز الانضباط.']],
+  ['السلوك الإيجابي', ['أهمية السلوك الإيجابي داخل المدرسة.', 'نماذج للسلوك المتميز.', 'دور المجلس في تعزيز القيم.'], ['تشجيع السلوك الإيجابي بين الطالبات.', 'تفعيل مبادرات السلوك المتميز.', 'تعزيز الاحترام المتبادل داخل المدرسة.', 'التعاون مع المعلمات في نشر القيم.']],
+  ['البيئة المدرسية', ['المحافظة على نظافة المدرسة.', 'العناية بالمرافق المدرسية.', 'دور الطالبات في تحسين البيئة المدرسية.'], ['تعزيز الوعي بأهمية النظافة.', 'المحافظة على ممتلكات المدرسة.', 'مشاركة الطالبات في المبادرات البيئية.', 'الالتزام بالتعليمات المدرسية.']],
+  ['الانضباط المدرسي خلال شهر رمضان', ['أثر شهر رمضان على الانضباط والحضور المدرسي.', 'أسباب الغياب والتأخر خلال الشهر الفضيل.', 'دور الطالبات في الالتزام بالأنظمة المدرسية في رمضان.'], ['الالتزام بالحضور والانصراف في الأوقات المحددة.', 'تعزيز الوعي بأهمية الانضباط خلال شهر رمضان.', 'التعاون بين الطالبات وإدارة المدرسة للحد من الغياب.', 'تشجيع الطالبات على النوم المبكر والاستعداد الجيد لليوم الدراسي.']],
+  ['المقصف المدرسي', ['دراسة أوضاع المقصف المدرسي ومدى رضا الطالبات عنه.', 'التغذية الصحية وأثرها على النشاط والتحصيل.', 'آداب الشراء والانتظام في الطابور.'], ['رفع مقترحات الطالبات لتحسين المقصف لإدارة المدرسة.', 'تشجيع الطالبات على اختيار الأطعمة الصحية.', 'تنظيم الشراء من المقصف بما يحفظ الوقت والنظام.']],
+  ['المحافظة على الممتلكات العامة', ['أهمية المحافظة على الممتلكات العامة.', 'مظاهر العبث بممتلكات المدرسة وأسبابه.', 'دور الطالبات في حماية ممتلكات المدرسة.'], ['تفعيل حملة «مدرستي مسؤوليتي» داخل الفصول.', 'تكليف عضوات المجلس بمتابعة نظافة الفصول والمرافق.', 'تعزيز الطالبات المحافظات على ممتلكات المدرسة.']],
+  ['الاستعداد للاختبارات', ['تنظيم الوقت والمذاكرة قبل الاختبارات.', 'التعامل مع قلق الاختبار.', 'مقترحات الطالبات حول جداول الاختبارات.'], ['نشر نصائح الاستعداد للاختبارات بين الطالبات.', 'رفع مقترحات الطالبات حول الجداول لإدارة المدرسة.', 'تشجيع الطالبات على النوم المبكر والتغذية السليمة أيام الاختبارات.']],
+  ['تقييم عمل المجلس', ['مراجعة ما تحقق من توصيات المجلس خلال الفصل.', 'آراء الطالبات حول أثر المجلس.', 'مقترحات تطوير عمل المجلس.'], ['رفع تقرير بتوصيات المجلس لمديرة المدرسة.', 'الاستمرار في المبادرات الناجحة.', 'إشراك عدد أكبر من الطالبات في أنشطة المجلس.']]
+];
+const council = () => { const d = myFile('council'); return { ...CN_DEF, ...d, members: d.members || [], meets: d.meets || [] }; };
+const councilMeets = () => council().meets.slice().sort((a, b) => (a.no || 0) - (b.no || 0));
+const cnOl = L => `<ol class="dcol">${(L || []).map(x => `<li>${esc(x)}</li>`).join('')}</ol>`;
+function councilPages() { const c = council(); const y = acadYear();
+  const p1 = `<div class="a4">${repHead('تشكيل المجلس الطلابي')}<table class="pinfo-t"><tbody><tr><th>العام الدراسي</th><td>${esc(y)}</td><th>المستفيدات</th><td>${esc(c.benef)}</td></tr><tr><th>المجال</th><td>${esc(c.domain)}</td><th>رئيسة المجلس</th><td>الموجهة الطلابية</td></tr></tbody></table>
+    <div class="boxes"><div class="box full"><h4>الهدف العام</h4><p>${esc(c.goal)}</p></div><div class="box full"><h4>الأهداف التفصيلية</h4>${cnOl(c.goals)}</div></div>${repSigs()}</div>`;
+  const p2 = `<div class="a4">${repHead('مهام المجلس الطلابي')}<table><thead><tr><th style="width:110px">التشكيل</th><th style="width:150px">من</th><th style="width:90px">مدة العضوية</th></tr></thead><tbody>${c.roles.map(r => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>عام دراسي</td></tr>`).join('')}</tbody></table>
+    <div class="boxes"><div class="box full"><h4>ضوابط الترشيح</h4>${cnOl(c.criteria)}</div><div class="box full"><h4>مهام المجلس</h4>${cnOl(c.tasks)}</div></div>${repSigs()}</div>`;
+  const p3 = `<div class="a4">${repHead('مراحل عمل المجلس الطلابي')}<div class="boxes"><div class="box full"><h4>مرحلة التخطيط والتنفيذ</h4>${cnOl(c.plan)}</div><div class="box full"><h4>مرحلة تقييم المجلس الطلابي</h4>${cnOl(c.evalm)}</div><div class="box full"><h4>مواضيع يُقترح مناقشتها في اجتماعات المجلس الطلابي</h4>${cnOl(c.topics)}</div></div>${repSigs()}</div>`;
+  const mem = [[SIGS[0][1].replace(/^أ\.\s*/, ''), 'رئيسة المجلس', 'الموجهة الطلابية']].concat(c.members.map(m => [m.name, m.role || 'عضوة', 'طالبة في الصف ' + ((m.grade || '') + ' ' + (m.section || '')).trim()]));
+  const p4 = `<div class="a4">${repHead('أعضاء المجلس الطلابي')}<table><thead><tr><th style="width:30px">م</th><th>الاسم</th><th style="width:120px">الصفة</th><th>العمل في المدرسة</th><th style="width:110px">التوقيع</th></tr></thead><tbody>${mem.map((m, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(m[0])}</td><td>${esc(m[1])}</td><td>${esc(m[2])}</td><td>${i === 0 && SIGN().sigC ? `<img data-img="${esc(SIGN().sigC)}" alt="" style="height:30px;max-width:100px;object-fit:contain;display:block;margin:auto">` : ''}</td></tr>`).join('')}</tbody></table>${repSigs()}</div>`;
+  return { p1, p2, p3, p4 };
+}
+function councilMeetPage(m) {
+  return `<div class="a4">${repHead('محضر اجتماع المجلس الطلابي')}<table><thead><tr><th style="width:80px">رقم الاجتماع</th><th style="width:120px">التاريخ</th><th>المقر</th><th style="width:90px">عدد الحاضرات</th><th>الموضوع</th></tr></thead><tbody><tr><td>${esc(CN_ORD[m.no] || ar(m.no))}</td><td>${esc(hij(m.date))}</td><td>${esc(m.place || 'مكتب الموجهة الطلابية')}</td><td>${ar(m.count || '')}</td><td>${esc(m.topic || '')}</td></tr></tbody></table>
+    <div class="boxes"><div class="box full"><h4>محاور الاجتماع</h4>${cnOl(m.axes)}</div><div class="box full"><h4>التوصيات</h4>${cnOl(m.recs)}</div>${m.note ? `<div class="box full"><h4>ملاحظات</h4><p>${esc(m.note)}</p></div>` : ''}</div>
+    ${(m.photos || []).length ? `<div class="eg e${Math.min(3, m.photos.length)}" style="--n:${Math.min(3, m.photos.length)}">${m.photos.slice(0, 3).map(id => `<figure><img data-img="${esc(id)}" alt=""></figure>`).join('')}</div>` : ''}${repSigs()}</div>`;
+}
+function councilPanel() { const c = council(); const M = councilMeets();
+  return `<section class="panel" style="--c:#B5458A"><div class="head"><h3>أعضاء المجلس</h3><span class="tiny muted">${ar(c.members.length + 1)}</span><span class="sp"></span><button class="btn sm" data-cnedit="1">تعديل الأهداف والمهام</button><button class="btn sm primary" data-cnmem="1" style="background:#B5458A;border-color:#B5458A">＋ إضافة عضوة</button></div>
+    <div class="fx-rows act"><div><small>رئيسة المجلس</small><b>${esc(SIGS[0][1])}</b><span>الموجهة الطلابية</span><span></span></div>${c.members.map((m, i) => `<div><small>${esc(m.role || 'عضوة')}</small><b>${esc(m.name)}</b><span>${esc(((m.grade || '') + ' ' + (m.section || '')).trim())}</span><span class="pacts" style="position:static;display:inline-flex;gap:4px"><button class="btn sm ghost" data-cnrole="${i}">الصفة</button><button class="btn sm ghost" data-cnmdel="${i}" aria-label="حذف">✕</button></span></div>`).join('')}</div></section>
+  <section class="panel" style="--c:#B5458A"><div class="head"><h3>اجتماعات المجلس</h3><span class="tiny muted">${ar(M.length)}</span><span class="sp"></span><button class="btn sm primary" data-cnmeet="new" style="background:#B5458A;border-color:#B5458A">＋ إضافة اجتماع</button></div>
+    ${M.length ? `<div class="fx-rows act">${M.map(m => `<div><small>${esc(hij(m.date))}</small><b>الاجتماع ${esc(CN_ORD[m.no] || ar(m.no))}</b><span>${esc(m.topic || '')}</span><span class="pacts" style="position:static;display:inline-flex;gap:4px"><button class="btn sm" data-cnrep="${esc(m.id)}">المحضر</button><button class="btn sm ghost" data-cnmeet="${esc(m.id)}">تعديل</button><button class="btn sm ghost" data-cnmtdel="${esc(m.id)}" aria-label="حذف">✕</button></span></div>`).join('')}</div>` : '<p class="small muted">ما فيه اجتماعات بعد. اضغطي «＋ إضافة اجتماع» واختاري الموضوع، وتتعبى المحاور والتوصيات لحالها.</p>'}</section>`;
+}
+const cnSave = async fn => { const d = JSON.parse(JSON.stringify({ k: 'council', ...myFile('council') })); d.members = d.members || []; d.meets = d.meets || []; fn(d); await saveDoc('myfile-council', 'myfile', d); };
+function cnMemForm() {
+  openSheet('إضافة عضوة للمجلس', `<div class="form"><label class="f full"><span>الطالبة</span><input id="cn_n" list="stuList" placeholder="اكتبي اسم الطالبة واختاري"></label>
+    <div class="f full"><span>الصفة</span><div class="clpick" id="cn_r">${['عضوة', 'نائبة الرئيسة', 'أمينة المجلس'].map((t, i) => `<label><input type="radio" name="cnr" value="${t}"${i ? '' : ' checked'}><span>${t}</span></label>`).join('')}</div></div></div>${stuDatalist()}
+    <div class="toolbar"><button class="btn primary" type="submit">إضافة</button></div>`,
+    async f => { const r = resolveStudent(f.querySelector('#cn_n').value); if (!r.studentName) throw new Error('اختاري اسم الطالبة'); const role = (f.querySelector('[name=cnr]:checked') || {}).value || 'عضوة';
+      await cnSave(d => { d.members.push({ name: r.studentName, grade: r.grade || '', section: r.section || '', role }); }); toast('أُضيفت ' + r.studentName.split(' ')[0] + ' للمجلس'); }, `--c:#B5458A;--cs:#F8E9F2`);
+}
+function cnMeetForm(id) { const c = council(); const m = id && id !== 'new' ? c.meets.find(x => x.id === id) : null;
+  const no = m ? m.no : Math.max(0, ...c.meets.map(x => x.no || 0)) + 1; const L = a => (a || []).join('\n');
+  const bg = openSheet(m ? 'تعديل الاجتماع ' + (CN_ORD[no] || ar(no)) : 'الاجتماع ' + (CN_ORD[no] || ar(no)) + ' للمجلس الطلابي', `<div class="form">
+    <div class="f"><span>التاريخ</span>${hdInput('cm_d', m ? m.date : todayH())}</div>
+    <label class="f"><span>عدد الحاضرات</span><input id="cm_c" type="number" min="1" value="${esc(m ? m.count : c.members.length + 1)}"></label>
+    <label class="f full"><span>المقر</span><input id="cm_p" value="${esc(m ? m.place : 'مكتب الموجهة الطلابية')}"></label>
+    <label class="f full"><span>الموضوع</span><input id="cm_t" value="${esc(m ? m.topic : '')}" placeholder="اختاري من تحت أو اكتبي"></label>
+    <div class="presets full">${CN_TPL.map((t, i) => `<button type="button" data-cntpl="${i}">${esc(t[0])}</button>`).join('')}</div>
+    <label class="f full"><span>محاور الاجتماع (كل محور في سطر)</span><textarea id="cm_a" style="min-height:110px">${esc(L(m && m.axes))}</textarea></label>
+    <label class="f full"><span>التوصيات (كل توصية في سطر)</span><textarea id="cm_r" style="min-height:120px">${esc(L(m && m.recs))}</textarea></label>
+    <label class="f full"><span>ملاحظات <small class="muted" style="font-weight:500">(اختياري)</small></span><textarea id="cm_o" style="min-height:50px">${esc(m ? m.note || '' : '')}</textarea></label>
+    <div class="f full"><span>صور من الاجتماع <small class="muted" style="font-weight:500">(اختياري، أول ٣ تطلع في المحضر)</small></span><div class="phs" id="cm_ph" data-photos='${esc(JSON.stringify(m ? m.photos || [] : []))}'>${(m ? m.photos || [] : []).map(phHTML).join('')}<label class="addph">＋ صورة<input type="file" accept="image/*" multiple data-addph="cm_ph" hidden></label></div></div></div>
+    <div class="toolbar"><button class="btn primary" type="submit">حفظ</button></div>`,
+    async f => { const lines = s0 => f.querySelector(s0).value.split('\n').map(x => x.replace(/^\s*[\d٠-٩]+\s*[-.)]\s*/, '').trim()).filter(Boolean);
+      const row = { id: m ? m.id : uid('cnm'), no, date: readHD(f, 'cm_d'), count: f.querySelector('#cm_c').value, place: f.querySelector('#cm_p').value.trim(), topic: f.querySelector('#cm_t').value.trim(), axes: lines('#cm_a'), recs: lines('#cm_r'), note: f.querySelector('#cm_o').value.trim(), photos: JSON.parse(f.querySelector('#cm_ph').dataset.photos || '[]') };
+      if (!row.topic) throw new Error('اكتبي موضوع الاجتماع');
+      await cnSave(d => { const i = d.meets.findIndex(x => x.id === row.id); if (i >= 0) d.meets[i] = row; else d.meets.push(row); }); toast('انحفظ الاجتماع'); }, `--c:#B5458A;--cs:#F8E9F2`);
+  hydratePhotos(bg);
+  bg.addEventListener('click', e => { const b = e.target.closest('[data-cntpl]'); if (!b) return; e.preventDefault(); const t = CN_TPL[+b.dataset.cntpl];
+    bg.querySelector('#cm_t').value = t[0]; bg.querySelector('#cm_a').value = t[1].join('\n'); bg.querySelector('#cm_r').value = t[2].join('\n'); bg.querySelectorAll('[data-cntpl]').forEach(z => z.setAttribute('aria-pressed', String(z === b))); });
+}
+function cnEditForm() { const c = council(); const L = a => (a || []).join('\n');
+  openSheet('المجلس الطلابي: الأهداف والمهام', `<p class="small muted">كل سطر بند.</p><div class="form">
+    <label class="f"><span>المستفيدات</span><input id="ce_b" value="${esc(c.benef)}"></label><label class="f"><span>المجال</span><input id="ce_d" value="${esc(c.domain)}"></label>
+    <label class="f full"><span>الهدف العام</span><textarea id="ce_g" style="min-height:50px">${esc(c.goal)}</textarea></label>
+    <label class="f full"><span>الأهداف التفصيلية</span><textarea id="ce_gs" style="min-height:120px">${esc(L(c.goals))}</textarea></label>
+    <label class="f full"><span>مهام المجلس</span><textarea id="ce_t" style="min-height:140px">${esc(L(c.tasks))}</textarea></label>
+    <label class="f full"><span>ضوابط الترشيح</span><textarea id="ce_c" style="min-height:60px">${esc(L(c.criteria))}</textarea></label>
+    <label class="f full"><span>مرحلة التخطيط والتنفيذ</span><textarea id="ce_p" style="min-height:80px">${esc(L(c.plan))}</textarea></label>
+    <label class="f full"><span>مرحلة التقييم</span><textarea id="ce_e" style="min-height:70px">${esc(L(c.evalm))}</textarea></label>
+    <label class="f full"><span>مواضيع مقترحة للاجتماعات</span><textarea id="ce_o" style="min-height:100px">${esc(L(c.topics))}</textarea></label></div>
+    <div class="toolbar"><button class="btn primary" type="submit">حفظ</button></div>`,
+    async f => { const v = s0 => f.querySelector(s0).value.trim(); const lines = s0 => v(s0).split('\n').map(x => x.trim()).filter(Boolean);
+      await cnSave(d => Object.assign(d, { benef: v('#ce_b'), domain: v('#ce_d'), goal: v('#ce_g'), goals: lines('#ce_gs'), tasks: lines('#ce_t'), criteria: lines('#ce_c'), plan: lines('#ce_p'), evalm: lines('#ce_e'), topics: lines('#ce_o') })); toast('انحفظ'); }, `--c:#B5458A;--cs:#F8E9F2`);
+}
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-cnedit],[data-cnmem],[data-cnmdel],[data-cnrole],[data-cnmeet],[data-cnmtdel],[data-cnrep]'); if (!b || b.closest('#sheetbg')) return; e.preventDefault(); const d0 = b.dataset;
+  if (d0.cnedit) return cnEditForm(); if (d0.cnmem) return cnMemForm(); if (d0.cnmeet) return cnMeetForm(d0.cnmeet);
+  if (d0.cnrep) { const m = council().meets.find(x => x.id === d0.cnrep); if (m) openReport(councilMeetPage(m), 'محضر-اجتماع-المجلس-' + (CN_ORD[m.no] || m.no), '#B5458A'); return; }
+  if (d0.cnmdel != null) { await cnSave(d => { d.members.splice(+d0.cnmdel, 1); }); toast('انحذفت من المجلس'); return rerender(); }
+  if (d0.cnrole != null) { const R = ['عضوة', 'نائبة الرئيسة', 'أمينة المجلس']; await cnSave(d => { const m = d.members[+d0.cnrole]; m.role = R[(R.indexOf(m.role || 'عضوة') + 1) % R.length]; }); return rerender(); }
+  if (d0.cnmtdel) { await cnSave(d => { d.meets = d.meets.filter(x => x.id !== d0.cnmtdel); }); toast('انحذف الاجتماع'); return rerender(); }
+});
 function discStats() {
   const ab = list('absence'); const dl = list('daily'); const beh = dl.filter(r => /سلوك/.test(r.type)); const ms = amMonths(); const mc = (S.mcases || []).filter(c => (c.cats || []).includes('behavior'));
   return `<div class="a4">${repHead('إحصائية الانضباط المدرسي')}${repTiles([[ab.length, 'ملف غياب'], [ab.reduce((s, a) => s + unex(a), 0), 'يوم بدون عذر'], [beh.length, 'حالة سلوكية طارئة'], [mc.length, 'حالة سلوكية في مسار'], [list('honor').filter(h => /انضباط|مواظب/.test(h.reason || '')).length, 'شهادة انضباط']])}
@@ -3235,6 +3403,10 @@ function fxParts(sec) {
   const P = []; const o = S.binOpt || {}; const att = () => { if ((myFile(sec).photos || []).length) { P.push({ t: 'المرفقات', div: 1 }); P.push({ t: 'صور الأوراق المرفقة', h: () => attPages(sec) }); } };
   if (sec === 'plans') { plans().slice().reverse().forEach(p0 => { const { p, ws } = planPair(p0.id); P.push({ t: p.title + ' — ' + (p.term || ''), div: 1 }); P.push({ t: 'الخطة الفصلية', h: () => semPlanReport(p) }); ws.forEach(w => P.push({ t: 'الخطة الأسبوعية — الأسبوع ' + ORD[w.n], sub: 1, h: () => weekReport(p, w) })); }); att(); }
   else if (sec === 'disc') {
+    P.push({ t: 'لجنة الانضباط المدرسي', div: 1 });
+    P.push({ t: 'قرار تشكيل لجنة الانضباط المدرسي', h: () => discComPages().p1 }); P.push({ t: 'أهداف اللجنة ومهامها', h: () => discComPages().p2 });
+    P.push({ t: 'اجتماعات اللجنة والمواضيع المقترحة', h: () => discComPages().p3 }); P.push({ t: 'الخطة الإجرائية لمتابعة الانضباط المدرسي', h: () => discComPages().p4 });
+    P.push({ t: 'الإحصائيات والغياب', div: 1 });
     P.push({ t: 'إحصائية الانضباط المدرسي', h: () => discStats() });
     binderParts('absence').forEach(x => P.push(x));
     const beh = list('daily').filter(r => /سلوك/.test(r.type)).sort((a, b) => String(a.date).localeCompare(String(b.date)));
@@ -3247,6 +3419,10 @@ function fxParts(sec) {
     const pr = list('program').filter(p => /تربوي|تحصيل|دافعية|الاختبار/.test((p.domain || '') + ' ' + (p.title || '')));
     if (pr.length) { P.push({ t: 'برامج رفع التحصيل', div: 1 }); pr.forEach(p => P.push({ t: p.title, sub: 1, h: () => p.status === 'منفذ' || p.status === 'قيد التنفيذ' ? progReport(p) : progPlanReport(p) })); }
     att();
+  } else if (sec === 'council') { P.push({ t: 'تشكيل المجلس الطلابي وأهدافه', h: () => councilPages().p1 }); P.push({ t: 'مهام المجلس الطلابي', h: () => councilPages().p2 });
+    P.push({ t: 'مراحل العمل والمواضيع المقترحة', h: () => councilPages().p3 }); P.push({ t: 'أعضاء المجلس الطلابي', h: () => councilPages().p4 });
+    const M = councilMeets(); if (M.length) { P.push({ t: 'محاضر الاجتماعات', div: 1 }); M.forEach(m => P.push({ t: 'الاجتماع ' + (CN_ORD[m.no] || ar(m.no)) + ': ' + (m.topic || ''), sub: 1, h: () => councilMeetPage(m) })); }
+    att();
   } else if (sec === 'ind') { P.push({ t: 'سجل جلسات التوجيه الفردي', h: () => indLog(o) }); att(); }
   else if (sec === 'grp') { P.push({ t: 'سجل جلسات التوجيه الجمعي', h: () => grpLogAll() }); att(); }
   return P;
@@ -3255,13 +3431,15 @@ function fxParts(sec) {
 function vFile(k) {
   const v = FX[k]; if (k === 'plans') return vPlans();
   const parts = fxParts(k).filter(p => !p.div); const ph = myFile(k).photos || [];
-  const needM = k !== 'disc';
+  const needM = k !== 'disc' && k !== 'council';
   return `<a class="btn ghost" href="#files" style="align-self:flex-start">→ ملفاتي</a>
     <div class="head"><h1><span class="dot" style="background:${v.c}"></span>${esc(v.t)}</h1><span class="sp"></span><button class="btn primary" data-fxbin="${k}" style="background:${v.c};border-color:${v.c}">طباعة السجل كامل</button></div>
     <p class="lede">${esc(v.d)} السجل كامل يطلع بغلاف وفهرس وأرقام صفحات.</p>
     ${needM && S.mloading ? '<p class="small muted">جارٍ تحميل بيانات مسار…</p>' : ''}
     ${needM && !S.mloading && !(S.mcases || []).length ? '<p class="small muted">ما لقيت حالات في مسار. إذا عندك حالات، افتحي مسار مرة وارجعي هنا.</p>' : ''}
     ${k === 'ind' || k === 'grp' ? xsPanel(k) : ''}
+    ${k === 'council' ? councilPanel() : ''}
+    ${k === 'disc' ? `<section class="panel" style="--c:${v.c}"><div class="head"><h3>لجنة الانضباط المدرسي</h3><span class="sp"></span><button class="btn sm" data-dcedit="1">تعديل بيانات اللجنة</button></div><p class="small muted">قرار التشكيل، والأهداف والمهام، والاجتماعات، والخطة الإجرائية: تطلع في أول السجل. اضغطي على أي وحدة تحت لعرضها وطباعتها.</p>${dcSigPanel()}</section>` : ''}
     ${fxPreview(k)}
     <section class="panel" style="--c:${v.c}"><div class="head"><h3>محتوى السجل</h3><span class="tiny muted">${ar(parts.length)} جزء</span></div>
       <div class="fx-parts">${parts.map((p, i) => `<div class="${p.sub ? 'sub' : ''}"><span>${esc(p.t)}</span><button class="btn sm" data-fxpart="${k}:${i}">عرض وطباعة</button></div>`).join('')}</div></section>
@@ -4019,6 +4197,7 @@ document.addEventListener('click', async e => {
   else if (act === 'vRep') openReport(valReport(S.param), 'تقرير-قيمة-' + VAL[S.param].t);
   else if (act === 'valPlan') openReport(valPlanReport(), 'خطة-القيم');
   else if (act === 'ideaAdd') ideaForm(null);
+  else if (act === 'pAgain') progAgain();
   else if (act === 'pTpl') { const p = DB.docs[S.param].data; const ex = list('ptpl').find(t => norm(t.title) === norm(p.title)); const T = { title: p.title, domain: p.domain, svc: p.svc, form: p.form, target: p.target, term: p.term, goals: p.goals, steps: (p.steps || []).map(s => s.t), tools: p.tools || '', evalm: p.evalm || '' };
     try { await saveDoc(ex ? ex.id : uid('ptpl'), 'ptpl', T); toast(ex ? 'حُدّث في برامجك الجاهزة' : 'صار من برامجك الجاهزة: تلقينه أول القائمة لما تضيفين برنامج'); } catch (er) { toast(errT(er)); } }
   else if (act === 'gAdd') groupForm(null);

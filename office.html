@@ -1903,6 +1903,7 @@ function groupForm(id, pre) {
     <label class="f"><span>ضمن برنامج (اختياري)</span><select id="g_prog"><option value="">بدون</option>${progs.map(p => `<option value="${p.id}"${p.id === g.progId ? ' selected' : ''}>${esc(p.title)}</option>`).join('')}</select></label>
     <label class="f full"><span>الهدف</span><textarea id="g_goal" style="min-height:64px">${esc(g.goal || '')}</textarea></label>
     <div class="f full gsug" id="g_gsug"></div>
+    <div class="f full"><span>المنفذة</span><div class="clpick">${['الموجهة الطلابية', 'مديرة المدرسة', 'وكيلة المدرسة', 'معلمة'].map((m, i) => `<label><input type="radio" name="g_by" value="${m}"${(g.by || 'الموجهة الطلابية') === m ? ' checked' : ''}><span>${m}</span></label>`).join('')}</div></div>
     <div class="f full"><span>الأسلوب</span><div class="clpick">${G_METHODS.map(m => `<label><input type="checkbox" data-gm value="${m}"${(g.methods || []).includes(m) ? ' checked' : ''}><span>${m}</span></label>`).join('')}</div></div>
     <label class="f full"><span>ما تم في اللقاء <small class="muted" style="font-weight:500">(يتعبى تلقائياً عند اختيار الموضوع، وعدّليه حسب لقائك)</small></span><textarea id="g_sum" style="min-height:130px" placeholder="مثال: بدأت بقصة قصيرة، ثم نقاش، ثم نشاط بطاقات المواقف">${esc(g.summary || '')}</textarea></label>
     <div class="f full gsug" id="g_ssug"></div>
@@ -1913,7 +1914,7 @@ function groupForm(id, pre) {
       const topic = f.querySelector('#g_topic').value.trim(); if (topic.length < 2) throw new Error('اكتبي موضوع اللقاء');
       const classes = [...f.querySelectorAll('#g_cls input:checked')].map(x => x.value); if (!classes.length) throw new Error('اختاري الفصل');
       const n = f.querySelector('#g_count').value;
-      const data = { ...g, topic, date: readHD(f, 'g_date'), term: f.querySelector('#g_term').value, classes, count: n === '' ? '' : Math.max(0, +n), progId: f.querySelector('#g_prog').value, goal: f.querySelector('#g_goal').value.trim(), methods: [...f.querySelectorAll('[data-gm]:checked')].map(x => x.value), summary: f.querySelector('#g_sum').value.trim(), photos: JSON.parse(f.querySelector('#f_photos').dataset.photos || '[]') };
+      const data = { ...g, topic, date: readHD(f, 'g_date'), term: f.querySelector('#g_term').value, classes, count: n === '' ? '' : Math.max(0, +n), progId: f.querySelector('#g_prog').value, goal: f.querySelector('#g_goal').value.trim(), methods: [...f.querySelectorAll('[data-gm]:checked')].map(x => x.value), summary: f.querySelector('#g_sum').value.trim(), photos: JSON.parse(f.querySelector('#f_photos').dataset.photos || '[]'), by: (f.querySelector('[name=g_by]:checked') || {}).value || 'الموجهة الطلابية' };
       await saveDoc(id || uid('group'), 'group', data); toast('حُفظ اللقاء');
     }, `--c:var(--prg);--cs:var(--prg-soft)`);
   const sug = () => gProgSug(bg, bg.querySelector('#g_prog').value);
@@ -1937,13 +1938,14 @@ function gProgSug(bg, pid) {
   gs.innerHTML = G.length ? `<span class="tiny muted">اقتراحات أهداف من «${esc(p.title)}» — اضغطي لإضافتها أو إزالتها</span><div class="presets">${G.map(v => chip('g', v, cg.includes(v))).join('')}</div>` : '';
   ss.innerHTML = `<span class="tiny muted">اقتراحات لما تم في اللقاء</span><div class="presets">${more.slice(0, 2).concat(st, more.slice(2)).map(v => chip('s', v, cs.includes(v))).join('')}</div>`;
 }
+const clsTxt = c => (c || []).length >= 12 ? 'جميع الفصول' : (c || []).join('، ');
 function gInfo(g) {
   const pr = g.progId && DB.docs[g.progId] ? DB.docs[g.progId].data.title : '';
-  return [['الموضوع', g.topic], ['التاريخ', hij(g.date)], ['الفصل', (g.classes || []).join('، ')], ['عدد الحاضرات', g.count ? ar(g.count) : ''], ['الأسلوب', (g.methods || []).join('، ')], ['الفصل الدراسي', g.term], ['ضمن برنامج', pr], ['المنفذة', 'الموجهة الطلابية']].filter(x => x[1]);
+  return [['الموضوع', g.topic], ['التاريخ', hij(g.date)], ['الفصل', clsTxt(g.classes)], ['عدد الحاضرات', g.count ? ar(g.count) : ''], ['الأسلوب', (g.methods || []).join('، ')], ['الفصل الدراسي', g.term], ['ضمن برنامج', pr], ['المنفذة', g.by || 'الموجهة الطلابية']].filter(x => x[1]);
 }
 function groupReport(g) {
   const r = gInfo(g); const rows = []; for (let i = 0; i < r.length; i += 2) rows.push(r.slice(i, i + 2)); const ph = (g.photos || []).slice(0, 6);
-  return `<div class="a4 prep-a4">${repHead('تقرير لقاء توجيه جمعي')}<div class="pband"><small>توجيه جمعي${g.classes && g.classes.length ? ' · ' + esc(g.classes.join('، ')) : ''}</small><b>${esc(g.topic)}</b></div>
+  return `<div class="a4 prep-a4">${repHead('تقرير لقاء توجيه جمعي')}<div class="pband"><small>توجيه جمعي${g.classes && g.classes.length ? ' · ' + esc(clsTxt(g.classes)) : ''}</small><b>${esc(g.topic)}</b></div>
     <table class="pinfo-t"><tbody>${rows.map(rw => `<tr>${rw.map(([k, v]) => `<th>${k}</th><td${rw.length === 1 ? ' colspan="3"' : ''}>${esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table>
     <div class="boxes"><div class="box full"><h4>الهدف</h4>${pList(g.goal, 'ul')}</div><div class="box full"><h4>ما تم في اللقاء</h4>${pList(g.summary, 'ul')}</div></div>
     ${evidHTML(ph)}${repSigs()}</div>`;
@@ -3502,18 +3504,32 @@ function sesReport(r) {
     <table class="pinfo-t"><tbody>${rows.map(rw => `<tr>${rw.map(([k, v]) => `<th>${k}</th><td${rw.length === 1 ? ' colspan="3"' : ''}>${esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table>
     <div class="boxes">${box('هدف الجلسة', r.goal)}${box('الإجراءات المتخذة', r.acts)}${box('خطة المتابعة', r.plan)}${box('ملاحظات', r.note)}</div>${repSigs()}</div>`;
 }
+/* لقاءات جاهزة: الانضباط في الحضور (٢ للمديرة + ٢ للموجهة) — تنضاف مرة وحدة */
+const ALLCLS = ['الأول أ', 'الأول ب', 'الثاني أ', 'الثاني ب', 'الثالث أ', 'الثالث ب', 'الرابع أ', 'الرابع ب', 'الخامس أ', 'الخامس ب', 'السادس أ', 'السادس ب'];
+const GSEED_DISC = [
+  { by: 'مديرة المدرسة', date: '1448-03-19', classes: ALLCLS, topic: 'الانضباط في الحضور والمواظبة على الدوام', methods: ['حوار ونقاش'], goal: 'توعية الطالبات بأهمية الحضور اليومي المنتظم وعدم الغياب\nتعريف الطالبات بقواعد السلوك والمواظبة المتعلقة بالغياب والتأخر', summary: 'حديث مديرة المدرسة للطالبات في الطابور الصباحي عن أهمية الحضور اليومي\nتوضيح أثر الغياب على التحصيل الدراسي وعلى صحبة الطالبة لزميلاتها\nالتعريف المبسط بقواعد السلوك والمواظبة وإجراءات الغياب\nتشجيع الطالبات على الحضور المبكر والاستعداد الجيد لليوم الدراسي' },
+  { by: 'مديرة المدرسة', date: '1448-04-24', classes: ALLCLS, topic: 'الانضباط في الحضور: يوم دراسي بلا غياب', methods: ['حوار ونقاش', 'مسابقة'], goal: 'تعزيز التزام الطالبات بالحضور اليومي وعدم الغياب بدون عذر\nتحفيز الطالبات المنتظمات وجعلهن قدوة لزميلاتهن', summary: 'حديث مديرة المدرسة في الطابور عن قيمة الانضباط والمواظبة\nالإشادة بالفصول الأقل غياباً خلال الشهر وتحفيز بقية الفصول\nالتذكير بأن الغياب بدون عذر يُحتسب ويؤثر على درجة المواظبة\nحث الطالبات على النوم المبكر والاستعداد لليوم الدراسي' },
+  { by: 'الموجهة الطلابية', date: '1448-03-25', classes: ['الرابع أ', 'الرابع ب', 'الخامس أ', 'الخامس ب', 'السادس أ', 'السادس ب'], topic: 'أهمية الحضور وعدم الغياب', methods: ['حوار ونقاش', 'نشاط عملي'], goal: 'توعية الطالبات بأهمية الحضور اليومي وأثر الغياب على التعلم\nتعريف الطالبات بقواعد السلوك والمواظبة المتعلقة بالغياب', summary: 'حوار مع الطالبات عن أسباب الغياب وكيف نتجنبها\nتوضيح أثر الغياب على التحصيل الدراسي وفوات الدروس\nالتعريف المبسط بقواعد السلوك والمواظبة وإجراءات الغياب بعذر وبدون عذر\nنشاط «يومي المنظم» لترتيب روتين الصباح والنوم المبكر' },
+  { by: 'الموجهة الطلابية', date: '1448-05-08', classes: ['الأول أ', 'الأول ب', 'الثاني أ', 'الثاني ب', 'الثالث أ', 'الثالث ب'], topic: 'أحب مدرستي وأحضر كل يوم', methods: ['قصة', 'حوار ونقاش'], goal: 'غرس حب المدرسة والحرص على الحضور اليومي لدى الطالبات\nتشجيع الطالبات على الانضباط وعدم الغياب', summary: 'قصة مصورة عن طالبة تحرص على الحضور وما يفوت زميلتها عند الغياب\nحوار مع الطالبات عن الأشياء الجميلة اللي تنتظرهن في المدرسة كل يوم\nالتذكير بلوحة الشرف الشهرية للمنضبطات وتحفيز الطالبات عليها\nرسالة للأمهات عن أهمية الحضور اليومي والنوم المبكر' }
+];
+async function gSeedDisc() { const f = JSON.parse(JSON.stringify(myFile('grp'))); if (f.seedDisc) return toast('أُضيفت من قبل');
+  const fixD = d => { let x = d; const off = offDays(); const bad = h => { const t = h2g(h); return t == null || new Date(t).getUTCDay() > 4 || off.has(h); }; for (let i = 0; i < 10 && bad(x); i++) x = nextSchoolH(x, off); return x; };
+  const cnt = cls => students().filter(st => cls.includes(clsKey(st.grade, st.section))).length;
+  const writes = GSEED_DISC.map(g => ({ id: uid('grp'), kind: 'group', data: { ...g, date: fixD(g.date), term: 'الفصل الأول', count: cnt(g.classes) || '', progId: '', photos: [] } }));
+  try { await saveMany(writes); f.k = 'grp'; f.seedDisc = 1; await saveDoc('myfile-grp', 'myfile', f); toast('أُضيفت ٤ لقاءات توجيه جمعي عن الانضباط في الحضور'); } catch (er) { toast(errT(er)); } rerender(); }
 function xsPanel(k) {
   const arr = myFile(k).sessions || []; const grp = k === 'grp';
   return `<section class="panel" style="--c:${FX[k].c}"><div class="head"><h3>${grp ? 'الجلسات الجماعية' : 'الجلسات الفردية'} المضافة هنا</h3><span class="tiny muted">${ar(arr.length)}</span><span class="sp"></span>
-    ${grp ? `<button class="btn sm" data-xsgrp="1">＋ لقاء توجيه جمعي</button>` : ''}<button class="btn sm primary" data-xsadd="${k}" style="background:${FX[k].c};border-color:${FX[k].c}">＋ ${grp ? 'جلسة جماعية' : 'جلسة فردية'}</button></div>
+    ${grp && !myFile('grp').seedDisc ? `<button class="btn sm" data-gseed="1">＋ ٤ لقاءات جاهزة: الانضباط في الحضور</button>` : ''}${grp ? `<button class="btn sm" data-xsgrp="1">＋ لقاء توجيه جمعي</button>` : ''}<button class="btn sm primary" data-xsadd="${k}" style="background:${FX[k].c};border-color:${FX[k].c}">＋ ${grp ? 'جلسة جماعية' : 'جلسة فردية'}</button></div>
     <p class="tiny muted">أي جلسة تضيفينها هنا تطلع في السجل مع جلسات مسار والغياب.</p>
     ${arr.length ? `<div class="fx-rows act">${arr.map((x, i) => [x, i]).sort((a, b) => hKey(b[0].date).localeCompare(hKey(a[0].date))).map(([x, i]) => `<div><small>${esc(hij(x.date))}</small><b>${esc(x.name || '')}</b><span>${esc([catT((x.cats || []).map(c => c === 'absence' ? 'الغياب' : c === 'other' ? 'أخرى' : c)), x.topic].filter(Boolean).join(' · '))}</span><span class="pacts" style="position:static;display:inline-flex;gap:4px;margin-inline-start:auto"><button class="btn sm" data-xsrep="${k}:${i}">التقرير</button><button class="btn sm ghost" data-xsed="${k}:${i}">تعديل</button><button class="btn sm ghost" data-xsdel="${k}:${i}" aria-label="حذف">✕</button></span></div>`).join('')}</div>` : ''}</section>`;
 }
 document.addEventListener('click', async e => {
-  const b = e.target.closest('[data-xsadd],[data-xsed],[data-xsdel],[data-xsgrp],[data-xsrep]'); if (!b || b.closest('#sheetbg')) return; e.preventDefault(); const d = b.dataset;
+  const b = e.target.closest('[data-xsadd],[data-xsed],[data-xsdel],[data-xsgrp],[data-xsrep],[data-gseed]'); if (!b || b.closest('#sheetbg')) return; e.preventDefault(); const d = b.dataset;
   if (d.xsadd) return xsForm(d.xsadd);
   if (d.xsrep) { const [k, i] = d.xsrep.split(':'); let r; if (k === 'm') r = (S.fxR || [])[+i]; else r = { ...(myFile(k).sessions || [])[+i] }; if (!r) return; r.type = r.type || (k === 'grp' ? 'جلسة جماعية' : 'جلسة فردية'); return openReport(sesReport(r), (r.type === 'جلسة جماعية' ? 'جلسة-جماعية-' : 'جلسة-فردية-') + String(r.name || '').split(/[،\s]/)[0], FX[k === 'grp' || r.type === 'جلسة جماعية' ? 'grp' : 'ind'].c); }
   if (d.xsgrp) return groupForm();
+  if (d.gseed) return gSeedDisc();
   if (d.xsed) { const [k, i] = d.xsed.split(':'); return xsForm(k, +i); }
   if (d.xsdel) { const [k, i] = d.xsdel.split(':'); const f = JSON.parse(JSON.stringify(myFile(k))); f.sessions.splice(+i, 1); await saveDoc('myfile-' + k, 'myfile', f); toast('حُذفت الجلسة'); return rerender(); }
 });

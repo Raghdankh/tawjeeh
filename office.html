@@ -545,6 +545,14 @@ button,label,.btn,.clpick,.clpick *,.presets,.presets *,.chip,.chips,.subtabs,na
 .sesdate{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.sesdate .hd select{padding:4px 6px;font-size:.85rem}
 .stage h4 .stref{margin-inline-start:auto;font-size:.78rem;font-weight:600}.stage h4{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .dcol{margin:0;padding-inline-start:22px;line-height:1.9}.dcol li{margin:2px 0}
+.qrlist{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px}.qrrow{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-inline-start:4px solid var(--qc);border-radius:12px;padding:8px}
+.qrprev{width:74px;height:74px;flex:none;display:grid;place-items:center;background:#fff;border-radius:8px}.qrprev svg{width:74px;height:74px}.qrinf{flex:1;display:grid;gap:3px;min-width:0}.qrinf input{width:100%;font-size:.8rem;padding:6px 8px}
+.a4.qrboard .qrhint{text-align:center;margin:-4px 0 12px;color:#5b6b69;font-size:13px}.a4.qrboard .qrgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+.a4.qrboard .qrcard{border:1.5px solid var(--qc);border-top:7px solid var(--qc);border-radius:14px;padding:8px 12px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;break-inside:avoid}
+.a4.qrboard .qrcard b{color:var(--qc);font-size:16px}.a4.qrboard .qrcard span{font-size:11.5px;color:#5b6b69}.a4.qrboard .qrimg svg{width:132px;height:132px;display:block}
+.a4.qrboard.big .qrgrid{gap:22px}.a4.qrboard.big .qrimg svg{width:230px;height:230px}.a4.qrboard.big .qrcard b{font-size:19px}.a4.qrboard.big .qrcard span{font-size:13px}
+.evlink{display:grid;gap:6px;margin:8px 0 10px;padding:10px;border:1px dashed var(--line);border-radius:12px}.evlink label{display:grid;gap:4px}.evlink input{width:100%;font-size:.85rem}.evmini svg{width:84px;height:84px;background:#fff;border-radius:6px}
+.evqr{display:flex;align-items:center;gap:14px;margin-top:10px;padding:8px 12px;border:1.5px dashed #9fb5b2;border-radius:12px;break-inside:avoid}.evqr .q svg{width:96px;height:96px;display:block}.evqr .t{display:grid;gap:3px}.evqr .t b{font-size:14px;color:#0E7F7B}.evqr .t span{font-size:12px;color:#5b6b69}
 </style>
 </head>
 <body>
@@ -1030,9 +1038,14 @@ function repHead(title) {
   return `<div class="rh"><div class="r">المملكة العربية السعودية<br>وزارة التعليم<br><small>${REGION}</small><br>${esc(S.school)}</div><img class="moe" src="moe-logo.png" alt="وزارة التعليم"><div class="l"><b>التوجيه الطلابي</b><span>${esc(S.school)}</span></div></div><div class="rtitle"><h2>${esc(title)}</h2></div>`;
 }
 function repTiles(arr) { return `<div class="rp-tiles">${arr.map(([v, l]) => `<div><b>${typeof v === 'number' ? ar(v) : esc(v)}</b><span>${esc(l)}</span></div>`).join('')}</div>`; }
-function evidHTML(photos) {
-  const ph = (photos || []).slice(0, 6); if (!ph.length) return '';
-  return `<div class="evid"><h4>الشواهد</h4><div class="eg e${ph.length}" style="--n:${ph.length}">${ph.map(x => `<figure><img data-img="${esc(x)}" alt=""></figure>`).join('')}</div></div>`;
+/* كود «بقية الشواهد»: رابط Drive يطلع تحت صور الشواهد في التقرير */
+const evOk = u => /^https?:\/\/\S+$/.test(String(u || '').trim());
+function evQR(link) { if (!evOk(link)) return ''; let q = ''; try { q = QRMini.svg(String(link).trim(), { color: '#16302d' }); } catch (e) { return ''; }
+  return `<div class="evqr"><div class="q">${q}</div><div class="t"><b>بقية الشواهد</b><span>لمشاهدة بقية الشواهد كاملة وجّهي كاميرا الجوال نحو الكود</span></div></div>`; }
+function evLinkBox(key, val) { return `<div class="evlink"><label class="small"><b>رابط بقية الشواهد (Drive)</b><input data-evlink="${esc(key)}" value="${esc(val || '')}" placeholder="https://drive.google.com/..." dir="ltr" inputmode="url"></label>${evOk(val) ? `<div class="evmini">${QRMini.svg(String(val).trim(), { color: '#16302d' })}</div>` : ''}<span class="tiny muted">يطلع كود QR تحت الصور في التقرير، ويفتح مجلد بقية الشواهد.</span></div>`; }
+function evidHTML(photos, link) {
+  const ph = (photos || []).slice(0, 6); const qr = evQR(link); if (!ph.length && !qr) return '';
+  return `<div class="evid"><h4>الشواهد</h4>${ph.length ? `<div class="eg e${ph.length}" style="--n:${ph.length}">${ph.map(x => `<figure><img data-img="${esc(x)}" alt=""></figure>`).join('')}</div>` : ''}${qr}</div>`;
 }
 const MMPX = 96 / 25.4;
 /* shrink each page's content (font, tables, photos together) so it never spills onto a second sheet */
@@ -1117,7 +1130,7 @@ function famReport(cfg, r) {
   const meta = cfg.fields.filter(f => !f.box && f.type !== 'photos' && f.type !== 'student' && r[f.k] !== '' && r[f.k] != null && f.k !== cfg.title);
   const kv = (r.studentName ? `<span><b>الطالبة:</b> ${esc(r.studentName)}${r.grade ? ' — ' + esc(r.grade) + ' ' + esc(r.section || '') : ''}</span>` : '') + meta.map(f => `<span><b>${f.t}:</b> ${esc(f.type === 'date' ? hij(r[f.k]) : r[f.k])}</span>`).join('');
   const boxes = cfg.fields.filter(f => f.box && r[f.k]).map((f, i, a) => `<div class="box${a.length % 2 && i === a.length - 1 ? ' full' : ''}"><h4>${f.t}</h4><p>${esc(r[f.k])}</p></div>`).join('');
-  const photos = evidHTML(r.photos || []);
+  const photos = evidHTML(r.photos || [], r.evLink);
   return `<div class="a4">${repHead(cfg.report + (r[cfg.title] && cfg.title !== 'studentName' ? ': ' + r[cfg.title] : ''), r.date)}
     ${r[cfg.title] && cfg.title !== 'studentName' ? `<div class="rt">${esc(r[cfg.title])}</div>` : ''}<div class="kv">${kv}</div><div class="boxes">${boxes}</div>${photos}${repSigs()}</div>`;
 }
@@ -1724,7 +1737,7 @@ function vProgramOne() {
         <span class="sbtn"><button class="btn sm ghost" data-pmv="${i}:-1" aria-label="لأعلى" ${i ? '' : 'disabled'}>↑</button><button class="btn sm ghost" data-pstep="${i}" aria-label="تعديل">✎</button><button class="btn sm ghost" data-pdel="${i}" aria-label="حذف">✕</button></span></li>`).join('')}</ol>` : '<p class="small muted">أضيفي خطوات التنفيذ: الأنشطة والفعاليات ومواعيدها والمسؤولة عنها.</p>'}</section>
     ${ideasHTML(id)}
     <section class="panel"><div class="head"><h3>الشواهد</h3><span class="tiny muted">${ar((p.photos || []).length)} صورة</span><span class="sp"></span><label class="btn primary sm" style="cursor:pointer">＋ صور<input type="file" accept="image/*" multiple data-pph hidden></label></div>
-      <p class="tiny muted" id="pphMsg">صور البرنامج كلها هنا. أول ١٢ صورة تظهر في التقرير، وتقدرين ترتيبها بالسهم.</p>
+      <p class="tiny muted" id="pphMsg">صور البرنامج كلها هنا. أول ١٢ صورة تظهر في التقرير، وتقدرين ترتيبها بالسهم.</p>${evLinkBox('prog:' + id, p.evLink)}
       ${(p.photos || []).length ? `<div class="pgrid">${p.photos.map((ph, i) => `<figure><img alt="" data-img="${esc(ph)}"><span class="pacts"><button class="btn sm ghost" data-phmv="${i}" aria-label="تقديم" ${i ? '' : 'disabled'}>→</button><button class="btn sm ghost" data-phdel="${esc(ph)}" aria-label="حذف الصورة">✕</button></span></figure>`).join('')}</div>`
         : `<label class="addph wide">＋ أضيفي صور الشواهد<input type="file" accept="image/*" multiple data-pph></label>`}</section>
     <section class="panel"><div class="head"><h3>لقاءات التوجيه الجمعي</h3><span class="tiny muted">${ar(progGroups(id).length)}</span><span class="sp"></span><button class="btn sm" data-act="gAddP">＋ لقاء ضمن البرنامج</button></div>
@@ -1770,7 +1783,7 @@ function progReport(p, full) {
     <div class="box full"><h4>آلية التنفيذ</h4>${st.length ? `<table><thead><tr><th style="width:28px">م</th><th>النشاط / الإجراء</th><th style="width:130px">المسؤولة</th></tr></thead><tbody>${st.map((s, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(s.t)}</td><td>${esc(s.who || '')}</td></tr>`).join('')}</tbody></table>` : '<p>—</p>'}</div>
     ${gs.length ? `<div class="box full"><h4>لقاءات التوجيه الجمعي (${ar(gs.length)})</h4><table><thead><tr><th style="width:28px">م</th><th>الموضوع</th><th style="width:120px">التاريخ</th><th>الفصل</th><th style="width:70px">الحاضرات</th></tr></thead><tbody>${gs.map((g, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(g.topic)}</td><td>${esc(hij(g.date))}</td><td>${esc((g.classes || []).join('، '))}</td><td>${g.count ? ar(g.count) : '—'}</td></tr>`).join('')}</tbody></table></div>` : ''}
     <div class="box"><h4>النتائج والأثر${p.achieve ? ` <span style="font-weight:500">(تحقق الأهداف ${ar(p.achieve)}٪)</span>` : ''}</h4>${pList(p.results, 'ul')}</div>
-    <div class="box"><h4>التوصيات</h4>${pList(p.recs, 'ul')}</div></div>${photos.length ? `<div class="evid"><h4>الشواهد</h4><div class="thumbs">${photos.slice(0, 12).map(x => `<figure><img data-img="${esc(x)}" alt=""></figure>`).join('')}</div></div>` : ''}${repSigs()}</div>`;
+    <div class="box"><h4>التوصيات</h4>${pList(p.recs, 'ul')}</div></div>${photos.length || evOk(p.evLink) ? `<div class="evid"><h4>الشواهد</h4>${photos.length ? `<div class="thumbs">${photos.slice(0, 12).map(x => `<figure><img data-img="${esc(x)}" alt=""></figure>`).join('')}</div>` : ''}${evQR(p.evLink)}</div>` : ''}${repSigs()}</div>`;
   return page1;
 }
 function progReport1(p) {
@@ -1779,7 +1792,7 @@ function progReport1(p) {
     <div class="kv one-kv">${[['الفئة المستهدفة', p.target], ['عدد المستفيدات', p.count ? ar(p.count) : ''], ['التاريخ', p.start ? (p.end && p.end !== p.start ? hij(p.start) + ' — ' + hij(p.end) : hij(p.start)) : ''], ['المكان', p.place], ['المنفذة', p.lead]].filter(x => x[1]).map(([k, v]) => `<span><b>${k}:</b> ${esc(v)}</span>`).join('')}</div>
     <div class="boxes"><div class="box"><h4>الأهداف</h4>${pList(p.goals)}</div><div class="box"><h4>آلية التنفيذ</h4>${st.length ? `<ol>${st.map(s => `<li>${esc(s.t)}${stepDate(s) ? ` <span style="color:#56635f">(${esc(stepDate(s))})</span>` : ''}</li>`).join('')}</ol>` : '<p>—</p>'}</div>
     <div class="box"><h4>النتائج والأثر</h4>${pList(p.results, 'ul')}</div><div class="box"><h4>التوصيات</h4>${pList(p.recs, 'ul')}</div></div>
-    ${ph.length ? `<div class="pg4 n${ph.length}">${ph.map(x => `<figure><img data-img="${esc(x)}" alt=""></figure>`).join('')}</div>` : ''}${repSigs()}</div>`;
+    ${ph.length ? `<div class="pg4 n${ph.length}">${ph.map(x => `<figure><img data-img="${esc(x)}" alt=""></figure>`).join('')}</div>` : ''}${evQR(p.evLink)}${repSigs()}</div>`;
 }
 function progPlanReport(p) {
   const st = p.steps || [];
@@ -2487,7 +2500,7 @@ function vValueOne(k) {
     <section class="panel"><div class="head"><h3>الأنشطة والفعاليات</h3><span class="sp"></span><button class="btn sm primary" data-act="vStep">＋ نشاط</button></div>
       <p class="tiny muted">أنشطة مقترحة للقيمة: أشّري على اللي نفذتيه، واحذفي اللي ما يناسب، وأضيفي أنشطتك.</p>
       <ol class="steps">${steps.map((s, i) => `<li class="${s.done ? 'done' : ''}"><label class="chk" style="--sc:${v.c}"><input type="checkbox" data-vdone="${i}" ${s.done ? 'checked' : ''}><span>${esc(s.t)}${s.who ? `<small>${esc(s.who)}</small>` : ''}</span></label><span class="sbtn"><button class="btn sm ghost" data-vstep="${i}" aria-label="تعديل">✎</button><button class="btn sm ghost" data-vdel="${i}" aria-label="حذف">✕</button></span></li>`).join('')}</ol></section>
-    <section class="panel"><div class="head"><h3>الشواهد</h3><span class="tiny muted">${ar((d.photos || []).length)} صورة</span><span class="sp"></span><label class="btn primary sm" style="cursor:pointer">＋ صور<input type="file" accept="image/*" multiple data-vph hidden></label></div><p class="tiny muted" id="vphMsg">صور تنفيذ القيمة: الإذاعة، والأنشطة، والجداريات، والتكريم.</p>
+    <section class="panel"><div class="head"><h3>الشواهد</h3><span class="tiny muted">${ar((d.photos || []).length)} صورة</span><span class="sp"></span><label class="btn primary sm" style="cursor:pointer">＋ صور<input type="file" accept="image/*" multiple data-vph hidden></label></div><p class="tiny muted" id="vphMsg">صور تنفيذ القيمة: الإذاعة، والأنشطة، والجداريات، والتكريم.</p>${evLinkBox('val:' + k, d.evLink)}
       ${(d.photos || []).length ? `<div class="pgrid">${d.photos.map((ph, i) => `<figure><img alt="" data-img="${esc(ph)}"><span class="pacts"><button class="btn sm ghost" data-vphmv="${i}" aria-label="تقديم" ${i ? '' : 'disabled'}>→</button><button class="btn sm ghost" data-vphdel="${esc(ph)}" aria-label="حذف الصورة">✕</button></span></figure>`).join('')}</div>` : `<label class="addph wide">＋ أضيفي صور الشواهد<input type="file" accept="image/*" multiple data-vph></label>`}</section>
     <section class="panel"><div class="head"><h3>الأثر والتوصيات</h3><span class="sp"></span><button class="btn sm ${d.done ? '' : 'primary'}" data-act="vDone">${d.done ? 'تعديل' : 'تسجيل الأثر وإنهاء التنفيذ'}</button></div>
       ${[['مؤشرات الأثر (السلوكيات الملاحظة)', d.ind], ['أساليب التقويم', d.evalm], ['المتميزات في القيمة', d.honored], ['التوصيات', d.recs]].filter(x => x[1]).map(([a, b]) => `<div><b class="small">${a}</b><ul class="goals" style="list-style:disc">${lines(b).map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>`).join('') || '<p class="small muted">بعد التنفيذ سجّلي الأثر الملاحظ وأسماء المتميزات والتوصيات.</p>'}</section>`;
@@ -2525,7 +2538,7 @@ function valReport(k) {
     <div class="boxes"><div class="box"><h4>الأهداف</h4>${pList(d.goals)}</div><div class="box"><h4>مؤشرات الأثر</h4>${pList(d.ind, 'ul')}</div>
     <div class="box full"><h4>الأنشطة والفعاليات المنفذة</h4><table><thead><tr><th style="width:28px">م</th><th>النشاط</th><th style="width:140px">المنفذة</th></tr></thead><tbody>${(done.length ? done : steps).map((s, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(s.t)}</td><td>${esc(s.who || '')}</td></tr>`).join('') || '<tr><td colspan="3">—</td></tr>'}</tbody></table></div>
     <div class="box"><h4>أساليب التقويم</h4>${pList(d.evalm, 'ul')}</div><div class="box"><h4>التوصيات</h4>${pList(d.recs, 'ul')}</div>
-    ${d.honored ? `<div class="box full"><h4>المتميزات في القيمة</h4><p>${lines(d.honored).map(esc).join('، ')}</p></div>` : ''}</div>${evidHTML(photos)}${repSigs()}</div>`;
+    ${d.honored ? `<div class="box full"><h4>المتميزات في القيمة</h4><p>${lines(d.honored).map(esc).join('، ')}</p></div>` : ''}</div>${evidHTML(photos, d.evLink)}${repSigs()}</div>`;
   return page1;
 }
 function valPlanReport() {
@@ -2969,6 +2982,7 @@ function vFiles() {
     <p class="lede">سجلاتك الرسمية في مكان واحد. كل سجل يتجمع لحاله من بيانات المنصة ومسار، وتقدرين تضيفين له صور أوراقك، وتطبعينه بغلاف وفهرس.</p>
     ${cur ? `<a class="fx-now" href="#files/${cur.p.id}/${cur.w.i}" style="--c:${FX.plans.c}"><span>هذا الأسبوع</span><b>الأسبوع ${ORD[cur.w.n]}: ${esc(cur.w.s.title || (cur.w.s.items || [])[0] || '')}</b><small>فتح الخطة الأسبوعية ←</small></a>` : ''}
     ${signPanel()}
+    ${qrPanel()}
     <div class="fx-grid">${Object.entries(FX).map(([k, v]) => `<a class="fx-card" href="#files/${k}" style="--c:${v.c}"><span class="fx-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${v.ic}</svg></span>
       <div><b>${esc(v.t)}</b><p>${esc(v.d)}</p><small>${S.mloading && k !== 'plans' && k !== 'disc' ? 'جارٍ التحميل…' : esc(stat[k])}</small></div></a>`).join('')}</div>`;
 }
@@ -3290,6 +3304,112 @@ document.addEventListener('click', async e => {
   if (d0.cnrole != null) { const R = ['عضوة', 'نائبة الرئيسة', 'أمينة المجلس']; await cnSave(d => { const m = d.members[+d0.cnrole]; m.role = R[(R.indexOf(m.role || 'عضوة') + 1) % R.length]; }); return rerender(); }
   if (d0.cnmtdel) { await cnSave(d => { d.meets = d.meets.filter(x => x.id !== d0.cnmtdel); }); toast('انحذف الاجتماع'); return rerender(); }
 });
+/* مولّد QR صغير (بايت، تصحيح أخطاء M) — مبني على خوارزمية qrcodegen المفتوحة (Nayuki, MIT) */
+const QRMini = (() => {
+  const ECC_M = 0; // index into tables for level M
+  const ECC_CODEWORDS_PER_BLOCK = [-1, 10, 16, 26, 18, 24, 16, 18, 22, 22, 26, 30, 22, 22, 24, 24, 28, 28, 26, 26, 26, 26, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28];
+  const NUM_ERROR_CORRECTION_BLOCKS = [-1, 1, 1, 1, 2, 2, 4, 4, 4, 5, 5, 5, 8, 9, 9, 10, 10, 11, 13, 14, 16, 17, 17, 18, 20, 21, 23, 25, 26, 28, 29, 31, 33, 35, 37, 38, 40, 43, 45, 47, 49];
+  const FORMAT_BITS_M = 0; // M = 00
+  function numRawDataModules(ver) {
+    let r = (16 * ver + 128) * ver + 64;
+    if (ver >= 2) { const na = Math.floor(ver / 7) + 2; r -= (25 * na - 10) * na - 55; if (ver >= 7) r -= 36; }
+    return r;
+  }
+  const numDataCodewords = ver => Math.floor(numRawDataModules(ver) / 8) - ECC_CODEWORDS_PER_BLOCK[ver] * NUM_ERROR_CORRECTION_BLOCKS[ver];
+  function rsMul(x, y) { let z = 0; for (let i = 7; i >= 0; i--) { z = (z << 1) ^ ((z >>> 7) * 0x11D); z ^= ((y >>> i) & 1) * x; } return z & 0xFF; }
+  function rsDivisor(deg) { const r = new Array(deg).fill(0); r[deg - 1] = 1; let root = 1;
+    for (let i = 0; i < deg; i++) { for (let j = 0; j < r.length; j++) { r[j] = rsMul(r[j], root); if (j + 1 < r.length) r[j] ^= r[j + 1]; } root = rsMul(root, 0x02); } return r; }
+  function rsRemainder(data, div) { const r = div.map(() => 0);
+    for (const b of data) { const f = b ^ r.shift(); r.push(0); div.forEach((c, i) => r[i] ^= rsMul(c, f)); } return r; }
+  function alignPos(ver) { if (ver === 1) return []; const n = Math.floor(ver / 7) + 2; const step = (ver === 32) ? 26 : Math.ceil((ver * 4 + 4) / (n * 2 - 2)) * 2;
+    const r = [6]; for (let p = ver * 4 + 10; r.length < n; p -= step) r.splice(1, 0, p); return r; }
+  function encode(text) {
+    const bytes = Array.from(new TextEncoder().encode(text));
+    let ver = 1; for (; ver <= 40; ver++) { const cap = numDataCodewords(ver) * 8; const used = 4 + (ver < 10 ? 8 : 16) + bytes.length * 8; if (used <= cap) break; }
+    if (ver > 40) throw new Error('الرابط طويل جداً');
+    const bb = []; const app = (v, n) => { for (let i = n - 1; i >= 0; i--) bb.push((v >>> i) & 1); };
+    app(4, 4); app(bytes.length, ver < 10 ? 8 : 16); bytes.forEach(b => app(b, 8));
+    const cap = numDataCodewords(ver) * 8; app(0, Math.min(4, cap - bb.length)); app(0, (8 - bb.length % 8) % 8);
+    for (let pad = 0xEC; bb.length < cap; pad ^= 0xEC ^ 0x11) app(pad, 8);
+    const data = []; for (let i = 0; i < bb.length; i += 8) { let v = 0; for (let j = 0; j < 8; j++) v = (v << 1) | bb[i + j]; data.push(v); }
+    // interleave with ECC
+    const nb = NUM_ERROR_CORRECTION_BLOCKS[ver], ecl = ECC_CODEWORDS_PER_BLOCK[ver], raw = Math.floor(numRawDataModules(ver) / 8);
+    const nShort = nb - raw % nb, shortLen = Math.floor(raw / nb); const div = rsDivisor(ecl); const blocks = [];
+    for (let i = 0, k = 0; i < nb; i++) { const dat = data.slice(k, k + shortLen - ecl + (i < nShort ? 0 : 1)); k += dat.length; const ecc = rsRemainder(dat, div); if (i < nShort) dat.push(0); blocks.push(dat.concat(ecc)); }
+    const all = []; for (let i = 0; i < blocks[0].length; i++) blocks.forEach((b, j) => { if (i !== shortLen - ecl || j >= nShort) all.push(b[i]); });
+    const size = ver * 4 + 17; const M = Array.from({ length: size }, () => new Array(size).fill(false)); const F = Array.from({ length: size }, () => new Array(size).fill(false));
+    const set = (x, y, d) => { M[y][x] = d; F[y][x] = true; };
+    for (let i = 0; i < size; i++) { set(6, i, i % 2 === 0); set(i, 6, i % 2 === 0); }
+    const finder = (x, y) => { for (let dy = -4; dy <= 4; dy++) for (let dx = -4; dx <= 4; dx++) { const d = Math.max(Math.abs(dx), Math.abs(dy)), xx = x + dx, yy = y + dy; if (xx >= 0 && xx < size && yy >= 0 && yy < size) set(xx, yy, d !== 2 && d !== 4); } };
+    finder(3, 3); finder(size - 4, 3); finder(3, size - 4);
+    const ap = alignPos(ver), na = ap.length;
+    for (let i = 0; i < na; i++) for (let j = 0; j < na; j++) { if ((i === 0 && j === 0) || (i === 0 && j === na - 1) || (i === na - 1 && j === 0)) continue;
+      for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) set(ap[i] + dx, ap[j] + dy, Math.max(Math.abs(dx), Math.abs(dy)) !== 1); }
+    const drawFormat = mask => { const d = (FORMAT_BITS_M << 3) | mask; let rem = d; for (let i = 0; i < 10; i++) rem = (rem << 1) ^ ((rem >>> 9) * 0x537); const bits = ((d << 10) | rem) ^ 0x5412; const g = i => ((bits >>> i) & 1) !== 0;
+      for (let i = 0; i <= 5; i++) set(8, i, g(i)); set(8, 7, g(6)); set(8, 8, g(7)); set(7, 8, g(8)); for (let i = 9; i < 15; i++) set(14 - i, 8, g(i));
+      for (let i = 0; i < 8; i++) set(size - 1 - i, 8, g(i)); for (let i = 8; i < 15; i++) set(8, size - 15 + i, g(i)); set(8, size - 8, true); };
+    drawFormat(0);
+    if (ver >= 7) { let rem = ver; for (let i = 0; i < 12; i++) rem = (rem << 1) ^ ((rem >>> 11) * 0x1F25); const bits = (ver << 12) | rem;
+      for (let i = 0; i < 18; i++) { const b = ((bits >>> i) & 1) !== 0; const a = size - 11 + i % 3, c = Math.floor(i / 3); set(a, c, b); set(c, a, b); } }
+    // data
+    let i = 0; for (let right = size - 1; right >= 1; right -= 2) { if (right === 6) right = 5;
+      for (let vert = 0; vert < size; vert++) for (let j = 0; j < 2; j++) { const x = right - j; const up = ((right + 1) & 2) === 0; const y = up ? size - 1 - vert : vert;
+        if (!F[y][x] && i < all.length * 8) { M[y][x] = ((all[i >>> 3] >>> (7 - (i & 7))) & 1) !== 0; i++; } } }
+    const applyMask = m => { for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) { let inv;
+      switch (m) { case 0: inv = (x + y) % 2 === 0; break; case 1: inv = y % 2 === 0; break; case 2: inv = x % 3 === 0; break; case 3: inv = (x + y) % 3 === 0; break;
+        case 4: inv = (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0; break; case 5: inv = x * y % 2 + x * y % 3 === 0; break; case 6: inv = (x * y % 2 + x * y % 3) % 2 === 0; break; default: inv = ((x + y) % 2 + x * y % 3) % 2 === 0; }
+      if (!F[y][x] && inv) M[y][x] = !M[y][x]; } };
+    const penalty = () => { let p = 0;
+      const runs = get => { for (let a = 0; a < size; a++) { let run = 1; for (let b = 1; b <= size; b++) { if (b < size && get(a, b) === get(a, b - 1)) run++; else { if (run >= 5) p += 3 + run - 5; run = 1; } } } };
+      runs((a, b) => M[a][b]); runs((a, b) => M[b][a]);
+      for (let y = 0; y < size - 1; y++) for (let x = 0; x < size - 1; x++) { const c = M[y][x]; if (c === M[y][x + 1] && c === M[y + 1][x] && c === M[y + 1][x + 1]) p += 3; }
+      const pat = [true, false, true, true, true, false, true]; const chk = get => { for (let a = 0; a < size; a++) for (let b = 0; b + 6 < size; b++) { let ok = true; for (let k = 0; k < 7; k++) if (get(a, b + k) !== pat[k]) { ok = false; break; }
+        if (ok) { const before = b >= 4 && [1, 2, 3, 4].every(k => !get(a, b - k)); const after = b + 10 < size && [7, 8, 9, 10].every(k => !get(a, b + k)); if (before || after) p += 40; } } };
+      chk((a, b) => M[a][b]); chk((a, b) => M[b][a]);
+      let dark = 0; M.forEach(r => r.forEach(c => { if (c) dark++; })); const total = size * size; p += Math.floor(Math.abs(dark * 20 - total * 10) / total) * 10; return p; };
+    let best = 0, bestP = Infinity;
+    for (let m = 0; m < 8; m++) { applyMask(m); drawFormat(m); const pp = penalty(); if (pp < bestP) { bestP = pp; best = m; } applyMask(m); }
+    applyMask(best); drawFormat(best);
+    return { size, get: (x, y) => M[y][x] };
+  }
+  function svg(text, opt = {}) { const q = encode(text), b = 4, n = q.size + b * 2; let d = '';
+    for (let y = 0; y < q.size; y++) for (let x = 0; x < q.size; x++) if (q.get(x, y)) d += `M${x + b},${y + b}h1v1h-1z`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n} ${n}" shape-rendering="crispEdges"${opt.cls ? ` class="${opt.cls}"` : ''}><rect width="${n}" height="${n}" fill="#fff"/><path d="${d}" fill="${opt.color || '#000'}"/></svg>`; }
+  return { encode, svg };
+})();
+
+/* ═════════ أكواد العرض: روابط الملفات الرقمية (Drive) في لوحة QR للطباعة ═════════ */
+const QR_DEF = [['plans', 'سجل خطط التوجيه الطلابي', 'الخطة الفصلية والخطط الأسبوعية'], ['disc', 'سجل الانضباط المدرسي', 'لجنة الانضباط، الغياب، السلوك، التكريم'], ['ach', 'سجل التحصيل الدراسي', 'التأخر الدراسي والمتفوقات والموهوبات'], ['ind', 'سجل جلسات التوجيه الفردي', 'الجلسات الفردية مرتبة بالتاريخ'], ['grp', 'سجل جلسات التوجيه الجمعي', 'لقاءات التوجيه الجمعي والجلسات الجماعية'], ['council', 'سجل المجلس الطلابي', 'التشكيل والأهداف ومحاضر الاجتماعات'], ['prog', 'البرامج والفعاليات', 'خطط البرامج وتقارير التنفيذ والشواهد'], ['vals', 'تعزيز القيم', 'خطة القيم وتقاريرها'], ['fam', 'علاقة الأسرة بالمدرسة', 'التواصل مع أولياء الأمور والمجالس'], ['com', 'لجنة التوجيه الطلابي', 'قرار التشكيل والمحاضر']];
+const QR_COL = { plans: '#0E7F7B', disc: '#C9532A', ach: '#1F6FB2', ind: '#6A4BC4', grp: '#2E7D4F', council: '#B5458A', prog: '#0E7F7B', vals: '#2E7D4F', fam: '#B4472B', com: '#1F6FB2' };
+const qrItems = () => { const d = myFile('qr'); const saved = d.items || []; const base = QR_DEF.map(([k, t, sub]) => ({ k, t, sub, url: '', ...(saved.find(x => x.k === k) || {}) })); return base.concat(saved.filter(x => !QR_DEF.some(z => z[0] === x.k))); };
+const qrOk = u => /^https?:\/\/\S+$/.test(String(u || '').trim());
+function qrPanel() { const L = qrItems();
+  return `<section class="panel"><div class="head"><h3>أكواد العرض</h3><span class="tiny muted">${ar(L.filter(x => qrOk(x.url)).length)} رابط</span><span class="sp"></span><button class="btn sm" data-qradd="1">＋ ملف آخر</button><button class="btn sm primary" data-qrprint="1">طباعة لوحة الأكواد</button></div>
+    <p class="small muted">الصقي رابط مجلد Drive لكل سجل، ويطلع له كود QR في لوحة جاهزة للطباعة. الملف اللي ما له رابط ما يطلع في اللوحة. انتبهي: أي أحد يصور الكود يفتح الرابط، فالملفات اللي فيها أسماء طالبات نزليها بخيار «إخفاء أسماء الطالبات».</p>
+    <div class="qrlist">${L.map((x, i) => `<div class="qrrow" style="--qc:${QR_COL[x.k] || '#555'}"><div class="qrprev">${qrOk(x.url) ? QRMini.svg(x.url.trim(), { color: '#1b2b2a' }) : '<span class="tiny muted">بدون رابط</span>'}</div>
+      <div class="qrinf"><b>${esc(x.t)}</b><span class="tiny muted">${esc(x.sub || '')}</span><input data-qrurl="${esc(x.k)}" value="${esc(x.url || '')}" placeholder="https://drive.google.com/..." dir="ltr" inputmode="url"></div>${QR_DEF.some(z => z[0] === x.k) ? '' : `<button class="btn sm ghost" data-qrdel="${esc(x.k)}" aria-label="حذف">✕</button>`}</div>`).join('')}</div></section>`; }
+const qrSave = async fn => { const d = JSON.parse(JSON.stringify({ k: 'qr', ...myFile('qr') })); d.items = qrItems(); fn(d); await saveDoc('myfile-qr', 'myfile', d); };
+document.addEventListener('change', async e => { const k = e.target.dataset && e.target.dataset.qrurl; if (k == null) return; const v = e.target.value.trim();
+  if (v && !qrOk(v)) { toast('الرابط لازم يبدأ بـ https://'); return; } await qrSave(d => { d.items.find(x => x.k === k).url = v; }); toast(v ? 'انحفظ الرابط' : 'انشال الرابط'); rerender(); });
+function qrBoard(big) { const L = qrItems().filter(x => qrOk(x.url)); const per = big ? 4 : 8; const pages = [];
+  for (let i = 0; i < L.length; i += per) pages.push(L.slice(i, i + per));
+  return pages.map(pg => `<div class="a4 qrboard${big ? ' big' : ''}">${repHead('الملفات الرقمية للتوجيه الطلابي')}<p class="qrhint">وجّهي كاميرا الجوال نحو الكود لفتح الملف</p>
+    <div class="qrgrid">${pg.map(x => `<div class="qrcard" style="--qc:${QR_COL[x.k] || '#555'}"><b>${esc(x.t)}</b><div class="qrimg">${QRMini.svg(x.url.trim(), { color: '#16302d' })}</div><span>${esc(x.sub || '')}</span></div>`).join('')}</div></div>`).join('');
+}
+function qrPrintForm() { if (!qrItems().some(x => qrOk(x.url))) { toast('الصقي رابط واحد على الأقل'); return; }
+  openSheet('طباعة لوحة الأكواد', `<div class="f full"><span>الحجم</span><div class="clpick"><label><input type="radio" name="qrsz" value="8" checked><span>٨ أكواد في الصفحة</span></label><label><input type="radio" name="qrsz" value="4"><span>٤ أكواد كبيرة في الصفحة</span></label></div></div>
+    <div class="toolbar"><button class="btn primary" type="submit">عرض اللوحة</button></div>`, async f => { const big = (f.querySelector('[name=qrsz]:checked') || {}).value === '4'; S.after = null; setTimeout(() => openReport(qrBoard(big), 'أكواد-الملفات-الرقمية', '#0E7F7B'), 50); });
+}
+function qrAddForm() { openSheet('إضافة ملف للوحة', `<div class="form"><label class="f full"><span>اسم الملف</span><input id="qa_t" placeholder="مثلاً: ملف الشواهد — المؤشر الأول"></label><label class="f full"><span>وصف قصير (اختياري)</span><input id="qa_s"></label><label class="f full"><span>الرابط</span><input id="qa_u" dir="ltr" inputmode="url" placeholder="https://drive.google.com/..."></label></div>
+  <div class="toolbar"><button class="btn primary" type="submit">إضافة</button></div>`, async f => { const t = f.querySelector('#qa_t').value.trim(), u = f.querySelector('#qa_u').value.trim(); if (!t) throw new Error('اكتبي اسم الملف'); if (u && !qrOk(u)) throw new Error('الرابط لازم يبدأ بـ https://');
+    await qrSave(d => { d.items.push({ k: uid('qr'), t, sub: f.querySelector('#qa_s').value.trim(), url: u }); }); toast('أُضيف'); }); }
+document.addEventListener('click', async e => { const b = e.target.closest('[data-qrprint],[data-qradd],[data-qrdel]'); if (!b || b.closest('#sheetbg')) return; e.preventDefault();
+  if (b.dataset.qrprint) return qrPrintForm(); if (b.dataset.qradd) return qrAddForm();
+  if (b.dataset.qrdel) { await qrSave(d => { d.items = d.items.filter(x => x.k !== b.dataset.qrdel); }); toast('انحذف'); rerender(); } });
+document.addEventListener('change', async e => { const key = e.target.dataset && e.target.dataset.evlink; if (key == null) return; const v = e.target.value.trim();
+  if (v && !evOk(v)) { toast('الرابط لازم يبدأ بـ https://'); return; } const [t, id] = [key.slice(0, key.indexOf(':')), key.slice(key.indexOf(':') + 1)];
+  try { if (t === 'prog') { const d = JSON.parse(JSON.stringify(DB.docs[id].data)); d.evLink = v; await saveDoc(id, 'program', d); } else if (t === 'val') await valUpdate(id, x => { x.evLink = v; }, v ? 'انحفظ رابط الشواهد' : 'انشال الرابط');
+    if (t === 'prog') toast(v ? 'انحفظ رابط الشواهد' : 'انشال الرابط'); rerender(); } catch (er) { toast(errT(er)); } });
 function discStats() {
   const ab = list('absence'); const dl = list('daily'); const beh = dl.filter(r => /سلوك/.test(r.type)); const ms = amMonths(); const mc = (S.mcases || []).filter(c => (c.cats || []).includes('behavior'));
   return `<div class="a4">${repHead('إحصائية الانضباط المدرسي')}${repTiles([[ab.length, 'ملف غياب'], [ab.reduce((s, a) => s + unex(a), 0), 'يوم بدون عذر'], [beh.length, 'حالة سلوكية طارئة'], [mc.length, 'حالة سلوكية في مسار'], [list('honor').filter(h => /انضباط|مواظب/.test(h.reason || '')).length, 'شهادة انضباط']])}

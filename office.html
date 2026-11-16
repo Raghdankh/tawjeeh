@@ -4310,12 +4310,13 @@ function honOne() {
 let prevTimer = null;
 function schedulePreview() { clearTimeout(prevTimer); prevTimer = setTimeout(async () => { const box = $('#certPrev'); if (!box) return; const o = readCert(CF()); if (!o.name) { box.innerHTML = '<span class="muted small">اكتبي الاسم لتظهر الشهادة</span>'; return; } const c = await drawCertCanvas(certOpts(o)); box.innerHTML = ''; const im = new Image(); im.alt = 'معاينة الشهادة'; im.src = c.toDataURL('image/jpeg', .85); box.append(im); }, 350); }
 function honBatch() {
-  const o = CF(); const all = students(); const g = S.bg || ''; const pick = S.bpick || {};
-  const shown = g ? all.filter(s => (s.grade + (s.section ? ' ' + s.section : '')) === g) : all;
+  const o = CF(); const all = students(); const gs = S.bgs || []; const pick = S.bpick || {};
+  const shown = gs.length ? all.filter(s => gs.includes(s.grade + (s.section ? ' ' + s.section : ''))) : all;
   const groups = [...new Set(all.map(s => s.grade + (s.section ? ' ' + s.section : '')))];
   return `<div class="certgrid"><form class="panel" id="certForm" onsubmit="return false">${certFields(o, true)}</form>
     <div class="panel"><b>المكرَّمون</b>
-      ${o.type === 'student' && all.length ? `<div class="toolbar"><select class="sel" id="bGroup" aria-label="الصف"><option value="">كل الصفوف</option>${groups.map(x => `<option${x === g ? ' selected' : ''}>${esc(x)}</option>`).join('')}</select><button type="button" class="btn sm" data-act="bAll">تحديد الكل</button><button type="button" class="btn sm" data-act="bNone">إلغاء التحديد</button></div>
+      ${o.type === 'student' && all.length ? `<p class="tiny muted" style="margin:6px 0 4px">اختاري فصل أو أكثر:</p><div class="presets">${groups.map(x => `<button type="button" data-bgrp="${esc(x)}" aria-pressed="${gs.includes(x)}">${esc(x)}</button>`).join('')}</div>
+        <div class="toolbar"><button type="button" class="btn sm" data-act="bAll">تحديد كل الظاهرات${gs.length ? ' (' + ar(shown.length) + ')' : ''}</button><button type="button" class="btn sm" data-act="bNone">إلغاء التحديد</button></div>
         <div class="checklist">${shown.map(s => `<label><input type="checkbox" data-bpick="${s.id}" ${pick[s.id] ? 'checked' : ''}>${esc(s.name)} <span class="tiny muted">${esc(s.grade)} ${esc(s.section || '')}</span></label>`).join('')}</div><p class="tiny muted">أو الصقي أسماء إضافية:</p>` : ''}
       <label class="f"><span>${o.type === 'student' && all.length ? 'أسماء إضافية' : 'الأسماء'} (كل اسم في سطر)</span><textarea id="bNames" style="min-height:120px">${esc(S.bnames || '')}</textarea></label>
       <label class="chk" style="--sc:var(--hon)"><input type="checkbox" id="bSave" ${S.bsave !== false ? 'checked' : ''}><span>حفظ الجميع في ملف التكريم</span></label>
@@ -4449,6 +4450,7 @@ document.addEventListener('click', async e => {
   if (d.delstu) { if (b.dataset.confirm !== '1') { b.dataset.confirm = '1'; b.textContent = 'تأكيد الحذف؟'; return; } try { await delDoc(d.delstu); closeSheet(); toast('تم الحذف'); rerender(); } catch (er) { toast(errT(er)); } return; }
   if (d.ctype) { const o = readCert(CF()); o.type = d.ctype; o.reason = RT[o.type].reasons[0]; o.bless = RT[o.type].bless; o.name = ''; rerender(); schedulePreview(); return; }
   if (d.ctheme) { readCert(CF()).theme = d.ctheme; rerender(); schedulePreview(); return; }
+  if (d.bgrp) { readCert(CF()); const g = d.bgrp; S.bgs = S.bgs || []; S.bgs = S.bgs.includes(g) ? S.bgs.filter(z => z !== g) : S.bgs.concat(g); rerender(); return; }
   if (d.cmonth) { const o = readCert(CF()); o.month = d.cmonth; o.reason = (o.reason || '').replace(/شهر (محرم|صفر|ربيع الأول|ربيع الآخر|جمادى الأولى|جمادى الآخرة|رجب|شعبان|رمضان|شوال|ذو القعدة|ذو الحجة)/, 'شهر ' + d.cmonth); rerender(); schedulePreview(); return; }
   if (d.creason) { const o = readCert(CF()); o.reason = RT[o.type].reasons[+d.creason]; o.reason = o.reason.replace(/\{ش\}/g, o.month || HMONTHS[(+String(todayH()).split('-')[1] || 1) - 1]); rerender(); schedulePreview(); return; }
   if (d.hdl) { const r = DB.docs[d.hdl].data; try { await downloadCert(r); } catch (er) { toast(errT(er)); } return; }
@@ -4542,7 +4544,7 @@ document.addEventListener('click', async e => {
     const o = readCert(CF()); if (!o.name) { toast('اكتبي الاسم أولاً'); return; }
     try { if (act === 'certSave') { await saveDoc(uid('hon'), 'honor', { type: o.type, name: o.name, grade: o.grade, section: o.section, studentId: o.studentId, label: o.label, title: o.title, occasion: o.occasion, reason: o.reason, bless: o.bless, date: o.date, theme: o.theme, sealText: o.sealText }); toast('حُفظت في ملف التكريم'); } await downloadCert(o); } catch (er) { toast(errT(er)); }
   }
-  else if (act === 'bAll' || act === 'bNone') { S.bpick = S.bpick || {}; document.querySelectorAll('[data-bpick]').forEach(c => { c.checked = act === 'bAll'; S.bpick[c.dataset.bpick] = c.checked; }); }
+  else if (act === 'bAll' || act === 'bNone') { if (act === 'bNone') { S.bpick = {}; document.querySelectorAll('[data-bpick]').forEach(c => { c.checked = false; }); return; } S.bpick = S.bpick || {}; document.querySelectorAll('[data-bpick]').forEach(c => { c.checked = act === 'bAll'; S.bpick[c.dataset.bpick] = c.checked; }); }
   else if (act === 'bGo') {
     const o = readCert(CF()); const msg = $('#bMsg');
     const picked = students().filter(s => (S.bpick || {})[s.id]).map(s => ({ name: s.name, grade: s.grade, section: s.section, studentId: s.id }));

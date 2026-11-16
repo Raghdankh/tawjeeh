@@ -3921,7 +3921,7 @@ const RT = {
 };
 function certOpts(o) {
   const t = RT[o.type] || RT.student; const label = o.type === 'other' ? (o.label || '') : t.label;
-  return { theme: o.theme || 'green', title: o.title || 'شهادة شكر وتقدير', intro: 'تتقدّم إدارة ' + S.school + ' بخالص الشكر والتقدير إلى' + (label ? ' ' + label : '') + ':', name: o.name, sub: o.type === 'student' && o.grade ? 'الصف: ' + o.grade + (o.section ? ' ' + o.section : '') : '', reason: (o.reason || '').replace(/\{م\}/g, o.occasion || ''), bless: o.bless || t.bless, date: hij(o.date || todayH()), seal: (o.sealText || 'شكر وتقدير').split(/\s+/).length > 1 ? [(o.sealText || 'شكر وتقدير').split(/\s+/)[0], (o.sealText || 'شكر وتقدير').split(/\s+/).slice(1).join(' ')] : [o.sealText] };
+  return { noSeal: !!o.noSeal, theme: o.theme || 'green', title: o.title || 'شهادة شكر وتقدير', intro: 'تتقدّم إدارة ' + S.school + ' بخالص الشكر والتقدير إلى' + (label ? ' ' + label : '') + ':', name: o.name, sub: o.type === 'student' && o.grade ? 'الصف: ' + o.grade + (o.section ? ' ' + o.section : '') : '', reason: (o.reason || '').replace(/\{م\}/g, o.occasion || ''), bless: o.bless || t.bless, date: hij(o.date || todayH()), seal: (o.sealText || 'شكر وتقدير').split(/\s+/).length > 1 ? [(o.sealText || 'شكر وتقدير').split(/\s+/)[0], (o.sealText || 'شكر وتقدير').split(/\s+/).slice(1).join(' ')] : [o.sealText] };
 }
 /* ═════════ تصاميم شهادات إضافية (تصاميم أصلية) ═════════ */
 const CERT_THEMES = {
@@ -4044,7 +4044,7 @@ async function drawCertCanvas(o) {
   if (CB) { if (CBI) { const r = Math.max(W / CBI.width, H / CBI.height), iw = CBI.width * r, ih = CBI.height * r; x.drawImage(CBI, (W - iw) / 2, (H - ih) / 2, iw, ih); }
     const sc = (CB.size || 90) / 100; x.save(); x.translate(W / 2 + (CB.dx || 0) * W / 100, H / 2 + (CB.dy || 0) * H / 100); x.scale(sc, sc); x.translate(-W / 2, -H / 2); }
   else if (CTH) CERT_FRAMES[o.theme](x, W, H); else if (gold) goldFrame(x, W, H); else greenFrame(x, W, H);
-  const hideHdr = CB && CB.hdr === false, hideSeal = CB && CB.seal === false;
+  const hideHdr = CB && CB.hdr === false, hideSeal = (CB && CB.seal === false) || !!o.noSeal;
   x.direction = 'rtl'; x.textBaseline = 'alphabetic';
   if (!hideHdr) { x.textAlign = 'right'; x.fillStyle = T.muted; x.font = '700 34px ' + NS; x.fillText('المملكة العربية السعودية', W - 225, 232); x.font = '400 34px ' + NS; x.fillText('وزارة التعليم', W - 225, 278); x.fillText(S.school, W - 225, 324);
   x.textAlign = 'left'; x.fillText('التاريخ: ' + o.date, 225, 232); }
@@ -4256,6 +4256,7 @@ function certFields(o, batch) {
     ${batch ? '' : `<label class="f"><span>الاسم</span><input id="c_name" ${o.type === 'student' ? 'list="stuList"' : ''} autocomplete="off" value="${esc(o.name)}" placeholder="${o.type === 'teacher' ? 'مثال: أ. نورة سعد' : 'اكتبي الاسم'}"></label>`}
     ${o.type === 'other' ? `<label class="f"><span>الصفة (اختياري)</span><input id="c_label" value="${esc(o.label)}" placeholder="مثال: الأستاذة، المتطوعة"></label>` : ''}
     <div class="cthemes" role="group" aria-label="التصميم">${certThemeList().map(([k, t, sw]) => `<button type="button" data-ctheme="${k}" aria-pressed="${(o.theme || 'green') === k}"><i style="background:linear-gradient(135deg,${sw[0]} 50%,${sw[1]} 50%)"></i>${t}</button>`).join('')}<label class="cbup">＋ رفع تصميم من عندي<input type="file" accept="image/*" data-cbup hidden></label>${String(o.theme || '').startsWith('cb_') ? `<button type="button" class="cbset" data-cbset="${o.theme}">ضبط مكان الكتابة</button>` : ''}</div>
+    <label class="chk" style="--sc:var(--hon);margin-top:6px"><input type="checkbox" id="c_noseal" ${o.noSeal ? '' : 'checked'}><span>إظهار الوسام الذهبي «شكر وتقدير»</span></label>
     <label class="f"><span>المناسبة (اختياري)</span><input id="c_occ" value="${esc(o.occasion)}" placeholder="مثال: اليوم الوطني، مسابقة القرآن الكريم"></label>
     <div class="f full"><span>الشهر <small class="muted" style="font-weight:500">(لصيغ الانضباط)</small></span><div class="presets">${HMONTHS.map(m => `<button type="button" data-cmonth="${m}" aria-pressed="${o.month === m}">${m}</button>`).join('')}</div></div>
     <label class="f"><span>سبب التكريم</span><textarea id="c_reason" style="min-height:70px">${esc(o.reason)}</textarea></label>
@@ -4297,6 +4298,7 @@ function cbSetForm(k) { const b0 = certBgs().find(z => z.k === k); if (!b0) retu
 document.addEventListener('click', e => { const b = e.target.closest('[data-cbset]'); if (!b || b.closest('#sheetbg')) return; e.preventDefault(); cbSetForm(b.dataset.cbset); });
 function readCert(o) {
   const v = id => { const el = $('#' + id); return el ? el.value : null; };
+  { const ns = $('#c_noseal'); if (ns) o.noSeal = !ns.checked; }
   if (v('c_name') != null) o.name = v('c_name').trim(); if (v('c_label') != null) o.label = v('c_label').trim();
   o.occasion = (v('c_occ') || '').trim(); o.reason = (v('c_reason') || '').trim(); o.bless = (v('c_bless') || '').trim(); o.title = (v('c_title') || '').trim() || 'شهادة شكر وتقدير'; o.date = readHD(document, 'c_date'); o.sealText = (v('c_seal') || '').trim() || 'شكر وتقدير';
   if (o.type === 'student' && o.name) { const s = resolveStudent(o.name); o.name = s.studentName; o.grade = s.grade; o.section = s.section; o.studentId = s.studentId; } else { o.grade = ''; o.section = ''; o.studentId = ''; }
@@ -4549,7 +4551,7 @@ document.addEventListener('click', async e => {
   else if (act === 'honDedup') honDedup();
   else if (act === 'certDl' || act === 'certSave') {
     const o = readCert(CF()); if (!o.name) { toast('اكتبي الاسم أولاً'); return; }
-    try { if (act === 'certSave') { const dup = honDup(o); await saveDoc(dup || uid('hon'), 'honor', { type: o.type, name: o.name, grade: o.grade, section: o.section, studentId: o.studentId, label: o.label, title: o.title, occasion: o.occasion, reason: o.reason, bless: o.bless, date: o.date, theme: o.theme, sealText: o.sealText }); toast(dup ? 'تحدّثت الشهادة في ملف التكريم (بدون تكرار)' : 'حُفظت في ملف التكريم'); } await downloadCert(o); } catch (er) { toast(errT(er)); }
+    try { if (act === 'certSave') { const dup = honDup(o); await saveDoc(dup || uid('hon'), 'honor', { type: o.type, name: o.name, grade: o.grade, section: o.section, studentId: o.studentId, label: o.label, title: o.title, occasion: o.occasion, reason: o.reason, bless: o.bless, date: o.date, theme: o.theme, sealText: o.sealText, noSeal: !!o.noSeal }); toast(dup ? 'تحدّثت الشهادة في ملف التكريم (بدون تكرار)' : 'حُفظت في ملف التكريم'); } await downloadCert(o); } catch (er) { toast(errT(er)); }
   }
   else if (act === 'bAll' || act === 'bNone') { if (act === 'bNone') { S.bpick = {}; document.querySelectorAll('[data-bpick]').forEach(c => { c.checked = false; }); return; } S.bpick = S.bpick || {}; document.querySelectorAll('[data-bpick]').forEach(c => { c.checked = act === 'bAll'; S.bpick[c.dataset.bpick] = c.checked; }); }
   else if (act === 'bGo') {
@@ -4560,7 +4562,7 @@ document.addEventListener('click', async e => {
     if (!people.length) { msg.textContent = 'اختاري أو الصقي الأسماء أولاً (كل اسم في سطر).'; return; }
     b.disabled = true;
     try {
-      const recs = people.map(p => ({ type: o.type, name: p.name, grade: p.grade, section: p.section, studentId: p.studentId, label: o.label, title: o.title, occasion: o.occasion, reason: o.reason, bless: o.bless, date: o.date, theme: o.theme, sealText: o.sealText }));
+      const recs = people.map(p => ({ type: o.type, name: p.name, grade: p.grade, section: p.section, studentId: p.studentId, label: o.label, title: o.title, occasion: o.occasion, reason: o.reason, bless: o.bless, date: o.date, theme: o.theme, sealText: o.sealText, noSeal: !!o.noSeal }));
       await certsToPdf(recs, 'شهادات-' + (o.occasion || o.title), (i, n) => { msg.textContent = `جارٍ إصدار ${ar(i)} من ${ar(n)}…`; });
       if (S.bsave !== false) await saveMany(recs.map(r => ({ id: honDup(r) || uid('hon'), kind: 'honor', data: r })));
       msg.textContent = `تم إصدار ${ar(recs.length)} شهادة${S.bsave !== false ? ' وحفظها في ملف التكريم' : ''}.`; S.lastBatch = recs; if (recs.some(r => r.type === 'student')) msg.insertAdjacentHTML('beforeend', ' <button type="button" class="btn sm wa" data-act="honBatchWA">📲 تهنئة أولياء أمورهن</button>');

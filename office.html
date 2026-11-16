@@ -555,6 +555,9 @@ button,label,.btn,.clpick,.clpick *,.presets,.presets *,.chip,.chips,.subtabs,na
 .evhead{display:flex;align-items:center;justify-content:space-between;gap:10px}.evhead h4{margin:0}.evid .evhead{margin-bottom:6px}
 .evqr{display:inline-flex;align-items:center;gap:6px;padding:2px 3px 2px 8px;border:1px solid #d3e0de;border-radius:8px;break-inside:avoid;line-height:1.2}.evqr .q svg{width:66px;height:66px;display:block}.evqr .t{display:grid;gap:1px;text-align:end}.evqr .t b{font-size:11px;color:#0E7F7B}.evqr .t span{font-size:9.5px;color:#6b7a78}
 .evsolo{display:flex;justify-content:flex-end;margin-top:6px}
+.cthemes{display:flex;flex-wrap:wrap;gap:8px}.cthemes button{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px 6px 8px;font:inherit;font-size:.88rem;cursor:pointer}.cthemes button i{width:22px;height:22px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}.cthemes button[aria-pressed=true]{border-color:#1F5E58;background:#e8f2f0;font-weight:700}
+.cbup,.cthemes .cbset{display:inline-flex;align-items:center;gap:6px;border:1.5px dashed #1F5E58;color:#1F5E58;background:#f3faf8;border-radius:999px;padding:6px 14px;font:inherit;font-size:.88rem;font-weight:700;cursor:pointer}.cthemes .cbset{border-style:solid;background:#1F5E58;color:#fff}
+.cbprev{margin:6px 0 12px;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.12);background:#eee;min-height:120px}.cbprev img{display:block;width:100%}.cbcols{display:flex;flex-wrap:wrap;gap:6px}.cbcols button{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:4px 10px 4px 6px;font:inherit;font-size:.85rem;cursor:pointer}.cbcols button i{width:18px;height:18px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2)}.cbcols button[aria-pressed=true]{border-color:#1F5E58;background:#e8f2f0;font-weight:700}
 </style>
 </head>
 <body>
@@ -3911,7 +3914,7 @@ function aiDaily(id) {
 
 /* ═════════ certificates ═════════ */
 const RT = {
-  student: { t: 'طالبة', label: 'الطالبة', reasons: ['لتفوقها الدراسي وتميّزها', 'لانضباطها ومواظبتها على الحضور', 'لتميّزها السلوكي وأخلاقها الرفيعة', 'لمشاركتها المتميزة في {م}', 'لحصولها على المركز الأول في {م}'], bless: 'سائلين الله لها دوام التوفيق والنجاح' },
+  student: { t: 'طالبة', label: 'الطالبة', reasons: ['لتفوقها الدراسي وتميّزها', 'لانضباطها ومواظبتها على الحضور', 'لتميّزها السلوكي وأخلاقها الرفيعة', 'لمشاركتها المتميزة في {م}', 'لحصولها على المركز الأول في {م}', 'لتفوقها وحصولها على درجات عالية في اختبارات «نافس» الوطنية للعام الدراسي الماضي، رافعةً اسم مدرستها عالياً', 'لتميّزها في اختبارات «نافس» الوطنية وتحقيقها مستوى متقدماً يعكس جدّها واجتهادها', 'لانضباطها التام وحرصها على الحضور اليومي دون أي غياب خلال شهر {ش}، لتكون قدوة حسنة لزميلاتها في الالتزام والمواظبة', 'لالتزامها بالحضور المبكر وعدم تغيّبها طوال شهر {ش}، مما يعكس حرصها على التعلم واحترامها لقيمة الانضباط المدرسي', 'لتميّزها السلوكي وأخلاقها الرفيعة وتعاملها الراقي مع معلماتها وزميلاتها، والتزامها بقواعد السلوك والمواظبة لتكون نموذجاً يُحتذى به', 'لحسن سلوكها وانضباطها داخل الفصل وخارجه، وحرصها على احترام الأنظمة المدرسية ونشر روح التعاون والمحبة بين زميلاتها'], bless: 'سائلين الله لها دوام التوفيق والنجاح' },
   teacher: { t: 'معلمة', label: 'المعلمة', reasons: ['تقديراً لجهودها المتميزة وعطائها المخلص', 'لتعاونها المثمر مع التوجيه الطلابي', 'لمشاركتها الفاعلة في {م}', 'لتميّزها في إحالة الطالبات ومتابعتهن'], bless: 'سائلين الله لها التوفيق والسداد' },
   mother: { t: 'أم / ولية أمر', label: 'ولية الأمر', reasons: ['لحرصها على متابعة ابنتها وتواصلها المستمر مع المدرسة', 'لمشاركتها الفاعلة في {م}', 'لتعاونها المثمر وشراكتها مع المدرسة', 'لحضورها مجالس الأمهات ومشاركتها'], bless: 'شاكرين لها حسن تعاونها، ومتمنين لها دوام التوفيق' },
   other: { t: 'أخرى', label: '', reasons: ['تقديراً لجهوده المتميزة', 'لمشاركته الفاعلة في {م}'], bless: 'سائلين الله له دوام التوفيق' }
@@ -3920,18 +3923,130 @@ function certOpts(o) {
   const t = RT[o.type] || RT.student; const label = o.type === 'other' ? (o.label || '') : t.label;
   return { theme: o.theme || 'green', title: o.title || 'شهادة شكر وتقدير', intro: 'تتقدّم إدارة ' + S.school + ' بخالص الشكر والتقدير إلى' + (label ? ' ' + label : '') + ':', name: o.name, sub: o.type === 'student' && o.grade ? 'الصف: ' + o.grade + (o.section ? ' ' + o.section : '') : '', reason: (o.reason || '').replace(/\{م\}/g, o.occasion || ''), bless: o.bless || t.bless, date: hij(o.date || todayH()), seal: (o.sealText || 'شكر وتقدير').split(/\s+/).length > 1 ? [(o.sealText || 'شكر وتقدير').split(/\s+/)[0], (o.sealText || 'شكر وتقدير').split(/\s+/).slice(1).join(' ')] : [o.sealText] };
 }
+/* ═════════ تصاميم شهادات إضافية (تصاميم أصلية) ═════════ */
+const CERT_THEMES = {
+  navy:    { t: 'كحلي وذهبي',      sw: ['#1f3a68', '#c9a24a'], seal: 'gold', T: { c0: '#ffffff', c1: '#f3f5f9', title: '#1f3a68', name: '#a87a1e', ink: '#1d2433', muted: '#5b6478', accent: '#c9a24a' } },
+  wave:    { t: 'موجة زرقاء',      sw: ['#1d4f91', '#e3b448'], seal: 'gold', T: { c0: '#ffffff', c1: '#f2f6fb', title: '#173e73', name: '#b8862a', ink: '#1d2433', muted: '#5b6478', accent: '#d2a440' } },
+  luxe:    { t: 'أسود وذهبي فاخر', sw: ['#1b1b1b', '#c9a24a'], seal: 'gold', T: { c0: '#fffdf7', c1: '#f6efdf', title: '#2a2116', name: '#a87a1e', ink: '#2b2420', muted: '#6d6258', accent: '#b8902f' } },
+  floral:  { t: 'ورود وردية',      sw: ['#d97a98', '#7f9c7a'], seal: 'rose', T: { c0: '#fffafa', c1: '#fbf0f2', title: '#7a3550', name: '#a0566f', ink: '#3a2a30', muted: '#7b6970', accent: '#c87a92' } },
+  geo:     { t: 'هندسي أزرق',      sw: ['#2a4d8f', '#9cc3e6'], seal: 'navy', T: { c0: '#ffffff', c1: '#f1f5fa', title: '#223f75', name: '#2a5ea8', ink: '#1d2433', muted: '#5b6478', accent: '#3d6fb8' } },
+  emerald: { t: 'زمردي وذهبي',     sw: ['#1f5e4a', '#c9a24a'], seal: 'gold', T: { c0: '#ffffff', c1: '#f2f7f4', title: '#1f5e4a', name: '#a87a1e', ink: '#1f2a22', muted: '#56665a', accent: '#c29a3e' } },
+  lilac:   { t: 'بنفسجي ناعم',     sw: ['#8b6bb8', '#cdb8e6'], seal: 'lilac', T: { c0: '#ffffff', c1: '#f6f2fb', title: '#4e3480', name: '#7a52b0', ink: '#2b2438', muted: '#6c637b', accent: '#9a7cc9' } },
+  classic: { t: 'كلاسيكي مزخرف',   sw: ['#3b3b3b', '#b8902f'], seal: 'gold', T: { c0: '#fffdf8', c1: '#f4efe4', title: '#2b2b2b', name: '#8f6a1c', ink: '#2b2420', muted: '#6d6258', accent: '#a8843a' } }
+};
+const HMONTHS = ['محرم', 'صفر', 'ربيع الأول', 'ربيع الآخر', 'جمادى الأولى', 'جمادى الآخرة', 'رجب', 'شعبان', 'رمضان', 'شوال', 'ذو القعدة', 'ذو الحجة'];
+const CB_COLS = [['#1f3a68', 'كحلي'], ['#2b2b2b', 'أسود'], ['#8f5410', 'ذهبي'], ['#1f5e4a', 'أخضر'], ['#6b1c2e', 'عنابي'], ['#4e3480', 'بنفسجي'], ['#7a3550', 'وردي'], ['#ffffff', 'أبيض']];
+const certBgs = () => ((DB.docs['myfile-certbg'] && DB.docs['myfile-certbg'].data.items) || []);
+const certThemeList = () => [['green', 'الأخضر', ['#2f7a4b', '#e3f1e6']], ['gold', 'الذهبي', ['#b0822a', '#f5ead2']]].concat(Object.entries(CERT_THEMES).map(([k, v]) => [k, v.t, v.sw]), certBgs().map(b => [b.k, b.name || 'تصميمي', [b.col || '#1f3a68', '#c9a24a']]));
+const _imgCache = {};
+async function loadImgEl(id) { if (_imgCache[id]) return _imgCache[id]; const src = await getImage(id); if (!src) return null; return _imgCache[id] = await new Promise(r => { const im = new Image(); im.onload = () => r(im); im.onerror = () => r(null); im.src = src; }); }
+function cbPalette(col) { const light = col === '#ffffff'; return { c0: '#ffffff', c1: '#ffffff', title: col, name: light ? '#ffe9a8' : col === '#2b2b2b' ? '#8f6a1c' : col, ink: light ? '#ffffff' : '#2b2420', muted: light ? 'rgba(255,255,255,.85)' : '#5d5650', accent: light ? '#ffe9a8' : col === '#1f3a68' || col === '#2b2b2b' ? '#b8902f' : col }; }
+function _goldGrad(x, x0, y0, x1, y1) { const g = x.createLinearGradient(x0, y0, x1, y1); g.addColorStop(0, '#8a6417'); g.addColorStop(.3, '#e9c96a'); g.addColorStop(.55, '#fff0b8'); g.addColorStop(.75, '#c99a36'); g.addColorStop(1, '#8a6417'); return g; }
+function _rect(x, m, col, lw) { x.strokeStyle = col; x.lineWidth = lw; x.strokeRect(m, m, x.canvas.width - 2 * m, x.canvas.height - 2 * m); }
+function frameNavy(x, W, H) {
+  const N = '#1f3a68', N2 = '#2f5596';
+  // ثلاثيات زوايا متدرجة
+  const tri = (ax, ay, bx, by, cx, cy, col) => { x.fillStyle = col; x.beginPath(); x.moveTo(ax, ay); x.lineTo(bx, by); x.lineTo(cx, cy); x.closePath(); x.fill(); };
+  [[0, 0, 1, 1], [W, 0, -1, 1], [0, H, 1, -1], [W, H, -1, -1]].forEach(([ox, oy, sx, sy]) => {
+    tri(ox, oy, ox + sx * 300, oy, ox, oy + sy * 300, N);
+    tri(ox + sx * 300, oy, ox + sx * 360, oy, ox, oy + sy * 360, N2); tri(ox + sx * 360, oy, ox, oy + sy * 360, ox, oy + sy * 300, N2);
+    x.strokeStyle = _goldGrad(x, ox, oy, ox + sx * 400, oy + sy * 400); x.lineWidth = 6; x.beginPath(); x.moveTo(ox + sx * 400, oy); x.lineTo(ox, oy + sy * 400); x.stroke();
+  });
+  _rect(x, 70, N, 4); x.strokeStyle = _goldGrad(x, 0, 0, W, H); x.lineWidth = 2; x.strokeRect(86, 86, W - 172, H - 172);
+}
+function frameWave(x, W, H) {
+  const band = (y0, dir) => {
+    const g = x.createLinearGradient(0, 0, W, 0); g.addColorStop(0, '#0f2f5c'); g.addColorStop(1, '#2a65b3');
+    x.fillStyle = g; x.beginPath();
+    if (dir > 0) { x.moveTo(0, 0); x.lineTo(W, 0); x.lineTo(W, 120); x.bezierCurveTo(W * .7, 40, W * .35, 210, 0, 110); }
+    else { x.moveTo(0, H); x.lineTo(W, H); x.lineTo(W, H - 130); x.bezierCurveTo(W * .65, H - 230, W * .3, H - 40, 0, H - 120); }
+    x.closePath(); x.fill();
+    x.strokeStyle = _goldGrad(x, 0, 0, W, 0); x.lineWidth = 9; x.beginPath();
+    if (dir > 0) { x.moveTo(W, 150); x.bezierCurveTo(W * .7, 70, W * .35, 240, 0, 140); }
+    else { x.moveTo(W, H - 160); x.bezierCurveTo(W * .65, H - 260, W * .3, H - 70, 0, H - 150); }
+    x.stroke(); x.lineWidth = 3; x.globalAlpha = .55; x.beginPath();
+    if (dir > 0) { x.moveTo(W, 175); x.bezierCurveTo(W * .7, 95, W * .35, 262, 0, 165); } else { x.moveTo(W, H - 185); x.bezierCurveTo(W * .65, H - 285, W * .3, H - 95, 0, H - 175); }
+    x.stroke(); x.globalAlpha = 1;
+  };
+  band(0, 1); band(0, -1);
+}
+function frameLuxe(x, W, H) {
+  const sweep = (flip) => {
+    x.save(); if (flip) { x.translate(W, H); x.rotate(Math.PI); } x.scale(.72, .72);
+    x.fillStyle = '#161616'; x.beginPath(); x.moveTo(0, 0); x.lineTo(560, 0); x.bezierCurveTo(380, 90, 180, 220, 0, 470); x.closePath(); x.fill();
+    for (let i = 0; i < 3; i++) { x.strokeStyle = _goldGrad(x, 0, 0, 600, 500); x.lineWidth = [10, 4, 2][i]; x.beginPath(); x.moveTo(620 + i * 34, 0); x.bezierCurveTo(430 + i * 30, 110 + i * 10, 210 + i * 20, 250 + i * 18, 0, 520 + i * 36); x.stroke(); }
+    x.restore();
+  };
+  sweep(false); sweep(true);
+  x.strokeStyle = _goldGrad(x, 0, 0, W, H); x.lineWidth = 5; x.strokeRect(120, 110, W - 240, H - 220); x.lineWidth = 1.5; x.strokeRect(136, 126, W - 272, H - 252);
+}
+function _flower(x, cx, cy, r, c1, c2) {
+  x.save(); x.translate(cx, cy);
+  for (let ring = 0; ring < 3; ring++) { const n = 5 + ring * 2, rr = r * (1 - ring * .28);
+    for (let k = 0; k < n; k++) { const a = k * Math.PI * 2 / n + ring * .4; x.save(); x.rotate(a); const g = x.createRadialGradient(0, rr * .45, 2, 0, rr * .5, rr * .7); g.addColorStop(0, ring === 2 ? c2 : c1); g.addColorStop(1, 'rgba(255,255,255,0)');
+      x.fillStyle = g; x.globalAlpha = .85; x.beginPath(); x.ellipse(0, rr * .45, rr * .38, rr * .55, 0, 0, Math.PI * 2); x.fill(); x.restore(); } }
+  x.globalAlpha = 1; x.fillStyle = c2; x.beginPath(); x.arc(0, 0, r * .12, 0, Math.PI * 2); x.fill(); x.restore();
+}
+function _leaf(x, cx, cy, len, ang, col) { x.save(); x.translate(cx, cy); x.rotate(ang); x.fillStyle = col; x.globalAlpha = .8; x.beginPath(); x.moveTo(0, 0); x.quadraticCurveTo(len * .5, -len * .28, len, 0); x.quadraticCurveTo(len * .5, len * .28, 0, 0); x.fill(); x.restore(); }
+function frameFloral(x, W, H) {
+  const corner = (ox0, oy0, sx, sy) => { x.save(); x.translate(ox0, oy0); x.scale(1.2, 1.2); const ox = 0, oy = 0;
+    [[60, 40, 22], [150, 110, 14], [40, 170, 16], [240, 50, 12]].forEach(([dx, dy, a], i) => _leaf(x, ox + sx * dx, oy + sy * dy, 120, Math.atan2(sy, sx) + (i - 1.5) * .7, i % 2 ? '#8fae8a' : '#6f8f6b'));
+    _flower(x, ox + sx * 95, oy + sy * 95, 85, '#e79ab2', '#b4436a');
+    _flower(x, ox + sx * 215, oy + sy * 55, 50, '#f2b8c9', '#c25c80');
+    _flower(x, ox + sx * 55, oy + sy * 215, 50, '#d9a0c8', '#8f4a86');
+    _flower(x, ox + sx * 190, oy + sy * 175, 34, '#f5c8d4', '#c25c80'); x.restore();
+  };
+  corner(0, 0, 1, 1); corner(W, 0, -1, 1); corner(0, H, 1, -1); corner(W, H, -1, -1);
+  x.strokeStyle = '#d7a5b5'; x.lineWidth = 3; x.strokeRect(150, 150, W - 300, H - 300);
+}
+function frameGeo(x, W, H) {
+  const tri = (pts0, col, a) => { const pts = pts0.map(([px, py]) => [px < W / 2 ? px * .72 : W - (W - px) * .72, py < H / 2 ? py * .72 : H - (H - py) * .72]); x.globalAlpha = a; x.fillStyle = col; x.beginPath(); pts.forEach((p, i) => i ? x.lineTo(p[0], p[1]) : x.moveTo(p[0], p[1])); x.closePath(); x.fill(); x.globalAlpha = 1; };
+  tri([[0, 0], [430, 0], [0, 260]], '#223f75', 1); tri([[430, 0], [560, 0], [0, 340], [0, 260]], '#9cc3e6', .9); tri([[200, 0], [320, 0], [120, 120]], '#3d6fb8', .9);
+  tri([[W, H], [W - 430, H], [W, H - 260]], '#223f75', 1); tri([[W - 430, H], [W - 560, H], [W, H - 340], [W, H - 260]], '#9cc3e6', .9); tri([[W - 200, H], [W - 320, H], [W - 120, H - 120]], '#3d6fb8', .9);
+  tri([[W, 0], [W - 160, 0], [W, 120]], '#9cc3e6', .8); tri([[0, H], [160, H], [0, H - 120]], '#9cc3e6', .8);
+  _rect(x, 110, '#223f75', 4);
+}
+function frameEmerald(x, W, H) {
+  const g = x.createLinearGradient(W, 0, W - 420, 0); g.addColorStop(0, '#143f32'); g.addColorStop(1, '#2a7a60');
+  x.fillStyle = g; x.beginPath(); x.moveTo(W, 0); x.lineTo(W - 175, 0); x.lineTo(W - 70, H / 2); x.lineTo(W - 175, H); x.lineTo(W, H); x.closePath(); x.fill();
+  x.fillStyle = 'rgba(255,255,255,.08)'; x.beginPath(); x.moveTo(W, 0); x.lineTo(W - 100, 0); x.lineTo(W - 20, H / 2); x.lineTo(W - 100, H); x.lineTo(W, H); x.closePath(); x.fill();
+  x.strokeStyle = _goldGrad(x, 0, 0, 0, H); x.lineWidth = 8; x.beginPath(); x.moveTo(W - 192, 0); x.lineTo(W - 88, H / 2); x.lineTo(W - 192, H); x.stroke();
+  x.lineWidth = 2; x.strokeRect(70, 70, W - 290, H - 140);
+}
+function frameLilac(x, W, H) {
+  const blob = (cx, cy, r, col, a) => { x.globalAlpha = a; x.fillStyle = col; x.beginPath(); for (let k = 0; k <= 24; k++) { const t = k / 24 * Math.PI * 2; const rr = r * (1 + .12 * Math.sin(t * 3 + cx) + .08 * Math.cos(t * 5)); k ? x.lineTo(cx + rr * Math.cos(t), cy + rr * Math.sin(t)) : x.moveTo(cx + rr * Math.cos(t), cy + rr * Math.sin(t)); } x.closePath(); x.fill(); x.globalAlpha = 1; };
+  blob(40, 40, 260, '#cdb8e6', .55); blob(W - 30, H - 30, 300, '#cdb8e6', .55); blob(W - 60, 70, 150, '#e6dbf3', .7); blob(60, H - 60, 160, '#e6dbf3', .7);
+  [[110, 120, .6], [170, 210, 1.1], [W - 140, H - 150, -2.5], [W - 220, H - 220, -2]].forEach(([cx, cy, a]) => { for (let i = 0; i < 4; i++) _leaf(x, cx, cy, 110, a + i * .5, i % 2 ? '#9a7cc9' : '#b59ad8'); });
+  x.strokeStyle = '#b59ad8'; x.lineWidth = 2; x.strokeRect(140, 140, W - 280, H - 280);
+}
+function frameClassic(x, W, H) {
+  _rect(x, 60, '#3b3b3b', 6); _rect(x, 78, '#3b3b3b', 1.5); x.strokeStyle = _goldGrad(x, 0, 0, W, H); x.lineWidth = 3; x.strokeRect(96, 96, W - 192, H - 192);
+  const curl = (ox, oy, sx, sy) => { x.save(); x.translate(ox, oy); x.scale(sx, sy); x.strokeStyle = '#3b3b3b'; x.lineWidth = 3;
+    for (let i = 0; i < 2; i++) { x.beginPath(); x.moveTo(40, 120 + i * 60); x.bezierCurveTo(40, 60, 90, 40, 120 + i * 60, 40); x.stroke(); }
+    x.beginPath(); x.arc(70, 70, 22, 0, Math.PI * 2); x.stroke(); x.fillStyle = '#b8902f'; x.beginPath(); x.arc(70, 70, 9, 0, Math.PI * 2); x.fill();
+    for (let k = 0; k < 3; k++) { x.beginPath(); x.arc(140 + k * 28, 70, 8, Math.PI, 0); x.stroke(); x.beginPath(); x.arc(70, 140 + k * 28, 8, -Math.PI / 2, Math.PI / 2); x.stroke(); }
+    x.restore(); };
+  curl(60, 60, 1, 1); curl(W - 60, 60, -1, 1); curl(60, H - 60, 1, -1); curl(W - 60, H - 60, -1, -1);
+  [[W / 2, 78], [W / 2, H - 78]].forEach(([cx, cy]) => { x.fillStyle = '#fffdf8'; x.fillRect(cx - 90, cy - 14, 180, 28); x.fillStyle = '#b8902f'; x.save(); x.translate(cx, cy); x.rotate(Math.PI / 4); x.fillRect(-10, -10, 20, 20); x.restore(); x.strokeStyle = '#3b3b3b'; x.lineWidth = 2; [-1, 1].forEach(s => { x.beginPath(); x.moveTo(cx + s * 22, cy); x.quadraticCurveTo(cx + s * 50, cy - 16, cx + s * 80, cy); x.stroke(); }); });
+}
+const CERT_FRAMES = { navy: frameNavy, wave: frameWave, luxe: frameLuxe, floral: frameFloral, geo: frameGeo, emerald: frameEmerald, lilac: frameLilac, classic: frameClassic };
+
 async function fontsReady() { if (document.fonts && document.fonts.load) { try { await Promise.all([document.fonts.load('700 100px "Amiri"', 'شهادة'), document.fonts.load('400 50px "Amiri"', 'شهادة')]); } catch (e) {} } }
 async function drawCertCanvas(o) {
   await fontsReady();
   const NS = '"Amiri", "Times New Roman", serif';
   const W = 2000, H = 1414, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
-  const gold = o.theme === 'gold';
-  const T = gold ? { c0: '#fffdf8', c1: '#f5ead2', title: '#6b1c2e', name: '#8f5410', ink: '#2b2420', muted: '#6d6258', accent: '#b0822a' } : { c0: '#fdfefb', c1: '#eaf3e5', title: '#1d5a37', name: '#9a5a14', ink: '#1f2a22', muted: '#56665a', accent: '#2f7a4b' };
+  const CB = String(o.theme || '').startsWith('cb_') ? certBgs().find(b => b.k === o.theme) : null; const CBI = CB ? await loadImgEl(CB.img) : null;
+  const CTH = CB ? null : CERT_THEMES[o.theme]; const gold = !!CB || o.theme === 'gold' || !!(CTH && CTH.seal !== 'green');
+  const T = CB ? cbPalette(CB.col || '#1f3a68') : CTH ? CTH.T : o.theme === 'gold' ? { c0: '#fffdf8', c1: '#f5ead2', title: '#6b1c2e', name: '#8f5410', ink: '#2b2420', muted: '#6d6258', accent: '#b0822a' } : { c0: '#fdfefb', c1: '#eaf3e5', title: '#1d5a37', name: '#9a5a14', ink: '#1f2a22', muted: '#56665a', accent: '#2f7a4b' };
   const bg = x.createRadialGradient(W / 2, H / 2, 200, W / 2, H / 2, 1150); bg.addColorStop(0, T.c0); bg.addColorStop(1, T.c1); x.fillStyle = bg; x.fillRect(0, 0, W, H);
-  if (gold) goldFrame(x, W, H); else greenFrame(x, W, H);
+  if (CB) { if (CBI) { const r = Math.max(W / CBI.width, H / CBI.height), iw = CBI.width * r, ih = CBI.height * r; x.drawImage(CBI, (W - iw) / 2, (H - ih) / 2, iw, ih); }
+    const sc = (CB.size || 90) / 100; x.save(); x.translate(W / 2 + (CB.dx || 0) * W / 100, H / 2 + (CB.dy || 0) * H / 100); x.scale(sc, sc); x.translate(-W / 2, -H / 2); }
+  else if (CTH) CERT_FRAMES[o.theme](x, W, H); else if (gold) goldFrame(x, W, H); else greenFrame(x, W, H);
+  const hideHdr = CB && CB.hdr === false, hideSeal = CB && CB.seal === false;
   x.direction = 'rtl'; x.textBaseline = 'alphabetic';
-  x.textAlign = 'right'; x.fillStyle = T.muted; x.font = '700 34px ' + NS; x.fillText('المملكة العربية السعودية', W - 225, 232); x.font = '400 34px ' + NS; x.fillText('وزارة التعليم', W - 225, 278); x.fillText(S.school, W - 225, 324);
-  x.textAlign = 'left'; x.fillText('التاريخ: ' + o.date, 225, 232);
+  if (!hideHdr) { x.textAlign = 'right'; x.fillStyle = T.muted; x.font = '700 34px ' + NS; x.fillText('المملكة العربية السعودية', W - 225, 232); x.font = '400 34px ' + NS; x.fillText('وزارة التعليم', W - 225, 278); x.fillText(S.school, W - 225, 324);
+  x.textAlign = 'left'; x.fillText('التاريخ: ' + o.date, 225, 232); }
   x.textAlign = 'center'; x.save(); x.shadowColor = 'rgba(0,0,0,.12)'; x.shadowOffsetY = 4; x.shadowBlur = 6; x.fillStyle = T.title;
   let ts = 140; x.font = '700 ' + ts + 'px ' + NS; while (x.measureText(o.title).width > W - 700 && ts > 80) { ts -= 6; x.font = '700 ' + ts + 'px ' + NS; } x.fillText(o.title, W / 2, 440); x.restore();
   divider(x, W / 2, 500, 300, T.accent, gold);
@@ -3945,9 +4060,10 @@ async function drawCertCanvas(o) {
   x.fillStyle = T.ink; x.font = '400 48px ' + NS;
   const L = wrap(x, o.reason, 1360).slice(0, 3); y += Math.max(0, 2 - L.length) * 40; L.forEach(l => { y += 70; x.fillText(l, W / 2, y); });
   x.fillStyle = T.accent; x.font = '700 48px ' + NS; x.fillText(o.bless, W / 2, Math.min(y + 80, 1050));
-  seal(x, W / 2, 1168, gold, o.seal);
+  if (!hideSeal) seal(x, W / 2, 1168, gold, o.seal);
   const sig = (xx, role, name) => { x.textAlign = 'center'; x.fillStyle = T.muted; x.font = '700 36px ' + NS; x.fillText(role, xx, 1118); x.fillStyle = T.ink; x.font = '400 44px ' + NS; x.fillText(name, xx, 1176); x.strokeStyle = T.accent; x.globalAlpha = .6; x.lineWidth = 2; x.beginPath(); x.moveTo(xx - 190, 1206); x.lineTo(xx + 190, 1206); x.stroke(); x.globalAlpha = 1; };
   sig(W - 560, SIGS[1][0], SIGS[1][1]); sig(560, SIGS[0][0], SIGS[0][1]);
+  if (CB) x.restore();
   return c;
 }
 async function certsToPdf(optsList, name, onProgress) {
@@ -4133,13 +4249,46 @@ function certFields(o, batch) {
   return `<div class="seg" role="group" aria-label="نوع المكرَّم">${Object.entries(RT).map(([k, v]) => `<button type="button" data-ctype="${k}" aria-pressed="${o.type === k}">${v.t}</button>`).join('')}</div>
     ${batch ? '' : `<label class="f"><span>الاسم</span><input id="c_name" ${o.type === 'student' ? 'list="stuList"' : ''} autocomplete="off" value="${esc(o.name)}" placeholder="${o.type === 'teacher' ? 'مثال: أ. نورة سعد' : 'اكتبي الاسم'}"></label>`}
     ${o.type === 'other' ? `<label class="f"><span>الصفة (اختياري)</span><input id="c_label" value="${esc(o.label)}" placeholder="مثال: الأستاذة، المتطوعة"></label>` : ''}
-    <div class="seg" role="group" aria-label="التصميم"><button type="button" data-ctheme="green" aria-pressed="${o.theme === 'green'}" style="--c:#2f7a4b;--cs:#e3f1e6">التصميم الأخضر</button><button type="button" data-ctheme="gold" aria-pressed="${o.theme === 'gold'}" style="--c:#b0822a;--cs:#f8eed7">التصميم الذهبي</button></div>
+    <div class="cthemes" role="group" aria-label="التصميم">${certThemeList().map(([k, t, sw]) => `<button type="button" data-ctheme="${k}" aria-pressed="${(o.theme || 'green') === k}"><i style="background:linear-gradient(135deg,${sw[0]} 50%,${sw[1]} 50%)"></i>${t}</button>`).join('')}<label class="cbup">＋ رفع تصميم من عندي<input type="file" accept="image/*" data-cbup hidden></label>${String(o.theme || '').startsWith('cb_') ? `<button type="button" class="cbset" data-cbset="${o.theme}">ضبط مكان الكتابة</button>` : ''}</div>
     <label class="f"><span>المناسبة (اختياري)</span><input id="c_occ" value="${esc(o.occasion)}" placeholder="مثال: اليوم الوطني، مسابقة القرآن الكريم"></label>
+    <div class="f full"><span>الشهر <small class="muted" style="font-weight:500">(لصيغ الانضباط)</small></span><div class="presets">${HMONTHS.map(m => `<button type="button" data-cmonth="${m}" aria-pressed="${o.month === m}">${m}</button>`).join('')}</div></div>
     <label class="f"><span>سبب التكريم</span><textarea id="c_reason" style="min-height:70px">${esc(o.reason)}</textarea></label>
-    <div class="presets">${t.reasons.map((r, i) => `<button type="button" data-creason="${i}">${esc(r.replace('{م}', '…'))}</button>`).join('')}</div>
+    <div class="presets">${t.reasons.map((r, i) => `<button type="button" data-creason="${i}">${esc(r.replace('{م}', '…').replace('{ش}', '…'))}</button>`).join('')}</div>
     <label class="f"><span>عبارة الختام</span><input id="c_bless" value="${esc(o.bless)}"></label>
     <div class="form" style="gap:10px"><label class="f"><span>عنوان الشهادة</span><input id="c_title" value="${esc(o.title)}"></label><div class="f"><span>التاريخ</span>${hdInput('c_date', o.date)}</div><label class="f"><span>نص الختم</span><input id="c_seal" value="${esc(o.sealText)}" maxlength="18"></label></div>`;
 }
+/* ═════════ تصاميم الشهادات المرفوعة (من Canva وغيره) ═════════ */
+async function cbSaveAll(fn) { const d = JSON.parse(JSON.stringify((DB.docs['myfile-certbg'] && DB.docs['myfile-certbg'].data) || { k: 'certbg', items: [] })); d.items = d.items || []; fn(d); await saveDoc('myfile-certbg', 'myfile', d); }
+function cbPrep(file) { return new Promise((res, rej) => { const r = new FileReader(); r.onerror = rej; r.onload = () => { const im = new Image(); im.onerror = () => rej(new Error('ما قدرت أقرأ الصورة')); im.onload = () => {
+  const W = 2000, H = 1414, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, W, H);
+  let iw = im.width, ih = im.height; if (ih > iw) { x.translate(W, 0); x.rotate(Math.PI / 2); [iw, ih] = [ih, iw]; const r2 = Math.max(H / im.width, W / im.height); x.drawImage(im, (H - im.width * r2) / 2, (W - im.height * r2) / 2, im.width * r2, im.height * r2); }
+  else { const r2 = Math.max(W / iw, H / ih); x.drawImage(im, (W - iw * r2) / 2, (H - ih * r2) / 2, iw * r2, ih * r2); }
+  res(c.toDataURL('image/jpeg', .93)); }; im.src = r.result; }; r.readAsDataURL(file); }); }
+document.addEventListener('change', async e => { if (!e.target.matches || !e.target.matches('[data-cbup]') || !e.target.files.length) return; const f = e.target.files[0];
+  try { toast('جارٍ رفع التصميم…'); const img = await putImage(await cbPrep(f)); const k = 'cb_' + uid('t').slice(-8); const n = certBgs().length + 1;
+    await cbSaveAll(d => d.items.push({ k, img, name: 'تصميمي ' + ar(n), col: '#1f3a68', size: 82, dx: 0, dy: 0, hdr: true, seal: true }));
+    readCert(CF()).theme = k; rerender(); schedulePreview(); setTimeout(() => cbSetForm(k), 300); } catch (er) { toast(errT(er)); } });
+function cbSetForm(k) { const b0 = certBgs().find(z => z.k === k); if (!b0) return; const b = { ...b0 };
+  const bg = openSheet('ضبط مكان الكتابة: ' + (b.name || ''), `<p class="small muted">حرّكي المؤشرات لين يجي الكلام في المكان الفاضي من التصميم.</p>
+    <div class="cbprev" id="cbPrev"></div>
+    <div class="form"><label class="f full"><span>اسم التصميم</span><input id="cb_n" value="${esc(b.name || '')}"></label>
+    <div class="f full"><span>لون الكتابة</span><div class="cbcols">${CB_COLS.map(([c, t]) => `<button type="button" data-cbcol="${c}" aria-pressed="${b.col === c}" title="${t}"><i style="background:${c}"></i>${t}</button>`).join('')}</div></div>
+    <label class="f full"><span>حجم الكلام <small class="muted">(أصغر ← → أكبر)</small></span><input type="range" dir="ltr" id="cb_s" min="55" max="100" value="${b.size || 82}"></label>
+    <label class="f full"><span>المكان فوق وتحت <small class="muted">(فوق ← → تحت)</small></span><input type="range" dir="ltr" id="cb_y" min="-20" max="20" value="${b.dy || 0}"></label>
+    <label class="f full"><span>المكان يمين ويسار <small class="muted">(يسار ← → يمين)</small></span><input type="range" dir="ltr" id="cb_x" min="-20" max="20" value="${b.dx || 0}"></label>
+    <div class="f full"><span>إظهار</span><div class="clpick"><label><input type="checkbox" id="cb_h"${b.hdr !== false ? ' checked' : ''}><span>سطر الوزارة والتاريخ</span></label><label><input type="checkbox" id="cb_e"${b.seal !== false ? ' checked' : ''}><span>الختم الذهبي في الوسط</span></label></div></div></div>
+    <div class="toolbar"><button class="btn primary" type="submit">حفظ</button><button class="btn ghost" type="button" data-cbdel="${k}">حذف التصميم</button></div>`,
+    async f => { await cbSaveAll(d => { const i = d.items.findIndex(z => z.k === k); if (i >= 0) d.items[i] = { ...b, name: f.querySelector('#cb_n').value.trim() || b.name }; }); toast('انحفظ'); schedulePreview(); });
+  let tm; const draw = () => { clearTimeout(tm); tm = setTimeout(async () => {
+    b.size = +bg.querySelector('#cb_s').value; b.dy = +bg.querySelector('#cb_y').value; b.dx = +bg.querySelector('#cb_x').value; b.hdr = bg.querySelector('#cb_h').checked; b.seal = bg.querySelector('#cb_e').checked;
+    const doc = DB.docs['myfile-certbg']; const keep = doc.data.items; doc.data.items = keep.map(z => z.k === k ? b : z);
+    try { const o = { ...readCert(CF()) }; o.theme = k; if (!o.name) o.name = 'اسم الطالبة'; const c = await drawCertCanvas(certOpts(o)); const box = bg.querySelector('#cbPrev'); if (box) box.innerHTML = `<img alt="" src="${c.toDataURL('image/jpeg', .8)}">`; } finally { doc.data.items = keep; } }, 120); };
+  bg.addEventListener('input', draw); bg.addEventListener('change', draw);
+  bg.addEventListener('click', async e => { const c = e.target.closest('[data-cbcol]'); if (c) { e.preventDefault(); b.col = c.dataset.cbcol; bg.querySelectorAll('[data-cbcol]').forEach(z => z.setAttribute('aria-pressed', String(z === c))); draw(); }
+    const d = e.target.closest('[data-cbdel]'); if (d) { e.preventDefault(); await cbSaveAll(x => { x.items = x.items.filter(z => z.k !== k); }); readCert(CF()).theme = 'green'; document.getElementById('sheetbg') && document.getElementById('sheetbg').remove(); toast('انحذف التصميم'); rerender(); schedulePreview(); } });
+  draw();
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-cbset]'); if (!b || b.closest('#sheetbg')) return; e.preventDefault(); cbSetForm(b.dataset.cbset); });
 function readCert(o) {
   const v = id => { const el = $('#' + id); return el ? el.value : null; };
   if (v('c_name') != null) o.name = v('c_name').trim(); if (v('c_label') != null) o.label = v('c_label').trim();
@@ -4174,7 +4323,7 @@ function honFile() {
   const counts = {}; rows.forEach(r => { const k = norm(r.name); counts[k] = (counts[k] || 0) + 1; });
   return `<div class="toolbar"><label class="search"><span aria-hidden="true">⌕</span><input id="honQ" type="search" placeholder="ابحثي بالاسم أو المناسبة" value="${esc(S.filter.hon || '')}" aria-label="بحث"></label>
     <select class="sel" id="honT" aria-label="النوع"><option value="">الكل</option>${Object.entries(RT).map(([k, v]) => `<option value="${k}"${tf === k ? ' selected' : ''}>${v.t}</option>`).join('')}</select><button class="btn" data-act="honRep">طباعة السجل</button></div>
-    ${shown.length ? `<div class="list">${shown.map(r => `<article class="rec" style="--c:${r.theme === 'gold' ? 'var(--hon)' : 'var(--good)'}"><div class="t"><b>${esc(r.name)}</b>${counts[norm(r.name)] > 1 ? `<span class="pill" style="--pc:var(--hon);--ps:var(--hon-soft)">كُرّمت ${ar(counts[norm(r.name)])} مرات</span>` : ''}</div>
+    ${shown.length ? `<div class="list">${shown.map(r => `<article class="rec" style="--c:${CERT_THEMES[r.theme] ? CERT_THEMES[r.theme].sw[0] : r.theme === 'gold' ? 'var(--hon)' : 'var(--good)'}"><div class="t"><b>${esc(r.name)}</b>${counts[norm(r.name)] > 1 ? `<span class="pill" style="--pc:var(--hon);--ps:var(--hon-soft)">كُرّمت ${ar(counts[norm(r.name)])} مرات</span>` : ''}</div>
       <div class="meta"><span class="chip c">${esc(RT[r.type] ? RT[r.type].t : '')}</span>${r.src === 'indibat' ? '<span class="chip">من لوحة الشرف</span>' : ''}<span class="chip">${esc(hij(r.date))}</span>${r.occasion ? `<span class="chip">${esc(r.occasion)}</span>` : ''}${r.grade ? `<span class="chip">${esc(r.grade)} ${esc(r.section || '')}</span>` : ''}</div>
       <p class="sum">${esc(String(r.reason || '').replace(/\{م\}/g, r.occasion || ''))}</p><div class="acts"><button class="btn sm" data-hdl="${r.id}">الشهادة</button>${r.type === 'student' ? `<button class="btn sm wa" data-honwa="${r.id}">📲 تهنئة ولي الأمر</button>` : ''}${r.src === 'indibat' ? '' : `<button class="btn sm danger" data-del="${r.id}">حذف</button>`}</div></article>`).join('')}</div>`
       : `<div class="empty"><b>ملف التكريم فاضي</b><span>كل شهادة تصدرينها وتحفظينها تظهر هنا.</span></div>`}`;
@@ -4295,7 +4444,8 @@ document.addEventListener('click', async e => {
   if (d.delstu) { if (b.dataset.confirm !== '1') { b.dataset.confirm = '1'; b.textContent = 'تأكيد الحذف؟'; return; } try { await delDoc(d.delstu); closeSheet(); toast('تم الحذف'); rerender(); } catch (er) { toast(errT(er)); } return; }
   if (d.ctype) { const o = readCert(CF()); o.type = d.ctype; o.reason = RT[o.type].reasons[0]; o.bless = RT[o.type].bless; o.name = ''; rerender(); schedulePreview(); return; }
   if (d.ctheme) { readCert(CF()).theme = d.ctheme; rerender(); schedulePreview(); return; }
-  if (d.creason) { const o = readCert(CF()); o.reason = RT[o.type].reasons[+d.creason]; rerender(); schedulePreview(); return; }
+  if (d.cmonth) { const o = readCert(CF()); o.month = d.cmonth; o.reason = (o.reason || '').replace(/شهر (محرم|صفر|ربيع الأول|ربيع الآخر|جمادى الأولى|جمادى الآخرة|رجب|شعبان|رمضان|شوال|ذو القعدة|ذو الحجة)/, 'شهر ' + d.cmonth); rerender(); schedulePreview(); return; }
+  if (d.creason) { const o = readCert(CF()); o.reason = RT[o.type].reasons[+d.creason]; o.reason = o.reason.replace(/\{ش\}/g, o.month || HMONTHS[(+String(todayH()).split('-')[1] || 1) - 1]); rerender(); schedulePreview(); return; }
   if (d.hdl) { const r = DB.docs[d.hdl].data; try { await downloadCert(r); } catch (er) { toast(errT(er)); } return; }
   if (d.cstep) { const [id, dv] = d.cstep.split(':'); const inp = document.getElementById(id); if (!inp) return; inp.value = Math.max(0, (+inp.value || 0) + +dv); if (id === 'cu' || id === 'cx') setCount(id, inp.value); return; }
   if (d.ldel != null) { const i = +d.ldel; absUpdate(a => { a.log.splice(i, 1); }); return; }

@@ -3939,6 +3939,7 @@ const CB_COLS = [['#1f3a68', 'كحلي'], ['#2b2b2b', 'أسود'], ['#8f5410', '
 const certBgs = () => ((DB.docs['myfile-certbg'] && DB.docs['myfile-certbg'].data.items) || []);
 const certThemeList = () => [['green', 'الأخضر', ['#2f7a4b', '#e3f1e6']], ['gold', 'الذهبي', ['#b0822a', '#f5ead2']]].concat(Object.entries(CERT_THEMES).map(([k, v]) => [k, v.t, v.sw]), certBgs().map(b => [b.k, b.name || 'تصميمي', [b.col || '#1f3a68', '#c9a24a']]));
 const _imgCache = {};
+let _moeP = null; const moeLogo = () => _moeP || (_moeP = new Promise(r => { const im = new Image(); im.onload = () => r(im); im.onerror = () => { _moeP = null; r(null); }; im.src = 'moe-logo.png'; }));
 async function loadImgEl(id) { if (_imgCache[id]) return _imgCache[id]; const src = await getImage(id); if (!src) return null; return _imgCache[id] = await new Promise(r => { const im = new Image(); im.onload = () => r(im); im.onerror = () => r(null); im.src = src; }); }
 function cbPalette(col) { const light = col === '#ffffff'; return { c0: '#ffffff', c1: '#ffffff', title: col, name: light ? '#ffe9a8' : col === '#2b2b2b' ? '#8f6a1c' : col, ink: light ? '#ffffff' : '#2b2420', muted: light ? 'rgba(255,255,255,.85)' : '#5d5650', accent: light ? '#ffe9a8' : col === '#1f3a68' || col === '#2b2b2b' ? '#b8902f' : col }; }
 function _goldGrad(x, x0, y0, x1, y1) { const g = x.createLinearGradient(x0, y0, x1, y1); g.addColorStop(0, '#8a6417'); g.addColorStop(.3, '#e9c96a'); g.addColorStop(.55, '#fff0b8'); g.addColorStop(.75, '#c99a36'); g.addColorStop(1, '#8a6417'); return g; }
@@ -4047,6 +4048,7 @@ async function drawCertCanvas(o) {
   x.direction = 'rtl'; x.textBaseline = 'alphabetic';
   if (!hideHdr) { x.textAlign = 'right'; x.fillStyle = T.muted; x.font = '700 34px ' + NS; x.fillText('المملكة العربية السعودية', W - 225, 232); x.font = '400 34px ' + NS; x.fillText('وزارة التعليم', W - 225, 278); x.fillText(S.school, W - 225, 324);
   x.textAlign = 'left'; x.fillText('التاريخ: ' + o.date, 225, 232); }
+  { const lg = await moeLogo(); if (lg) { const lh = 175, lw = lg.width * lh / lg.height; x.drawImage(lg, W / 2 - lw / 2, 128, lw, lh); } }
   x.textAlign = 'center'; x.save(); x.shadowColor = 'rgba(0,0,0,.12)'; x.shadowOffsetY = 4; x.shadowBlur = 6; x.fillStyle = T.title;
   let ts = 140; x.font = '700 ' + ts + 'px ' + NS; while (x.measureText(o.title).width > W - 700 && ts > 80) { ts -= 6; x.font = '700 ' + ts + 'px ' + NS; } x.fillText(o.title, W / 2, 440); x.restore();
   divider(x, W / 2, 500, 300, T.accent, gold);
@@ -4063,6 +4065,9 @@ async function drawCertCanvas(o) {
   if (!hideSeal) seal(x, W / 2, 1168, gold, o.seal);
   const sig = (xx, role, name) => { x.textAlign = 'center'; x.fillStyle = T.muted; x.font = '700 36px ' + NS; x.fillText(role, xx, 1118); x.fillStyle = T.ink; x.font = '400 44px ' + NS; x.fillText(name, xx, 1176); x.strokeStyle = T.accent; x.globalAlpha = .6; x.lineWidth = 2; x.beginPath(); x.moveTo(xx - 190, 1206); x.lineTo(xx + 190, 1206); x.stroke(); x.globalAlpha = 1; };
   sig(W - 560, SIGS[1][0], SIGS[1][1]); sig(560, SIGS[0][0], SIGS[0][1]);
+  { const g = SIGN(); const put = (im, cx, cy, mh, mw, rot, a) => { if (!im) return; const r = Math.min(mh / im.height, mw / im.width); const w = im.width * r, h = im.height * r; x.save(); x.globalAlpha = a || 1; x.translate(cx, cy); x.rotate(rot || 0); x.drawImage(im, -w / 2, -h / 2, w, h); x.restore(); };
+    const [iC, iP, iS] = await Promise.all([g.sigC && loadImgEl(g.sigC), g.sigP && loadImgEl(g.sigP), g.stamp && loadImgEl(g.stamp)]);
+    put(iP, W - 560, 1238, 90, 330); put(iC, 560, 1238, 90, 330); put(iS, W - 760, 1225, 200, 265, -0.07, .8); }
   if (CB) x.restore();
   return c;
 }

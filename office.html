@@ -4063,12 +4063,12 @@ async function drawCertCanvas(o) {
   const L = wrap(x, o.reason, 1360).slice(0, 3); y += Math.max(0, 2 - L.length) * 40; L.forEach(l => { y += 70; x.fillText(l, W / 2, y); });
   x.fillStyle = T.accent; x.font = '700 48px ' + NS; x.fillText(o.bless, W / 2, Math.min(y + 80, 1050));
   const hasStamp = !!SIGN().stamp;
-  if (!hideSeal) { if (hasStamp) { x.save(); x.translate(W / 2, 1098); x.scale(.5, .5); seal(x, 0, 0, gold, o.seal); x.restore(); } else seal(x, W / 2, 1168, gold, o.seal); }
+  if (!hideSeal) { if (hasStamp) { x.save(); x.translate(W / 2, 1112); x.scale(.45, .45); seal(x, 0, 0, gold, o.seal); x.restore(); } else seal(x, W / 2, 1168, gold, o.seal); }
   const sig = (xx, role, name) => { x.textAlign = 'center'; x.fillStyle = T.muted; x.font = '700 36px ' + NS; x.fillText(role, xx, 1118); x.fillStyle = T.ink; x.font = '400 44px ' + NS; x.fillText(name, xx, 1176); x.strokeStyle = T.accent; x.globalAlpha = .6; x.lineWidth = 2; x.beginPath(); x.moveTo(xx - 190, 1206); x.lineTo(xx + 190, 1206); x.stroke(); x.globalAlpha = 1; };
   sig(W - 560, SIGS[1][0], SIGS[1][1]); sig(560, SIGS[0][0], SIGS[0][1]);
   { const g = SIGN(); const put = (im, cx, cy, mh, mw, rot, a) => { if (!im) return; const r = Math.min(mh / im.height, mw / im.width); const w = im.width * r, h = im.height * r; x.save(); x.globalAlpha = a || 1; x.translate(cx, cy); x.rotate(rot || 0); x.drawImage(im, -w / 2, -h / 2, w, h); x.restore(); };
     const [iC, iP, iS] = await Promise.all([g.sigC && loadImgEl(g.sigC), g.sigP && loadImgEl(g.sigP), g.stamp && loadImgEl(g.stamp)]);
-    put(iP, W - 560, 1238, 90, 330); put(iC, 560, 1238, 90, 330); put(iS, W / 2, hideSeal ? 1180 : 1240, 178, 300, 0, .92); }
+    put(iP, W - 560, 1238, 90, 330); put(iC, 560, 1238, 90, 330); put(iS, W / 2, hideSeal ? 1200 : 1262, 225, 345, 0, .9); }
   if (CB) x.restore();
   return c;
 }

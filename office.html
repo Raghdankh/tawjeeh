@@ -4062,12 +4062,13 @@ async function drawCertCanvas(o) {
   x.fillStyle = T.ink; x.font = '400 48px ' + NS;
   const L = wrap(x, o.reason, 1360).slice(0, 3); y += Math.max(0, 2 - L.length) * 40; L.forEach(l => { y += 70; x.fillText(l, W / 2, y); });
   x.fillStyle = T.accent; x.font = '700 48px ' + NS; x.fillText(o.bless, W / 2, Math.min(y + 80, 1050));
-  if (!hideSeal) seal(x, W / 2, 1168, gold, o.seal);
+  const hasStamp = !!SIGN().stamp;
+  if (!hideSeal) { if (hasStamp) { x.save(); x.translate(W / 2, 1098); x.scale(.5, .5); seal(x, 0, 0, gold, o.seal); x.restore(); } else seal(x, W / 2, 1168, gold, o.seal); }
   const sig = (xx, role, name) => { x.textAlign = 'center'; x.fillStyle = T.muted; x.font = '700 36px ' + NS; x.fillText(role, xx, 1118); x.fillStyle = T.ink; x.font = '400 44px ' + NS; x.fillText(name, xx, 1176); x.strokeStyle = T.accent; x.globalAlpha = .6; x.lineWidth = 2; x.beginPath(); x.moveTo(xx - 190, 1206); x.lineTo(xx + 190, 1206); x.stroke(); x.globalAlpha = 1; };
   sig(W - 560, SIGS[1][0], SIGS[1][1]); sig(560, SIGS[0][0], SIGS[0][1]);
   { const g = SIGN(); const put = (im, cx, cy, mh, mw, rot, a) => { if (!im) return; const r = Math.min(mh / im.height, mw / im.width); const w = im.width * r, h = im.height * r; x.save(); x.globalAlpha = a || 1; x.translate(cx, cy); x.rotate(rot || 0); x.drawImage(im, -w / 2, -h / 2, w, h); x.restore(); };
     const [iC, iP, iS] = await Promise.all([g.sigC && loadImgEl(g.sigC), g.sigP && loadImgEl(g.sigP), g.stamp && loadImgEl(g.stamp)]);
-    put(iP, W - 560, 1238, 90, 330); put(iC, 560, 1238, 90, 330); put(iS, W - 760, 1225, 200, 265, -0.07, .8); }
+    put(iP, W - 560, 1238, 90, 330); put(iC, 560, 1238, 90, 330); put(iS, W / 2, hideSeal ? 1180 : 1240, 178, 300, 0, .92); }
   if (CB) x.restore();
   return c;
 }
@@ -4322,13 +4323,18 @@ function honBatch() {
       <label class="chk" style="--sc:var(--hon)"><input type="checkbox" id="bSave" ${S.bsave !== false ? 'checked' : ''}><span>حفظ الجميع في ملف التكريم</span></label>
       <button class="btn primary" type="button" data-act="bGo">إصدار الشهادات (PDF)</button><p class="status" id="bMsg" role="status"></p></div></div>`;
 }
+/* منع التكرار: نفس الاسم ونفس النوع ونفس التاريخ = نفس الشهادة، تتحدّث بدل ما تنضاف مرة ثانية */
+const honKey = r => [norm(r.name || ''), r.type || '', r.date || ''].join('|');
+function honDup(o) { const k = honKey(o); const hit = list('honor').filter(r => honKey(r) === k); return hit.length ? hit[0].id : ''; }
+async function honDedup() { const seen = {}, del = []; list('honor').slice().sort((a, b) => String(b.updatedAt || b.id).localeCompare(String(a.updatedAt || a.id))).forEach(r => { const k = honKey(r); if (seen[k]) del.push(r.id); else seen[k] = 1; });
+  if (!del.length) return toast('ما فيه شهادات مكررة'); for (const id of del) await delDoc(id); toast('انحذفت ' + ar(del.length) + ' شهادة مكررة'); rerender(); }
 function honFile() {
   const rows = list('honor').sort((a, b) => String(b.date).localeCompare(String(a.date)));
   const qv = norm(S.filter.hon || ''); const tf = S.filter.hont || '';
   const shown = rows.filter(r => (!qv || norm(r.name + ' ' + r.reason + ' ' + r.occasion).includes(qv)) && (!tf || r.type === tf));
   const counts = {}; rows.forEach(r => { const k = norm(r.name); counts[k] = (counts[k] || 0) + 1; });
   return `<div class="toolbar"><label class="search"><span aria-hidden="true">⌕</span><input id="honQ" type="search" placeholder="ابحثي بالاسم أو المناسبة" value="${esc(S.filter.hon || '')}" aria-label="بحث"></label>
-    <select class="sel" id="honT" aria-label="النوع"><option value="">الكل</option>${Object.entries(RT).map(([k, v]) => `<option value="${k}"${tf === k ? ' selected' : ''}>${v.t}</option>`).join('')}</select><button class="btn" data-act="honRep">طباعة السجل</button></div>
+    <select class="sel" id="honT" aria-label="النوع"><option value="">الكل</option>${Object.entries(RT).map(([k, v]) => `<option value="${k}"${tf === k ? ' selected' : ''}>${v.t}</option>`).join('')}</select><button class="btn" data-act="honRep">طباعة السجل</button><button class="btn" data-act="honDedup">حذف المكرر</button></div>
     ${shown.length ? `<div class="list">${shown.map(r => `<article class="rec" style="--c:${CERT_THEMES[r.theme] ? CERT_THEMES[r.theme].sw[0] : r.theme === 'gold' ? 'var(--hon)' : 'var(--good)'}"><div class="t"><b>${esc(r.name)}</b>${counts[norm(r.name)] > 1 ? `<span class="pill" style="--pc:var(--hon);--ps:var(--hon-soft)">كُرّمت ${ar(counts[norm(r.name)])} مرات</span>` : ''}</div>
       <div class="meta"><span class="chip c">${esc(RT[r.type] ? RT[r.type].t : '')}</span>${r.src === 'indibat' ? '<span class="chip">من لوحة الشرف</span>' : ''}<span class="chip">${esc(hij(r.date))}</span>${r.occasion ? `<span class="chip">${esc(r.occasion)}</span>` : ''}${r.grade ? `<span class="chip">${esc(r.grade)} ${esc(r.section || '')}</span>` : ''}</div>
       <p class="sum">${esc(String(r.reason || '').replace(/\{م\}/g, r.occasion || ''))}</p><div class="acts"><button class="btn sm" data-hdl="${r.id}">الشهادة</button>${r.type === 'student' ? `<button class="btn sm wa" data-honwa="${r.id}">📲 تهنئة ولي الأمر</button>` : ''}${r.src === 'indibat' ? '' : `<button class="btn sm danger" data-del="${r.id}">حذف</button>`}</div></article>`).join('')}</div>`
@@ -4540,9 +4546,10 @@ document.addEventListener('click', async e => {
       else if (f.querySelector('#m_s').checked) { const v = k => f.querySelector('#' + k).value.trim(); const topic = v('ab_tp'); if (!topic) throw new Error('اكتبي موضوع الجلسة');
         const dd = JSON.parse(JSON.stringify(DB.docs[absId].data)); const ms0 = f.querySelector('#m_s').dataset.ms || ''; dd.log = (dd.log || []).concat({ date, type: 'session', ms: ms0, text: 'جلسة فردية' + (ms0 ? ' (' + MS_T[ms0] + ')' : '') + ': ' + topic, topic, goal: v('ab_g'), note: v('ab_n'), agree: v('ab_r'), prog: '' }); await saveDoc(absId, 'absence', dd); toast('حُفظت الجلسة هنا وفي سجل جلسات التوجيه الفردي'); }
       else { const text = f.querySelector('#l_t').value.trim(); if (!text) throw new Error('اكتبي الإجراء'); const dd = JSON.parse(JSON.stringify(DB.docs[absId].data)); dd.log = (dd.log || []).concat({ date, text }); await saveDoc(absId, 'absence', dd); } }, `--c:var(--abs);--cs:var(--abs-soft)`); }
+  else if (act === 'honDedup') honDedup();
   else if (act === 'certDl' || act === 'certSave') {
     const o = readCert(CF()); if (!o.name) { toast('اكتبي الاسم أولاً'); return; }
-    try { if (act === 'certSave') { await saveDoc(uid('hon'), 'honor', { type: o.type, name: o.name, grade: o.grade, section: o.section, studentId: o.studentId, label: o.label, title: o.title, occasion: o.occasion, reason: o.reason, bless: o.bless, date: o.date, theme: o.theme, sealText: o.sealText }); toast('حُفظت في ملف التكريم'); } await downloadCert(o); } catch (er) { toast(errT(er)); }
+    try { if (act === 'certSave') { const dup = honDup(o); await saveDoc(dup || uid('hon'), 'honor', { type: o.type, name: o.name, grade: o.grade, section: o.section, studentId: o.studentId, label: o.label, title: o.title, occasion: o.occasion, reason: o.reason, bless: o.bless, date: o.date, theme: o.theme, sealText: o.sealText }); toast(dup ? 'تحدّثت الشهادة في ملف التكريم (بدون تكرار)' : 'حُفظت في ملف التكريم'); } await downloadCert(o); } catch (er) { toast(errT(er)); }
   }
   else if (act === 'bAll' || act === 'bNone') { if (act === 'bNone') { S.bpick = {}; document.querySelectorAll('[data-bpick]').forEach(c => { c.checked = false; }); return; } S.bpick = S.bpick || {}; document.querySelectorAll('[data-bpick]').forEach(c => { c.checked = act === 'bAll'; S.bpick[c.dataset.bpick] = c.checked; }); }
   else if (act === 'bGo') {
@@ -4555,7 +4562,7 @@ document.addEventListener('click', async e => {
     try {
       const recs = people.map(p => ({ type: o.type, name: p.name, grade: p.grade, section: p.section, studentId: p.studentId, label: o.label, title: o.title, occasion: o.occasion, reason: o.reason, bless: o.bless, date: o.date, theme: o.theme, sealText: o.sealText }));
       await certsToPdf(recs, 'شهادات-' + (o.occasion || o.title), (i, n) => { msg.textContent = `جارٍ إصدار ${ar(i)} من ${ar(n)}…`; });
-      if (S.bsave !== false) await saveMany(recs.map(r => ({ id: uid('hon'), kind: 'honor', data: r })));
+      if (S.bsave !== false) await saveMany(recs.map(r => ({ id: honDup(r) || uid('hon'), kind: 'honor', data: r })));
       msg.textContent = `تم إصدار ${ar(recs.length)} شهادة${S.bsave !== false ? ' وحفظها في ملف التكريم' : ''}.`; S.lastBatch = recs; if (recs.some(r => r.type === 'student')) msg.insertAdjacentHTML('beforeend', ' <button type="button" class="btn sm wa" data-act="honBatchWA">📲 تهنئة أولياء أمورهن</button>');
     } catch (er) { msg.textContent = errT(er); }
     b.disabled = false;

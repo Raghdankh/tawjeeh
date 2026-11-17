@@ -553,6 +553,8 @@ button,label,.btn,.clpick,.clpick *,.presets,.presets *,.chip,.chips,.subtabs,na
 .a4.qrboard.big .qrgrid{gap:22px}.a4.qrboard.big .qrimg svg{width:230px;height:230px}.a4.qrboard.big .qrcard b{font-size:19px}.a4.qrboard.big .qrcard span{font-size:13px}
 .evlink{display:grid;gap:6px;margin:8px 0 10px;padding:10px;border:1px dashed var(--line);border-radius:12px}.evlink label{display:grid;gap:4px}.evlink input{width:100%;font-size:.85rem}.evmini svg{width:84px;height:84px;background:#fff;border-radius:6px}
 .evhead{display:flex;align-items:center;justify-content:space-between;gap:10px}.evhead h4{margin:0}.evid .evhead{margin-bottom:6px}
+.a4 .hpsub{text-align:center;margin:-4px 0 10px;font-weight:600;color:#3d4f4c}.a4 .hph{margin:12px 0 6px;color:#0E5E5A}.a4 .hpinfo th{width:150px;background:#f1f6f5;text-align:start}.a4 .hpday{margin-bottom:8px;break-inside:avoid}.a4 .hpday thead th{text-align:start;background:#e6f0ee}.a4 .hpday tbody th{width:80px;background:#f6f9f8}.a4 .hpday td{text-align:start}
+.hpd{border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px;background:var(--surface)}
 .qro{text-align:center;break-inside:avoid}.qro h4{text-align:start;margin:0 0 6px}.qro .qbig{display:inline-block;padding:6px;border:1px solid #d3e0de;border-radius:10px}.qro .qbig svg{width:120px;height:120px;display:block}
 .evqr{display:inline-flex;align-items:center;gap:6px;padding:2px 3px 2px 8px;border:1px solid #d3e0de;border-radius:8px;break-inside:avoid;line-height:1.2}.evqr .q svg{width:66px;height:66px;display:block}.evqr .t{display:grid;gap:1px;text-align:end}.evqr .t b{font-size:11px;color:#0E7F7B}.evqr .t span{font-size:9.5px;color:#6b7a78}
 .evsolo{display:flex;justify-content:flex-end;margin-top:6px}
@@ -3314,6 +3316,97 @@ document.addEventListener('click', async e => {
   if (d0.cnrole != null) { const R = ['عضوة', 'نائبة الرئيسة', 'أمينة المجلس']; await cnSave(d => { const m = d.members[+d0.cnrole]; m.role = R[(R.indexOf(m.role || 'عضوة') + 1) % R.length]; }); return rerender(); }
   if (d0.cnmtdel) { await cnSave(d => { d.meets = d.meets.filter(x => x.id !== d0.cnmtdel); }); toast('انحذف الاجتماع'); return rerender(); }
 });
+/* ── خطط الأسابيع والمناسبات (ملف الانضباط) ── */
+const HP_TYPES = ['توعوي صحي', 'قيمي سلوكي', 'مهاري إبداعي', 'ثقافي فني', 'احتفالي ترفيهي', 'وطني', 'ديني', 'رياضي', 'تحفيزي', 'توعوي أمني'];
+const HP_TITLES = ['خطة أسبوع ما قبل إجازة الخريف', 'خطة أسبوع ما قبل إجازة منتصف العام', 'خطة أسبوع ما قبل إجازة الربيع', 'خطة أسبوع ما قبل إجازة عيد الفطر', 'خطة أسبوع ما قبل إجازة عيد الأضحى', 'خطة أسبوع ما بعد الإجازة'];
+const HP_ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس', 'السادس', 'السابع', 'الثامن', 'التاسع', 'العاشر'];
+const HP_DUR = ['', 'يوم دراسي واحد', 'يومان دراسيان', 'ثلاثة أيام دراسية', 'أربعة أيام دراسية', 'خمسة أيام دراسية', 'ستة أيام دراسية', 'سبعة أيام دراسية', 'ثمانية أيام دراسية', 'تسعة أيام دراسية', 'عشرة أيام دراسية'];
+const GMON = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+const WD7 = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+const hpDay = h => { const t = h2g(h); return t == null ? '' : WD7[new Date(t).getUTCDay()]; };
+const hpG = h => { const t = h2g(h); if (t == null) return ''; const d = new Date(t); return ar(d.getUTCDate()) + ' ' + GMON[d.getUTCMonth()] + ' ' + ar(d.getUTCFullYear()) + 'م'; };
+const hpNext = h => { let t = h2g(h); if (t == null) return todayH(); do { t += DAYMS; } while ([5, 6].includes(new Date(t).getUTCDay())); return g2h(t); };
+const hpFile = () => { const d = myFile('discplans'); return { plans: d.plans || [] }; };
+const hpSave = async fn => { const d = JSON.parse(JSON.stringify({ k: 'discplans', ...myFile('discplans') })); d.plans = d.plans || []; fn(d); await saveDoc('myfile-discplans', 'myfile', d); };
+const hpPlans = () => hpFile().plans.slice().sort((a, b) => String(a.days && a.days[0] ? a.days[0].date : '').localeCompare(String(b.days && b.days[0] ? b.days[0].date : '')));
+const HP_SEED = { seed: 'autumn48', title: 'خطة أسبوع ما قبل إجازة الخريف', term: 'الفصل الدراسي الأول', exec: 'التوجيه الطلابي والنشاط الطلابي', target: 'جميع طالبات المدرسة',
+  prep: [['الموجهة الطلابية', 'أ. أمل علي الغامدي'], ['رائدة النشاط', 'أ. عبير عبدالرحمن الدهري']],
+  goals: ['استثمار الأسبوع الأخير قبل الإجازة في برامج نافعة تحافظ على انتظام الطالبات وحضورهن.', 'رفع الوعي الصحي لدى الطالبات وتعزيز العادات الغذائية السليمة.', 'غرس قيم التسامح والاحترام والتعايش في البيئة المدرسية.', 'تنمية المهارات اليدوية والإبداعية واكتشاف مواهب الطالبات.', 'ربط الطالبات بالموروث الوطني بأسلوب معاصر.', 'تعريف الطالبات بحقوقهن وإسعادهن في ختام الفترة قبل الإجازة.'],
+  days: [
+    { date: '1448-06-05', title: 'الاحتفال باليوم العالمي للسكري', type: 'توعوي صحي', goal: 'توعية الطالبات بمرض السكري وطرق الوقاية منه، وتشجيعهن على الغذاء الصحي والحركة.', acts: 'كلمة توعوية في الطابور الصباحي، ومعلومات مبسطة عن الغذاء الصحي والسكريات، ومطويات وملصقات توعوية.', evid: 'صور الفعالية، والمطويات أو الملصقات المستخدمة.' },
+    { date: '1448-06-06', title: 'الاحتفال باليوم العالمي للتسامح', type: 'قيمي سلوكي', goal: 'غرس قيمة التسامح والعفو وحسن التعامل بين الطالبات.', acts: 'كلمة صباحية عن التسامح، وعرض مواقف ونماذج من السيرة النبوية، ونشاط صفي أو لوحة جماعية لعبارات التسامح.', evid: 'صور الفعالية، ونماذج من أعمال الطالبات.' },
+    { date: '1448-06-07', title: 'ورشة (صناعة أكواب الشتاء)', type: 'مهاري إبداعي', goal: 'تنمية المهارات اليدوية والإبداع لدى الطالبات، وإدخال البهجة مع قدوم فصل الشتاء.', acts: 'ورشة عملية تزيّن فيها الطالبات أكوابًا بطابع شتوي بأدوات بسيطة وآمنة.', evid: 'صور الورشة، ونماذج من الأكواب المنفذة.' },
+    { date: '1448-06-08', title: 'ورشة (الفنون التراثية المعاصرة)', type: 'ثقافي فني', goal: 'تعريف الطالبات بالموروث الشعبي وتعزيز الاعتزاز بالهوية الوطنية، مع تقديمه بأسلوب عصري.', acts: 'ورشة فنية تستلهم النقوش والزخارف التراثية في أعمال فنية حديثة.', evid: 'صور الورشة، ونماذج من الأعمال الفنية.' },
+    { date: '1448-06-09', title: 'الاحتفال باليوم العالمي للطفل', type: 'احتفالي ترفيهي', goal: 'تعريف الطالبات بحقوق الطفل، وإسعادهن في ختام الأسبوع قبل بداية الإجازة.', acts: 'فقرات احتفالية ومسابقات وأنشطة ترفيهية، ورسائل تعريفية بحقوق الطفل.', evid: 'صور الحفل، وأسماء الطالبات الفائزات في المسابقات.' }],
+  impact: ['انتظام حضور الطالبات في الأسبوع الأخير قبل الإجازة.', 'زيادة الوعي الصحي والقيمي لدى الطالبات.', 'إبراز مواهب الطالبات في المهارات اليدوية والفنية.', 'تعزيز انتماء الطالبات للمدرسة ورضاهن عن البيئة المدرسية.'] };
+function hpPages(p) {
+  const D = p.days || []; const f = D[0] ? D[0].date : '', l = D.length ? D[D.length - 1].date : '';
+  const sub = f ? `<p class="hpsub">من ${hpDay(f)} ${esc(hij(f))} إلى ${hpDay(l)} ${esc(hij(l))}<br>الموافق ${esc(hpG(f))} – ${esc(hpG(l))}</p>` : '';
+  const info = [['المدرسة', S.school], ['الفصل الدراسي', p.term], ['الجهة المنفذة', p.exec], ['إعداد', (p.prep || []).map(x => x[0] + ': ' + x[1]).join('<br>')], ['مدة التنفيذ', HP_DUR[D.length] || ar(D.length) + ' أيام'], ['الفئة المستهدفة', p.target]].filter(r => r[1]);
+  const sigs = () => { const g = SIGN(); const P = (p.prep || []).concat([[SIGS[1][0], SIGS[1][1]]]);
+    const im = s => /الموجهة/.test(s[0]) ? g.sigC : /مدير/.test(s[0]) ? g.sigP : '';
+    return `<div class="sigs${g.stamp ? ' has-stamp' : ''}" style="grid-template-columns:repeat(${P.length},1fr);gap:14px">${P.map(s => `<div>${esc(s[0])}${im(s) ? `<img class="sigimg" data-img="${esc(im(s))}" alt="">` : '<span></span>'}<i>${esc(s[1])}</i></div>`).join('')}${g.stamp ? `<img class="stampimg" data-img="${esc(g.stamp)}" alt="" style="left:${100 / P.length / 2}%">` : ''}</div>`; };
+  const p1 = `<div class="a4">${repHead(p.title || 'خطة')}${sub}
+    <h4 class="hph">البيانات العامة</h4><table class="hpinfo"><tbody>${info.map(r => `<tr><th>${r[0]}</th><td>${r[0] === 'إعداد' ? r[1] : esc(r[1])}</td></tr>`).join('')}</tbody></table>
+    ${(p.goals || []).length ? `<h4 class="hph">أهداف الخطة</h4>${dcOl(p.goals)}` : ''}
+    <h4 class="hph">الجدول الزمني</h4><table><thead><tr><th style="width:62px">اليوم</th><th style="width:150px">التاريخ الهجري</th><th style="width:140px">التاريخ الميلادي</th><th>الفعالية</th><th style="width:105px">نوع البرنامج</th></tr></thead><tbody>${D.map(d => `<tr><td>${hpDay(d.date)}</td><td>${esc(hij(d.date))}</td><td>${esc(hpG(d.date))}</td><td>${esc(d.title)}</td><td>${esc(d.type || '')}</td></tr>`).join('')}</tbody></table></div>`;
+  const p2 = `<div class="a4">${repHead('تفاصيل الفعاليات')}<p class="hpsub">${esc(p.title || '')}</p>
+    ${D.map((d, i) => `<table class="hpday"><thead><tr><th colspan="2">اليوم ${HP_ORD[i] || ar(i + 1)}: ${hpDay(d.date)} ${esc(hij(d.date))} — ${esc(d.title)}</th></tr></thead><tbody>${[['الهدف', d.goal], ['الأنشطة', d.acts], ['الشواهد', d.evid]].filter(r => r[1]).map(r => `<tr><th>${r[0]}</th><td>${esc(r[1])}</td></tr>`).join('')}</tbody></table>`).join('')}
+    ${(p.impact || []).length ? `<h4 class="hph">الأثر المتوقع</h4>${dcOl(p.impact)}` : ''}${sigs()}</div>`;
+  return p1 + p2;
+}
+function hpDayBlock(d, i) {
+  return `<div class="hpd" data-hpd><div class="row" style="gap:8px;align-items:center"><b class="hpn">اليوم ${HP_ORD[i] || ar(i + 1)}</b><span class="sp"></span><button type="button" class="btn sm ghost" data-hpddel aria-label="حذف اليوم">✕ حذف اليوم</button></div>
+    <div class="form"><div class="f"><span>التاريخ</span>${hdInput('hpd' + uid('x').replace(/\W/g, ''), d.date)}</div>
+    <label class="f full"><span>الفعالية</span><input data-k="title" value="${esc(d.title || '')}" placeholder="مثال: الاحتفال باليوم العالمي للطفل"></label>
+    <div class="f full"><span>نوع البرنامج</span><input data-k="type" value="${esc(d.type || '')}"><div class="presets">${HP_TYPES.map(t => `<button type="button" data-hptype="${esc(t)}">${esc(t)}</button>`).join('')}</div></div>
+    <label class="f full"><span>الهدف</span><textarea data-k="goal" style="min-height:48px">${esc(d.goal || '')}</textarea></label>
+    <label class="f full"><span>الأنشطة</span><textarea data-k="acts" style="min-height:48px">${esc(d.acts || '')}</textarea></label>
+    <label class="f full"><span>الشواهد</span><input data-k="evid" value="${esc(d.evid || '')}"></label></div></div>`;
+}
+function hpForm(id, copyOf) {
+  const src = hpFile().plans.find(x => x.id === (id && id !== 'new' ? id : copyOf));
+  const p = src ? JSON.parse(JSON.stringify(src)) : { title: '', term: 'الفصل الدراسي الأول', exec: 'التوجيه الطلابي والنشاط الطلابي', target: 'جميع طالبات المدرسة', prep: [['الموجهة الطلابية', SIGS[0][1]]], goals: [], days: [{ date: todayH() }], impact: [] };
+  const edit = id && id !== 'new'; if (copyOf) { p.title = ''; delete p.seed; }
+  const L = a => (a || []).join('\n');
+  const bg = openSheet(edit ? 'تعديل الخطة' : copyOf ? 'خطة جديدة (منسوخة)' : 'خطة جديدة', `<div class="form">
+    <label class="f full"><span>عنوان الخطة</span><input id="hp_t" value="${esc(p.title)}" placeholder="اختاري من تحت أو اكتبي"></label>
+    <div class="presets full">${HP_TITLES.map(t => `<button type="button" data-hptitle="${esc(t)}">${esc(t.replace('خطة أسبوع ', ''))}</button>`).join('')}</div>
+    <label class="f"><span>الفصل الدراسي</span><select id="hp_s">${['الفصل الدراسي الأول', 'الفصل الدراسي الثاني'].map(t => `<option${t === p.term ? ' selected' : ''}>${t}</option>`).join('')}</select></label>
+    <label class="f"><span>الفئة المستهدفة</span><input id="hp_g" value="${esc(p.target)}"></label>
+    <label class="f full"><span>الجهة المنفذة</span><input id="hp_e" value="${esc(p.exec)}"></label>
+    <label class="f full"><span>إعداد (الصفة: الاسم — كل وحدة في سطر، وتطلع تواقيعهن آخر الخطة مع مديرة المدرسة)</span><textarea id="hp_p" style="min-height:56px">${esc((p.prep || []).map(x => x[0] + ': ' + x[1]).join('\n'))}</textarea></label>
+    <label class="f full"><span>أهداف الخطة (كل هدف في سطر)</span><textarea id="hp_o" style="min-height:110px">${esc(L(p.goals))}</textarea></label></div>
+    <h3 style="margin:14px 0 6px">أيام الخطة <small class="muted" style="font-weight:500">(اليوم والتاريخ الميلادي والمدة تنحسب لحالها)</small></h3>
+    <div id="hp_days">${(p.days || []).map(hpDayBlock).join('')}</div>
+    <button type="button" class="btn sm" data-hpadd="1" style="margin:6px 0 12px">＋ إضافة يوم</button>
+    <div class="form"><label class="f full"><span>الأثر المتوقع (كل بند في سطر)</span><textarea id="hp_i" style="min-height:90px">${esc(L(p.impact))}</textarea></label></div>
+    <div class="toolbar"><button class="btn primary" type="submit">حفظ</button></div>`,
+    async f => { const lines = s0 => f.querySelector(s0).value.split('\n').map(x => x.replace(/^\s*[\d٠-٩]+\s*[-.)]\s*/, '').trim()).filter(Boolean);
+      const days = [...f.querySelectorAll('[data-hpd]')].map(b => { const v = k => b.querySelector(`[data-k="${k}"]`).value.trim(); return { date: readHD(b, b.querySelector('[data-hd]').id), title: v('title'), type: v('type'), goal: v('goal'), acts: v('acts'), evid: v('evid') }; }).filter(d => d.title);
+      const row = { ...(edit ? src : {}), id: edit ? src.id : uid('hp'), title: f.querySelector('#hp_t').value.trim(), term: f.querySelector('#hp_s').value, target: f.querySelector('#hp_g').value.trim(), exec: f.querySelector('#hp_e').value.trim(),
+        prep: lines('#hp_p').map(x => { const i = x.indexOf(':'); return i > 0 ? [x.slice(0, i).trim(), x.slice(i + 1).trim()] : ['', x]; }), goals: lines('#hp_o'), impact: lines('#hp_i'), days: days.sort((a, b) => a.date.localeCompare(b.date)) };
+      if (!row.title) throw new Error('اكتبي عنوان الخطة'); if (!days.length) throw new Error('أضيفي يوم واحد على الأقل وفيه اسم الفعالية');
+      await hpSave(d => { const i = d.plans.findIndex(x => x.id === row.id); if (i >= 0) d.plans[i] = row; else d.plans.push(row); }); toast('انحفظت الخطة'); }, `--c:#C9532A;--cs:#FBEDE6`);
+  const renum = () => bg.querySelectorAll('[data-hpd] .hpn').forEach((n, i) => { n.textContent = 'اليوم ' + (HP_ORD[i] || ar(i + 1)); });
+  bg.addEventListener('click', e => { const t = e.target;
+    if (t.dataset.hptitle) { e.preventDefault(); bg.querySelector('#hp_t').value = t.dataset.hptitle; return; }
+    if (t.dataset.hptype) { e.preventDefault(); t.closest('.f').querySelector('[data-k="type"]').value = t.dataset.hptype; return; }
+    if (t.closest('[data-hpddel]')) { e.preventDefault(); t.closest('[data-hpd]').remove(); renum(); return; }
+    if (t.dataset.hpadd) { e.preventDefault(); const B = [...bg.querySelectorAll('[data-hpd]')]; const last = B.length ? readHD(B[B.length - 1], B[B.length - 1].querySelector('[data-hd]').id) : null;
+      const w = document.createElement('div'); w.innerHTML = hpDayBlock({ date: last ? hpNext(last) : todayH() }, B.length); bg.querySelector('#hp_days').append(w.firstElementChild); } });
+}
+function hpPanel() { const P = hpPlans(); const seeded = hpFile().plans.some(x => x.seed === 'autumn48');
+  return `<section class="panel" style="--c:#C9532A"><div class="head"><h3>خطط الأسابيع والمناسبات</h3><span class="tiny muted">${ar(P.length)}</span><span class="sp"></span>${seeded ? '' : '<button class="btn sm" data-hpseed="1">＋ خطة ما قبل إجازة الخريف (جاهزة)</button>'}<button class="btn sm primary" data-hpedit="new" style="background:#C9532A;border-color:#C9532A">＋ خطة جديدة</button></div>
+    ${P.length ? `<div class="fx-rows act">${P.map(p => `<div><small>${p.days && p.days[0] ? esc(hij(p.days[0].date)) : ''}</small><b>${esc(p.title)}</b><span>${ar((p.days || []).length)} أيام · ${esc(p.term || '')}</span><span class="pacts" style="position:static;display:inline-flex;gap:4px;flex-wrap:wrap"><button class="btn sm" data-hprep="${esc(p.id)}">التقرير</button><button class="btn sm ghost" data-hpedit="${esc(p.id)}">تعديل</button><button class="btn sm ghost" data-hpcopy="${esc(p.id)}">نسخ لخطة جديدة</button><button class="btn sm ghost" data-hpdel="${esc(p.id)}" aria-label="حذف">✕</button></span></div>`).join('')}</div>` : '<p class="small muted">ما فيه خطط بعد. أضيفي خطة، وكل ما جت إجازة ثانية اضغطي «نسخ لخطة جديدة» وعدلي الأيام بس.</p>'}</section>`;
+}
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-hpedit],[data-hpcopy],[data-hpdel],[data-hprep],[data-hpseed]'); if (!b || b.closest('#sheetbg')) return; e.preventDefault(); const d0 = b.dataset;
+  if (d0.hpedit) return hpForm(d0.hpedit); if (d0.hpcopy) return hpForm('new', d0.hpcopy);
+  if (d0.hprep) { const p = hpFile().plans.find(x => x.id === d0.hprep); if (p) openReport(hpPages(p), (p.title || 'خطة').replace(/\s+/g, '-'), '#C9532A'); return; }
+  if (d0.hpseed) { if (hpFile().plans.some(x => x.seed === 'autumn48')) return; await hpSave(d => { d.plans.push({ id: uid('hp'), ...JSON.parse(JSON.stringify(HP_SEED)) }); }); toast('انضافت خطة ما قبل إجازة الخريف'); return rerender(); }
+  if (d0.hpdel) { const p = hpFile().plans.find(x => x.id === d0.hpdel); if (!p || !confirm('أحذف «' + p.title + '»؟')) return; await hpSave(d => { d.plans = d.plans.filter(x => x.id !== d0.hpdel); }); toast('انحذفت الخطة'); return rerender(); }
+});
 /* مولّد QR صغير (بايت، تصحيح أخطاء M) — مبني على خوارزمية qrcodegen المفتوحة (Nayuki, MIT) */
 const QRMini = (() => {
   const ECC_M = 0; // index into tables for level M
@@ -3550,6 +3643,7 @@ function fxParts(sec) {
     P.push({ t: 'لجنة الانضباط المدرسي', div: 1 });
     P.push({ t: 'قرار تشكيل لجنة الانضباط المدرسي', h: () => discComPages().p1 }); P.push({ t: 'أهداف اللجنة ومهامها', h: () => discComPages().p2 });
     P.push({ t: 'اجتماعات اللجنة والمواضيع المقترحة', h: () => discComPages().p3 }); P.push({ t: 'الخطة الإجرائية لمتابعة الانضباط المدرسي', h: () => discComPages().p4 });
+    const HPs = hpPlans(); if (HPs.length) { P.push({ t: 'خطط الأسابيع والمناسبات', div: 1 }); HPs.forEach(p => P.push({ t: p.title, sub: 1, h: () => hpPages(p) })); }
     P.push({ t: 'الإحصائيات والغياب', div: 1 });
     P.push({ t: 'إحصائية الانضباط المدرسي', h: () => discStats() });
     binderParts('absence').forEach(x => P.push(x));
@@ -3583,7 +3677,7 @@ function vFile(k) {
     ${needM && !S.mloading && !(S.mcases || []).length ? '<p class="small muted">ما لقيت حالات في مسار. إذا عندك حالات، افتحي مسار مرة وارجعي هنا.</p>' : ''}
     ${k === 'ind' || k === 'grp' ? xsPanel(k) : ''}
     ${k === 'council' ? councilPanel() : ''}
-    ${k === 'disc' ? `<section class="panel" style="--c:${v.c}"><div class="head"><h3>لجنة الانضباط المدرسي</h3><span class="sp"></span><button class="btn sm" data-dcedit="1">تعديل بيانات اللجنة</button></div><p class="small muted">قرار التشكيل، والأهداف والمهام، والاجتماعات، والخطة الإجرائية: تطلع في أول السجل. اضغطي على أي وحدة تحت لعرضها وطباعتها.</p>${dcSigPanel()}</section>` : ''}
+    ${k === 'disc' ? `<section class="panel" style="--c:${v.c}"><div class="head"><h3>لجنة الانضباط المدرسي</h3><span class="sp"></span><button class="btn sm" data-dcedit="1">تعديل بيانات اللجنة</button></div><p class="small muted">قرار التشكيل، والأهداف والمهام، والاجتماعات، والخطة الإجرائية: تطلع في أول السجل. اضغطي على أي وحدة تحت لعرضها وطباعتها.</p>${dcSigPanel()}</section>${hpPanel()}` : ''}
     ${fxPreview(k)}
     <section class="panel" style="--c:${v.c}"><div class="head"><h3>محتوى السجل</h3><span class="tiny muted">${ar(parts.length)} جزء</span></div>
       <div class="fx-parts">${parts.map((p, i) => `<div class="${p.sub ? 'sub' : ''}"><span>${esc(p.t)}</span><button class="btn sm" data-fxpart="${k}:${i}">عرض وطباعة</button></div>`).join('')}</div></section>

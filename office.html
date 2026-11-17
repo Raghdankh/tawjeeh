@@ -682,8 +682,8 @@ const FAMILY = [
     { k: 'title', t: 'عنوان المجلس', req: 1, full: 1 }, { k: 'date', t: 'التاريخ', type: 'date', meta: 1 },
     { k: 'target', t: 'الفئة المستهدفة', type: 'select', opts: ['أمهات الطالبات', 'أولياء الأمور', 'أمهات صف محدد', 'أولياء أمور صف محدد'], meta: 1 },
     { k: 'attendees', t: 'عدد الحاضرات', type: 'number', meta: 1, suffix: 'حاضرة' }, { k: 'place', t: 'المكان', ph: 'مثال: مصادر التعلم' },
-    { k: 'goals', t: 'أهداف المجلس', type: 'textarea', box: 1 }, { k: 'summary', t: 'ما تم في المجلس', type: 'textarea', box: 1, sum: 1 },
-    { k: 'recs', t: 'التوصيات', type: 'textarea', box: 1 }, { k: 'photos', t: 'الشواهد', type: 'photos' }] },
+    { k: 'goals', t: 'أهداف المجلس', type: 'textarea', box: 1 }, { k: 'summary', t: 'أبرز المواضيع التي تمت مناقشتها', type: 'textarea', box: 1, sum: 1 },
+    { k: 'recs', t: 'أهم التوصيات والمقترحات', type: 'textarea', box: 1 }, { k: 'photos', t: 'الشواهد', type: 'photos' }, { k: 'evLink', t: 'رابط بقية الشواهد (Drive) — يطلع كود QR في التقرير', ph: 'https://drive.google.com/...', full: 1, hide: 1 }] },
   { k: 'contact', t: 'التواصل مع أولياء الأمور', add: 'تسجيل تواصل', title: 'studentName', report: 'سجل تواصل', log: 1, fields: [
     { k: 'student', t: 'الطالبة', type: 'student', req: 1 }, { k: 'guardian', t: 'ولي الأمر', ph: 'مثال: الأم' },
     { k: 'type', t: 'نوع التواصل', type: 'select', opts: ['اتصال هاتفي', 'رسالة', 'لقاء حضوري', 'استدعاء ولي أمر', 'زيارة'], meta: 1 },
@@ -1132,9 +1132,9 @@ async function saveBlob(blob, name) {
   const u = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = u; a.download = name; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 5000);
 }
 function famReport(cfg, r) {
-  const meta = cfg.fields.filter(f => !f.box && f.type !== 'photos' && f.type !== 'student' && r[f.k] !== '' && r[f.k] != null && f.k !== cfg.title);
+  const meta = cfg.fields.filter(f => !f.box && !f.hide && f.type !== 'photos' && f.type !== 'student' && r[f.k] !== '' && r[f.k] != null && f.k !== cfg.title);
   const kv = (r.studentName ? `<span><b>الطالبة:</b> ${esc(r.studentName)}${r.grade ? ' — ' + esc(r.grade) + ' ' + esc(r.section || '') : ''}</span>` : '') + meta.map(f => `<span><b>${f.t}:</b> ${esc(f.type === 'date' ? hij(r[f.k]) : r[f.k])}</span>`).join('');
-  const boxes = cfg.fields.filter(f => f.box && r[f.k]).map((f, i, a) => `<div class="box${a.length % 2 && i === a.length - 1 ? ' full' : ''}"><h4>${f.t}</h4><p>${esc(r[f.k])}</p></div>`).join('');
+  const boxes = cfg.fields.filter(f => f.box && r[f.k]).map((f, i, a) => `<div class="box${cfg.k === 'council' || (a.length % 2 && i === a.length - 1) ? ' full' : ''}"><h4>${f.t}</h4>${cfg.k === 'council' ? pList(r[f.k], 'ol') : `<p>${esc(r[f.k])}</p>`}</div>`).join('');
   const photos = evidHTML(r.photos || [], r.evLink);
   return `<div class="a4">${repHead(cfg.report + (r[cfg.title] && cfg.title !== 'studentName' ? ': ' + r[cfg.title] : ''), r.date)}
     ${r[cfg.title] && cfg.title !== 'studentName' ? `<div class="rt">${esc(r[cfg.title])}</div>` : ''}<div class="kv">${kv}</div><div class="boxes">${boxes}</div>${photos}${repSigs()}</div>`;
@@ -1222,7 +1222,7 @@ function vFamily() {
     <div class="subtabs" role="tablist">${FAMILY.map(f => `<button role="tab" data-fam="${f.k}" aria-selected="${f.k === k}">${f.t}<span class="n">${ar(list(f.k).length)}</span></button>`).join('')}</div>
     ${k === 'survey' ? eSurveys() : ''}
     <div class="toolbar"><label class="search"><span aria-hidden="true">⌕</span><input id="famQ" type="search" placeholder="بحث في ${esc(cfg.t)}" value="${esc(S.filter.fam || '')}" aria-label="بحث"></label>
-      <button class="btn" data-act="famWA">📲 دعوة أولياء الأمور</button><button class="btn" data-act="famLog">طباعة السجل</button><button class="btn primary" data-act="famAdd">＋ ${cfg.add}</button></div>
+      <button class="btn" data-act="famWA">📲 دعوة أولياء الأمور</button><button class="btn" data-act="famLog">طباعة السجل</button>${k === 'council' && !list('council').some(c => c.seed === 'm1') ? '<button class="btn" data-act="famSeedM1">＋ مجلس الأمهات الأول (جاهز)</button>' : ''}<button class="btn primary" data-act="famAdd">＋ ${cfg.add}</button></div>
     ${k === 'contact' ? contactLog(shown) : shown.length ? `<div class="list">${shown.map(r => famCard(cfg, r)).join('')}</div>` : `<div class="empty"><b>لا توجد سجلات بعد</b><button class="btn primary" data-act="famAdd">＋ ${cfg.add}</button></div>`}${stuDatalist()}`;
 }
 function contactLog(rows) {
@@ -4068,7 +4068,7 @@ async function drawCertCanvas(o) {
   sig(W - 560, SIGS[1][0], SIGS[1][1]); sig(560, SIGS[0][0], SIGS[0][1]);
   { const g = SIGN(); const put = (im, cx, cy, mh, mw, rot, a) => { if (!im) return; const r = Math.min(mh / im.height, mw / im.width); const w = im.width * r, h = im.height * r; x.save(); x.globalAlpha = a || 1; x.translate(cx, cy); x.rotate(rot || 0); x.drawImage(im, -w / 2, -h / 2, w, h); x.restore(); };
     const [iC, iP, iS] = await Promise.all([g.sigC && loadImgEl(g.sigC), g.sigP && loadImgEl(g.sigP), g.stamp && loadImgEl(g.stamp)]);
-    put(iP, W - 560, 1238, 90, 330); put(iC, 560, 1238, 90, 330); put(iS, W / 2, hideSeal ? 1200 : 1262, 225, 345, 0, .9); }
+    put(iP, W - 560, 1238, 90, 330); put(iC, 560, 1238, 90, 330); if (iS) { /* عرض الختم ٥٫٣ سم بالضبط في ورقة A4 بالعرض (٢٩٫٧ سم = ٢٠٠٠ نقطة) */ const sw = Math.round(5.3 / 29.7 * W), sh = sw * iS.height / iS.width; const cy = Math.min(hideSeal ? 1200 : 1262, H - 40 - sh / 2); put(iS, W / 2, cy, sh, sw, 0, .9); } }
   if (CB) x.restore();
   return c;
 }
@@ -4548,6 +4548,9 @@ document.addEventListener('click', async e => {
       else if (f.querySelector('#m_s').checked) { const v = k => f.querySelector('#' + k).value.trim(); const topic = v('ab_tp'); if (!topic) throw new Error('اكتبي موضوع الجلسة');
         const dd = JSON.parse(JSON.stringify(DB.docs[absId].data)); const ms0 = f.querySelector('#m_s').dataset.ms || ''; dd.log = (dd.log || []).concat({ date, type: 'session', ms: ms0, text: 'جلسة فردية' + (ms0 ? ' (' + MS_T[ms0] + ')' : '') + ': ' + topic, topic, goal: v('ab_g'), note: v('ab_n'), agree: v('ab_r'), prog: '' }); await saveDoc(absId, 'absence', dd); toast('حُفظت الجلسة هنا وفي سجل جلسات التوجيه الفردي'); }
       else { const text = f.querySelector('#l_t').value.trim(); if (!text) throw new Error('اكتبي الإجراء'); const dd = JSON.parse(JSON.stringify(DB.docs[absId].data)); dd.log = (dd.log || []).concat({ date, text }); await saveDoc(absId, 'absence', dd); } }, `--c:var(--abs);--cs:var(--abs-soft)`); }
+  else if (act === 'famSeedM1') { try { await saveDoc(uid('council'), 'council', { seed: 'm1', title: 'التهيئة والاستعداد للعام الدراسي الجديد', date: '1448-03-25', target: 'أمهات الطالبات', attendees: 33, place: '', goals: '',
+      summary: 'الالتزام بالزي المدرسي.\nقواعد السلوك والمواظبة ودور الأسرة في تطبيقها.\nخصائص النمو للمرحلة العمرية من ٦-١٢ سنة.\nأهمية مشاركة الأسرة وتفاعلها في الأنشطة المدرسية.\nالانضباط المدرسي والحد من الغياب والتأخر.\nدور الأسرة في تعزيز السلوك الإيجابي.\nالمحافظة على الكتب المدرسية.',
+      recs: 'متابعة الالتزام بالزي المدرسي والحضور المنتظم.\nتعزيز السلوك الإيجابي ومراعاة خصائص النمو.\nتشجيع المشاركة والمحافظة على الكتب المدرسية.\nاستمرار التواصل مع الأسرة ومشاركة ملخص اللقاء.', photos: [], evLink: '' }); toast('أُضيف مجلس الأمهات الأول'); } catch (er) { toast(errT(er)); } rerender(); }
   else if (act === 'honDedup') honDedup();
   else if (act === 'certDl' || act === 'certSave') {
     const o = readCert(CF()); if (!o.name) { toast('اكتبي الاسم أولاً'); return; }

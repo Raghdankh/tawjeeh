@@ -553,6 +553,7 @@ button,label,.btn,.clpick,.clpick *,.presets,.presets *,.chip,.chips,.subtabs,na
 .a4.qrboard.big .qrgrid{gap:22px}.a4.qrboard.big .qrimg svg{width:230px;height:230px}.a4.qrboard.big .qrcard b{font-size:19px}.a4.qrboard.big .qrcard span{font-size:13px}
 .evlink{display:grid;gap:6px;margin:8px 0 10px;padding:10px;border:1px dashed var(--line);border-radius:12px}.evlink label{display:grid;gap:4px}.evlink input{width:100%;font-size:.85rem}.evmini svg{width:84px;height:84px;background:#fff;border-radius:6px}
 .evhead{display:flex;align-items:center;justify-content:space-between;gap:10px}.evhead h4{margin:0}.evid .evhead{margin-bottom:6px}
+.qro{text-align:center;break-inside:avoid}.qro h4{text-align:start;margin:0 0 6px}.qro .qbig{display:inline-block;padding:6px;border:1px solid #d3e0de;border-radius:10px}.qro .qbig svg{width:120px;height:120px;display:block}
 .evqr{display:inline-flex;align-items:center;gap:6px;padding:2px 3px 2px 8px;border:1px solid #d3e0de;border-radius:8px;break-inside:avoid;line-height:1.2}.evqr .q svg{width:66px;height:66px;display:block}.evqr .t{display:grid;gap:1px;text-align:end}.evqr .t b{font-size:11px;color:#0E7F7B}.evqr .t span{font-size:9.5px;color:#6b7a78}
 .evsolo{display:flex;justify-content:flex-end;margin-top:6px}
 .cthemes{display:flex;flex-wrap:wrap;gap:8px}.cthemes button{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px 6px 8px;font:inherit;font-size:.88rem;cursor:pointer}.cthemes button i{width:22px;height:22px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}.cthemes button[aria-pressed=true]{border-color:#1F5E58;background:#e8f2f0;font-weight:700}
@@ -683,7 +684,7 @@ const FAMILY = [
     { k: 'target', t: 'الفئة المستهدفة', type: 'select', opts: ['أمهات الطالبات', 'أولياء الأمور', 'أمهات صف محدد', 'أولياء أمور صف محدد'], meta: 1 },
     { k: 'attendees', t: 'عدد الحاضرات', type: 'number', meta: 1, suffix: 'حاضرة' }, { k: 'place', t: 'المكان', ph: 'مثال: مصادر التعلم' },
     { k: 'goals', t: 'أهداف المجلس', type: 'textarea', box: 1 }, { k: 'summary', t: 'أبرز المواضيع التي تمت مناقشتها', type: 'textarea', box: 1, sum: 1 },
-    { k: 'recs', t: 'أهم التوصيات والمقترحات', type: 'textarea', box: 1 }, { k: 'photos', t: 'الشواهد', type: 'photos' }, { k: 'evLink', t: 'رابط بقية الشواهد (Drive) — يطلع كود QR في التقرير', ph: 'https://drive.google.com/...', full: 1, hide: 1 }] },
+    { k: 'recs', t: 'أهم التوصيات والمقترحات', type: 'textarea', box: 1 }, { k: 'evLink', t: 'رابط الشواهد (Drive) — يطلع كود QR فقط في التقرير', ph: 'https://drive.google.com/...', full: 1, hide: 1 }] },
   { k: 'contact', t: 'التواصل مع أولياء الأمور', add: 'تسجيل تواصل', title: 'studentName', report: 'سجل تواصل', log: 1, fields: [
     { k: 'student', t: 'الطالبة', type: 'student', req: 1 }, { k: 'guardian', t: 'ولي الأمر', ph: 'مثال: الأم' },
     { k: 'type', t: 'نوع التواصل', type: 'select', opts: ['اتصال هاتفي', 'رسالة', 'لقاء حضوري', 'استدعاء ولي أمر', 'زيارة'], meta: 1 },
@@ -1048,6 +1049,8 @@ const evOk = u => /^https?:\/\/\S+$/.test(String(u || '').trim());
 function evQR(link) { if (!evOk(link)) return ''; let q = ''; try { q = QRMini.svg(String(link).trim(), { color: '#16302d' }); } catch (e) { return ''; }
   return `<div class="evqr"><div class="t"><b>بقية الشواهد</b><span>امسحي الكود</span></div><div class="q">${q}</div></div>`; }
 function evLinkBox(key, val) { return `<div class="evlink"><label class="small"><b>رابط بقية الشواهد (Drive)</b><input data-evlink="${esc(key)}" value="${esc(val || '')}" placeholder="https://drive.google.com/..." dir="ltr" inputmode="url"></label>${evOk(val) ? `<div class="evmini">${QRMini.svg(String(val).trim(), { color: '#16302d' })}</div>` : ''}<span class="tiny muted">يطلع كود QR تحت الصور في التقرير، ويفتح مجلد بقية الشواهد.</span></div>`; }
+function qrOnly(link) { if (!evOk(link)) return ''; let q = ''; try { q = QRMini.svg(String(link).trim(), { color: '#16302d' }); } catch (e) { return ''; }
+  return `<div class="evid qro"><h4>الشواهد</h4><div class="qbig">${q}</div></div>`; }
 function evidHTML(photos, link) {
   const ph = (photos || []).slice(0, 6); const qr = evQR(link); if (!ph.length && !qr) return '';
   return `<div class="evid"><div class="evhead"><h4>الشواهد</h4>${qr}</div>${ph.length ? `<div class="eg e${ph.length}" style="--n:${ph.length}">${ph.map(x => `<figure><img data-img="${esc(x)}" alt=""></figure>`).join('')}</div>` : ''}</div>`;
@@ -1135,7 +1138,7 @@ function famReport(cfg, r) {
   const meta = cfg.fields.filter(f => !f.box && !f.hide && f.type !== 'photos' && f.type !== 'student' && r[f.k] !== '' && r[f.k] != null && f.k !== cfg.title);
   const kv = (r.studentName ? `<span><b>الطالبة:</b> ${esc(r.studentName)}${r.grade ? ' — ' + esc(r.grade) + ' ' + esc(r.section || '') : ''}</span>` : '') + meta.map(f => `<span><b>${f.t}:</b> ${esc(f.type === 'date' ? hij(r[f.k]) : r[f.k])}</span>`).join('');
   const boxes = cfg.fields.filter(f => f.box && r[f.k]).map((f, i, a) => `<div class="box${cfg.k === 'council' || (a.length % 2 && i === a.length - 1) ? ' full' : ''}"><h4>${f.t}</h4>${cfg.k === 'council' ? pList(r[f.k], 'ol') : `<p>${esc(r[f.k])}</p>`}</div>`).join('');
-  const photos = evidHTML(r.photos || [], r.evLink);
+  const photos = cfg.k === 'council' ? qrOnly(r.evLink) : evidHTML(r.photos || [], r.evLink);
   return `<div class="a4">${repHead(cfg.report + (r[cfg.title] && cfg.title !== 'studentName' ? ': ' + r[cfg.title] : ''), r.date)}
     ${r[cfg.title] && cfg.title !== 'studentName' ? `<div class="rt">${esc(r[cfg.title])}</div>` : ''}<div class="kv">${kv}</div><div class="boxes">${boxes}</div>${photos}${repSigs()}</div>`;
 }

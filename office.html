@@ -2004,6 +2004,16 @@ function progGroups(id) { return list('group').filter(g => g.progId === id).sort
 /* ═════════ absence: individual treatment plan ═════════ */
 const AP_CAUSES = ['ظرف صحي', 'السفر', 'ظرف أسري', 'صعوبات دراسية', 'مشكلات مع الزميلات', 'رفض المدرسة أو عدم الرغبة', 'السهر واضطراب النوم', 'بُعد المسكن أو المواصلات', 'تهاون الأسرة في المتابعة'];
 const AP_STEPS = ['مقابلة الطالبة لدراسة أسباب الغياب', 'التواصل مع ولي الأمر وإطلاعه على الإجراءات المترتبة', 'أخذ التعهد على الطالبة وولي الأمر', 'خطة تعويضية لما فات من دروس بالتعاون مع المعلمات', 'تكليف الطالبة بمهمة تحبّبها في المدرسة', 'لوحة متابعة الحضور ومكافأة عند الانتظام', 'متابعة يومية لحضور الطالبة لمدة أسبوعين', 'إشراك الطالبة في نشاط أو نادٍ تحبه', 'إحالة الطالبة للجنة التوجيه الطلابي', 'التنسيق مع المرشدة الصحية إذا كان السبب صحياً'];
+/* المسؤولة عن كل إجراء علاجي (الموجهة الطلابية لما يكون الإجراء من عملها) */
+function apWho(t) { t = String(t || '');
+  if (/تعهد/.test(t)) return 'مديرة المدرسة';
+  if (/تعويض|المعلمات|معلمة المادة/.test(t)) return 'المعلمات';
+  if (/نشاط|نادٍ|نادي/.test(t)) return 'رائدة النشاط';
+  if (/المرشدة الصحية|صحي/.test(t)) return 'المرشدة الصحية';
+  if (/لوحة متابعة الحضور|متابعة يومية|تكليف الطالبة بمهمة/.test(t)) return 'معلمة الفصل';
+  if (/نظام نور|رصد الغياب/.test(t)) return 'منسقة نظام نور';
+  return 'الموجهة الطلابية'; }
+const apStepWho = s => !s.who || s.who === 'الموجهة الطلابية' ? apWho(s.t) : s.who;
 const AP_GOALS = 'انتظام الطالبة في الحضور اليومي\nتعويض ما فاتها من دروس\nمعالجة أسباب الغياب بالتعاون مع الأسرة';
 /* ═════════ خطة التعلم في أيام الغياب ═════════ */
 const LP_SUBS = ['لغتي', 'الرياضيات', 'العلوم', 'القرآن الكريم والدراسات الإسلامية', 'اللغة الإنجليزية', 'الدراسات الاجتماعية', 'المهارات الرقمية', 'التربية الفنية', 'المهارات الحياتية والأسرية', 'التربية البدنية'];
@@ -2063,7 +2073,7 @@ function apSuggest(id, a) {
   if (u && K.has('health')) G.push(AP_GOAL_OPTS[4]); if (K.has('sleep')) G.push(AP_GOAL_OPTS[5]); if (K.has('refuse') || K.has('peers')) G.push(AP_GOAL_OPTS[6]);
   const S2 = [AP_STEPS[0], AP_STEPS[1]]; if (u >= 3) S2.push(AP_STEPS[2]); if (x >= 3 || u >= 3) S2.push(AP_STEPS[3]); if (K.has('refuse') || K.has('peers')) S2.push(AP_STEPS[4], AP_STEPS[7]);
   S2.push(AP_STEPS[5]); if (u >= 3) S2.push(AP_STEPS[6]); if (u >= 5) S2.push(AP_STEPS[8]); if (K.has('health')) S2.push(AP_STEPS[9]);
-  return { causes, causeNote: '', goals: [...new Set(G)].join('\n'), who: 'الموجهة الطلابية', follow: AP_FOLLOW[0], steps: [...new Set(S2)].map(t => ({ t, date: '', who: 'الموجهة الطلابية', done: false })) };
+  return { causes, causeNote: '', goals: [...new Set(G)].join('\n'), who: 'الموجهة الطلابية', follow: AP_FOLLOW[0], steps: [...new Set(S2)].map(t => ({ t, date: '', who: apWho(t), done: false })) };
 }
 const apCur = (id, a) => a.plan ? JSON.parse(JSON.stringify(a.plan)) : apSuggest(id, a);
 function absPlanHTML(a) {
@@ -2137,17 +2147,17 @@ function apForm() {
       const old = {}; (p.steps || []).forEach(s => { old[s.t] = s; });
       const d = JSON.parse(JSON.stringify(DB.docs[id].data));
       d.plan = { causes: [...f.querySelectorAll('[data-apc]:checked')].map(x => x.value), causeNote: f.querySelector('#ap_cn').value.trim(), goals: f.querySelector('#ap_g').value.trim(), start, who, follow: f.querySelector('#ap_f').value.trim(),
-        steps: chosen.map(t => old[t] || { t, date: start, who, done: false }) };
+        steps: chosen.map(t => old[t] || { t, date: start, who: apWho(t), done: false }) };
       await saveDoc(id, 'absence', d); toast('حُفظت الخطة');
     }, `--c:var(--abs);--cs:var(--abs-soft)`);
 }
 function apReport(a) {
   const p = a.plan || {}; const st = p.steps || [];
   return `<div class="a4 prep-a4">${repHead('خطة علاجية لطالبة متكررة الغياب')}<div class="pband" style="border-color:#C9532A;background:#FCE9E1"><small style="color:#C9532A">${esc((a.grade || '') + ' ' + (a.section || ''))}</small><b>${esc(a.studentName)}</b></div>
-    <table class="pinfo-t"><tbody><tr><th>الغياب بدون عذر</th><td>${ar(unex(a))} ${unex(a) > 2 && unex(a) < 11 ? 'أيام' : 'يوم'}</td><th>الغياب بعذر</th><td>${ar(exc(a))} ${exc(a) > 2 && exc(a) < 11 ? 'أيام' : 'يوم'}</td></tr><tr><th>المسؤولة</th><td colspan="3">${esc(p.who || '')}</td></tr></tbody></table>
+    <table class="pinfo-t"><tbody><tr><th>الغياب بدون عذر</th><td>${ar(unex(a))} ${unex(a) > 2 && unex(a) < 11 ? 'أيام' : 'يوم'}</td><th>الغياب بعذر</th><td>${ar(exc(a))} ${exc(a) > 2 && exc(a) < 11 ? 'أيام' : 'يوم'}</td></tr></tbody></table>
     <div class="boxes"><div class="box full"><h4>أسباب الغياب</h4><p>${esc((p.causes || []).join('، ') || '—')}${p.causeNote ? '\n' + esc(p.causeNote) : ''}</p></div>
     <div class="box full"><h4>الأهداف</h4>${pList(p.goals)}</div>
-    <div class="box full"><h4>الإجراءات العلاجية</h4><table><thead><tr><th style="width:28px">م</th><th>الإجراء</th><th style="width:120px">المسؤولة</th></tr></thead><tbody>${st.map((s, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(s.t)}</td><td>${esc(s.who || '')}</td></tr>`).join('') || '<tr><td colspan="5">—</td></tr>'}</tbody></table></div>
+    <div class="box full"><h4>الإجراءات العلاجية</h4><table><thead><tr><th style="width:28px">م</th><th>الإجراء</th></tr></thead><tbody>${st.map((s, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(s.t)}</td></tr>`).join('') || '<tr><td colspan="2">—</td></tr>'}</tbody></table></div>
     ${p.follow ? `<div class="box full"><h4>المتابعة والتقييم</h4><p>${esc(p.follow)}</p></div>` : ''}</div>${repSigs()}</div>`;
 }
 
@@ -2913,7 +2923,7 @@ function binderParts(sec) {
     if (ms.length) { P.push({ t: 'التقارير الشهرية', div: 1 }); ms.forEach(m => { P.push({ t: 'التقرير الشهري — ' + amLabel(m), sub: 1, h: () => amReport(m.id) }); if ((m.list || []).length) P.push({ t: 'كشف الغائبات — ' + amLabel(m), sub: 1, h: () => amListReport(m) }); }); }
     const files = list('absence').sort((a, b) => unex(b) - unex(a) || String(a.studentName).localeCompare(String(b.studentName), 'ar'));
     P.push({ t: 'ملفات الطالبات متكررات الغياب', div: 1 });
-    P.push({ t: 'قائمة الملفات', h: () => `<div class="a4">${repHead('ملفات الطالبات متكررات الغياب')}<table><thead><tr><th>م</th><th>الطالبة</th><th>الصف</th><th>بدون عذر</th><th>بعذر</th><th>خطة علاجية</th></tr></thead><tbody>${files.map((a, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(a.studentName)}</td><td>${esc((a.grade || '') + ' ' + (a.section || ''))}</td><td>${ar(unex(a))}</td><td>${ar(exc(a))}</td><td>${a.plan ? '✔' : ''}</td></tr>`).join('') || '<tr><td colspan="6">لا توجد ملفات</td></tr>'}</tbody></table>${repSigs()}</div>` });
+    P.push({ t: 'قائمة الملفات', h: () => `<div class="a4">${repHead('ملفات الطالبات متكررات الغياب')}<table><thead><tr><th>م</th><th>الطالبة</th><th>الصف</th><th>بدون عذر</th><th>بعذر</th></tr></thead><tbody>${files.map((a, i) => `<tr><td>${ar(i + 1)}</td><td>${esc(a.studentName)}</td><td>${esc((a.grade || '') + ' ' + (a.section || ''))}</td><td>${ar(unex(a))}</td><td>${ar(exc(a))}</td></tr>`).join('') || '<tr><td colspan="5">لا توجد ملفات</td></tr>'}</tbody></table>${repSigs()}</div>` });
     files.forEach(a => P.push({ t: a.studentName, sub: 1, h: () => { const keep = S.param; S.param = a.id; const h = absReport() + (a.plan ? apReport(DB.docs[a.id].data) : ''); S.param = keep; return h; } }));
   } else if (sec === 'daily') {
     const rows = list('daily').sort((a, b) => String(a.date).localeCompare(String(b.date)) || String(a.time || '').localeCompare(String(b.time || '')));
@@ -4527,8 +4537,8 @@ document.addEventListener('click', async e => {
   if (d.apt) { const v = d.v, k = d.apt; apMut(p => {
       if (k === 'c') { p.causes = p.causes || []; p.causes = p.causes.includes(v) ? p.causes.filter(x => x !== v) : p.causes.concat(v); }
       else if (k === 'g') { const G = lines(p.goals); p.goals = (G.includes(v) ? G.filter(x => x !== v) : G.concat(v)).join('\n'); }
-      else { p.steps = p.steps || []; const i = p.steps.findIndex(s => s.t === v); if (i >= 0) p.steps.splice(i, 1); else p.steps.push({ t: v, date: '', who: p.who || 'الموجهة الطلابية', done: false }); } }); return; }
-  if (d.apadd) { const inp = document.querySelector(`[data-apin="${d.apadd}"]`); const v = inp && inp.value.trim(); if (!v) return; apMut(p => { if (d.apadd === 'g') p.goals = lines(p.goals).concat(v).join('\n'); else { p.steps = p.steps || []; if (!p.steps.some(s => s.t === v)) p.steps.push({ t: v, date: '', who: p.who || 'الموجهة الطلابية', done: false }); } }); return; }
+      else { p.steps = p.steps || []; const i = p.steps.findIndex(s => s.t === v); if (i >= 0) p.steps.splice(i, 1); else p.steps.push({ t: v, date: '', who: apWho(v), done: false }); } }); return; }
+  if (d.apadd) { const inp = document.querySelector(`[data-apin="${d.apadd}"]`); const v = inp && inp.value.trim(); if (!v) return; apMut(p => { if (d.apadd === 'g') p.goals = lines(p.goals).concat(v).join('\n'); else { p.steps = p.steps || []; if (!p.steps.some(s => s.t === v)) p.steps.push({ t: v, date: '', who: apWho(v), done: false }); } }); return; }
   if (d.apfol) { apMut(p => { p.follow = d.apfol; }); return; }
   if (d.apdel) { if (b.dataset.confirm !== '1') { b.dataset.confirm = '1'; b.textContent = 'تأكيد حذف الخطة؟'; return; } closeSheet(); absUpdate(a => { delete a.plan; }, 'حُذفت الخطة'); return; }
   if (d.psub) { S.sub.prg = d.psub; rerender(); return; }

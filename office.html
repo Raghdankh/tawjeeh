@@ -550,6 +550,7 @@ button,label,.btn,.clpick,.clpick *,.presets,.presets *,.chip,.chips,.subtabs,na
 .a4.qrboard .qrhint{text-align:center;margin:-4px 0 12px;color:#5b6b69;font-size:13px}.a4.qrboard .qrgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
 .a4.qrboard .qrcard{border:1.5px solid var(--qc);border-top:7px solid var(--qc);border-radius:14px;padding:8px 12px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;break-inside:avoid}
 .a4.qrboard .qrcard b{color:var(--qc);font-size:16px}.a4.qrboard .qrcard span{font-size:11.5px;color:#5b6b69}.a4.qrboard .qrimg svg{width:132px;height:132px;display:block}
+.a4.qrboard .qrpair{display:flex;align-items:flex-end;gap:8px}.a4.qrboard .qrev{display:flex;flex-direction:column;align-items:center;gap:2px}.a4.qrboard .qrev svg{width:80px;height:80px;display:block}.a4.qrboard .qrev small{font-size:11px;font-weight:700;color:var(--qc)}.a4.qrboard.big .qrev svg{width:105px;height:105px}
 .a4.qrboard.big .qrgrid{gap:22px}.a4.qrboard.big .qrimg svg{width:230px;height:230px}.a4.qrboard.big .qrcard b{font-size:19px}.a4.qrboard.big .qrcard span{font-size:13px}
 .evlink{display:grid;gap:6px;margin:8px 0 10px;padding:10px;border:1px dashed var(--line);border-radius:12px}.evlink label{display:grid;gap:4px}.evlink input{width:100%;font-size:.85rem}.evmini svg{width:84px;height:84px;background:#fff;border-radius:6px}
 .evhead{display:flex;align-items:center;justify-content:space-between;gap:10px}.evhead h4{margin:0}.evid .evhead{margin-bottom:6px}
@@ -3531,19 +3532,19 @@ const qrOk = u => /^https?:\/\/\S+$/.test(String(u || '').trim());
 /* كود الملف يفتح السجل الحي من المنصة (بتسجيل دخول) إذا ما فيه رابط Drive */
 const QR_VIEW = { plans: 'plans', disc: 'disc', ach: 'ach', ind: 'ind', grp: 'grp', council: 'council', prog: 'programs', vals: 'values', fam: 'family' };
 const viewURL = k => location.origin + location.pathname + '?view=' + k;
-const qrLink = x => qrOk(x.url) ? x.url.trim() : QR_VIEW[x.k] ? viewURL(x.k) : '';
+const qrLink = x => QR_VIEW[x.k] ? viewURL(x.k) : qrOk(x.url) ? x.url.trim() : '';
 function qrPanel() { const L = qrItems();
   return `<section class="panel"><div class="head"><h3>أكواد العرض</h3><span class="tiny muted">${ar(L.filter(x => qrLink(x)).length)} كود</span><span class="sp"></span><button class="btn sm" data-qradd="1">＋ ملف آخر</button><button class="btn sm primary" data-qrprint="1">طباعة لوحة الأكواد</button></div>
-    <p class="small muted">كل سجل له كود يفتح السجل نفسه من المنصة، ويتحدث تلقائي مع كل إدخال. اللي يصور الكود يفتح السجل على طول بدون دخول، للعرض بس: أسماء الطالبات أول الحروف، وبدون أرقام جوالات ولا صور الشواهد. التواقيع والختم تطلع. وإذا تبين سجل يفتح مجلد Drive بداله، الصقي الرابط في خانته.</p>
+    <p class="small muted">كل سجل له كود يفتح السجل نفسه من المنصة، ويتحدث تلقائي مع كل إدخال. اللي يصور الكود يفتح السجل على طول بدون دخول، للعرض بس: الأسماء كاملة ما عدا طالبات الحالات السرية (انفصال الوالدين، اليتم، الظروف الاقتصادية، النفسية) تطلع أول الحروف، وبدون أرقام جوالات ولا صور الشواهد. التواقيع والختم تطلع. وإذا لصقتي رابط Drive لسجل، يطلع جنبه في اللوحة كود ثاني صغير مكتوب تحته «الشواهد».</p>
     ${S.pubErr ? `<p class="small" style="color:#B4472B">أكواد المنصة ما تحدثت: ${esc(S.pubErr)}. تأكدي إنك شغلتي كود SQL حق جدول public_views.</p>` : S.pubAt ? `<p class="tiny muted">آخر تحديث لنسخة العرض: الحين</p>` : ''}<div class="qrlist">${L.map((x, i) => `<div class="qrrow" style="--qc:${QR_COL[x.k] || '#555'}"><div class="qrprev">${qrLink(x) ? QRMini.svg(qrLink(x), { color: '#1b2b2a' }) : '<span class="tiny muted">بدون رابط</span>'}</div>
-      <div class="qrinf"><b>${esc(x.t)}</b><span class="tiny muted">${esc(x.sub || '')}</span><span class="tiny" style="color:${qrOk(x.url) ? '#6b7a78' : '#0E7F7B'};font-weight:700">${qrOk(x.url) ? 'يفتح مجلد Drive' : QR_VIEW[x.k] ? 'يفتح السجل من المنصة' : ''}</span><input data-qrurl="${esc(x.k)}" value="${esc(x.url || '')}" placeholder="${QR_VIEW[x.k] ? 'رابط Drive (اختياري)' : 'https://drive.google.com/...'}" dir="ltr" inputmode="url"></div>${QR_DEF.some(z => z[0] === x.k) ? '' : `<button class="btn sm ghost" data-qrdel="${esc(x.k)}" aria-label="حذف">✕</button>`}</div>`).join('')}</div></section>`; }
+      <div class="qrinf"><b>${esc(x.t)}</b><span class="tiny muted">${esc(x.sub || '')}</span>${QR_VIEW[x.k] ? '<span class="tiny" style="color:#0E7F7B;font-weight:700">الكود يفتح السجل من المنصة</span>' : ''}<input data-qrurl="${esc(x.k)}" value="${esc(x.url || '')}" placeholder="${QR_VIEW[x.k] ? 'رابط Drive للشواهد (اختياري، يطلع له كود ثاني)' : 'https://drive.google.com/...'}" dir="ltr" inputmode="url"></div>${QR_DEF.some(z => z[0] === x.k) ? '' : `<button class="btn sm ghost" data-qrdel="${esc(x.k)}" aria-label="حذف">✕</button>`}</div>`).join('')}</div></section>`; }
 const qrSave = async fn => { const d = JSON.parse(JSON.stringify({ k: 'qr', ...myFile('qr') })); d.items = qrItems(); fn(d); await saveDoc('myfile-qr', 'myfile', d); };
 document.addEventListener('change', async e => { const k = e.target.dataset && e.target.dataset.qrurl; if (k == null) return; const v = e.target.value.trim();
   if (v && !qrOk(v)) { toast('الرابط لازم يبدأ بـ https://'); return; } await qrSave(d => { d.items.find(x => x.k === k).url = v; }); toast(v ? 'انحفظ الرابط' : 'انشال الرابط'); rerender(); });
 function qrBoard(big) { const L = qrItems().filter(x => qrLink(x)); const per = big ? 4 : 8; const pages = [];
   for (let i = 0; i < L.length; i += per) pages.push(L.slice(i, i + per));
   return pages.map(pg => `<div class="a4 qrboard${big ? ' big' : ''}">${repHead('الملفات الرقمية للتوجيه الطلابي')}<p class="qrhint">وجّهي كاميرا الجوال نحو الكود لفتح الملف</p>
-    <div class="qrgrid">${pg.map(x => `<div class="qrcard" style="--qc:${QR_COL[x.k] || '#555'}"><b>${esc(x.t)}</b><div class="qrimg">${QRMini.svg(qrLink(x), { color: '#16302d' })}</div><span>${esc(x.sub || '')}</span></div>`).join('')}</div></div>`).join('');
+    <div class="qrgrid">${pg.map(x => `<div class="qrcard" style="--qc:${QR_COL[x.k] || '#555'}"><b>${esc(x.t)}</b><div class="qrpair"><div class="qrimg">${QRMini.svg(qrLink(x), { color: '#16302d' })}</div>${QR_VIEW[x.k] && qrOk(x.url) ? `<div class="qrev">${QRMini.svg(x.url.trim(), { color: '#16302d' })}<small>الشواهد</small></div>` : ''}</div><span>${esc(x.sub || '')}</span></div>`).join('')}</div></div>`).join('');
 }
 function qrPrintForm() { if (!qrItems().some(x => qrLink(x))) { toast('الصقي رابط واحد على الأقل'); return; }
   openSheet('طباعة لوحة الأكواد', `<div class="f full"><span>الحجم</span><div class="clpick"><label><input type="radio" name="qrsz" value="8" checked><span>٨ أكواد في الصفحة</span></label><label><input type="radio" name="qrsz" value="4"><span>٤ أكواد كبيرة في الصفحة</span></label></div></div>
@@ -3561,7 +3562,7 @@ document.addEventListener('change', async e => { const key = e.target.dataset &&
     if (t === 'prog') toast(v ? 'انحفظ رابط الشواهد' : 'انشال الرابط'); rerender(); } catch (er) { toast(errT(er)); } });
 function discStats() {
   const ab = list('absence'); const dl = list('daily'); const beh = dl.filter(r => /سلوك/.test(r.type)); const ms = amMonths(); const mc = (S.mcases || []).filter(c => (c.cats || []).includes('behavior'));
-  return `<div class="a4">${repHead('إحصائية الانضباط المدرسي')}${repTiles([[ab.length, 'ملف غياب'], [ab.reduce((s, a) => s + unex(a), 0), 'يوم بدون عذر'], [beh.length, 'حالة سلوكية طارئة'], [mc.length, 'حالة سلوكية في مسار'], [list('honor').filter(h => /انضباط|مواظب/.test(h.reason || '')).length, 'شهادة انضباط']])}
+  return `<div class="a4">${repHead('إحصائية الانضباط المدرسي')}${repTiles([[ab.length, 'ملف غياب'], [ab.reduce((s, a) => s + unex(a), 0), 'يوم بدون عذر'], [beh.length, 'حالة سلوكية طارئة'], [mc.length, 'حالة سلوكية في مسار'], [list('honor').filter(honDisc).length, 'شهادة انضباط']])}
     ${ms.length ? `<table><thead><tr><th>الشهر</th><th>عدد الطالبات</th><th>أيام الدراسة</th><th>أيام الغياب</th><th>نسبة الغياب</th></tr></thead><tbody>${ms.slice().reverse().map(m => { const c = amCalc(m); return `<tr><td>${esc(amLabel(m))}</td><td>${ar(c.N)}</td><td>${ar(c.days)}</td><td>${ar(c.A)}</td><td>${pct(c.rate)}</td></tr>`; }).join('')}</tbody></table>` : '<p>لم تُسجل تقارير شهرية للغياب بعد.</p>'}
     ${repSigs()}</div>`;
 }
@@ -3696,7 +3697,7 @@ function fxParts(sec) {
     const beh = list('daily').filter(r => /سلوك/.test(r.type)).sort((a, b) => String(a.date).localeCompare(String(b.date)));
     P.push({ t: 'الحالات السلوكية', div: 1 }); P.push({ t: 'سجل الحالات السلوكية الطارئة', h: () => beh.length ? dayLogReport(beh, 'سجل الحالات السلوكية الطارئة') : emptyPage('سجل الحالات السلوكية الطارئة') });
     const mc = (S.mcases || []).filter(c => (c.cats || []).includes('behavior')); P.push({ t: 'حالات الملاحظات السلوكية (مسار)', h: () => caseTable('حالات الملاحظات السلوكية', mc, o) });
-    P.push({ t: 'التعزيز والتكريم', div: 1 }); P.push({ t: 'سجل التكريم', h: () => honLogReport() }); att();
+    P.push({ t: 'تكريم المنضبطات', div: 1 }); P.push({ t: 'تكريم الطالبات المنضبطات', h: () => honLogReport(honDisc, 'تكريم الطالبات المنضبطات') }); att();
   } else if (sec === 'ach') {
     const cs = S.mcases || [];
     [['delayed', 'حالات التأخر الدراسي'], ['excellent', 'المتفوقات'], ['gifted', 'الموهوبات']].forEach(([k, t]) => { const L = cs.filter(c => (c.cats || []).includes(k)); P.push({ t, h: () => caseTable(t, L, o) }); });
@@ -4485,11 +4486,12 @@ function honFile() {
       <p class="sum">${esc(String(r.reason || '').replace(/\{م\}/g, r.occasion || ''))}</p><div class="acts"><button class="btn sm" data-hdl="${r.id}">الشهادة</button>${r.type === 'student' ? `<button class="btn sm wa" data-honwa="${r.id}">📲 تهنئة ولي الأمر</button>` : ''}${r.src === 'indibat' ? '' : `<button class="btn sm danger" data-del="${r.id}">حذف</button>`}</div></article>`).join('')}</div>`
       : `<div class="empty"><b>ملف التكريم فاضي</b><span>كل شهادة تصدرينها وتحفظينها تظهر هنا.</span></div>`}`;
 }
-function honLogReport() {
-  const rows = list('honor').sort((a, b) => String(a.date).localeCompare(String(b.date))); const per = 18; const pages = [];
+const honDisc = r => /انضباط|مواظب|حضور|غياب|تغي[ّ]?ب/.test(r.reason || '') && !/سلوك/.test(r.reason || '');
+function honLogReport(filt, title) {
+  const rows = list('honor').filter(filt || (() => true)).sort((a, b) => String(a.date).localeCompare(String(b.date))); const per = 18; const pages = [];
   for (let i = 0; i < Math.max(rows.length, 1); i += per) pages.push(rows.slice(i, i + per));
   const tiles = repTiles([[rows.length, 'إجمالي المكرَّمين']].concat(Object.entries(RT).map(([k, v]) => [rows.filter(r => r.type === k).length, v.t])).filter(x => x[0] || x[1] === 'إجمالي المكرَّمين'));
-  return pages.map((chunk, pi) => `<div class="a4">${repHead('سجل التكريم')}${pi ? '' : tiles}<table><thead><tr><th>م</th><th>الاسم</th><th>الفئة</th><th>المناسبة / السبب</th><th>التاريخ</th></tr></thead><tbody>${chunk.map((r, i) => `<tr><td>${ar(pi * per + i + 1)}</td><td>${esc(r.name)}${r.grade ? '<br><small>' + esc(r.grade + ' ' + (r.section || '')) + '</small>' : ''}</td><td>${esc(RT[r.type] ? RT[r.type].t : '')}</td><td>${esc(r.occasion ? r.occasion + ': ' : '')}${esc(String(r.reason || '').replace(/\{م\}/g, r.occasion || ''))}</td><td>${esc(hij(r.date))}</td></tr>`).join('') || '<tr><td colspan="5">لا توجد سجلات</td></tr>'}</tbody></table>${pi === pages.length - 1 ? repSigs() : ''}</div>`).join('');
+  return pages.map((chunk, pi) => `<div class="a4">${repHead(title || 'سجل التكريم')}${pi ? '' : tiles}<table><thead><tr><th>م</th><th>الاسم</th><th>الفئة</th><th>المناسبة / السبب</th><th>التاريخ</th></tr></thead><tbody>${chunk.map((r, i) => `<tr><td>${ar(pi * per + i + 1)}</td><td>${esc(r.name)}${r.grade ? '<br><small>' + esc(r.grade + ' ' + (r.section || '')) + '</small>' : ''}</td><td>${esc(RT[r.type] ? RT[r.type].t : '')}</td><td>${esc(r.occasion ? r.occasion + ': ' : '')}${esc(String(r.reason || '').replace(/\{م\}/g, r.occasion || ''))}</td><td>${esc(hij(r.date))}</td></tr>`).join('') || '<tr><td colspan="5">لا توجد سجلات</td></tr>'}</tbody></table>${pi === pages.length - 1 ? repSigs() : ''}</div>`).join('');
 }
 async function downloadCert(o) { const c = await drawCertCanvas(certOpts(o)); const blob = await new Promise(r => c.toBlob(r, 'image/png')); await saveBlob(blob, 'شهادة-' + String(o.name).replace(/[\\/:*?"<>|]/g, '') + '.png'); }
 
@@ -4724,12 +4726,19 @@ const VIEW_T = { plans: 'سجل خطط التوجيه الطلابي', disc: 'س
    تنحدث تلقائي بعد كل إدخال، والكود يفتحها بدون تسجيل دخول. */
 const pubSigIds = () => { const g = SIGN(); const ids = new Set([g.sigC, g.sigP, g.stamp].filter(Boolean));
   Object.values(DB.docs || {}).forEach(v => { const d = v && v.kind === 'myfile' && v.data; if (d && d.sigs) Object.values(d.sigs).forEach(x => { if (x) ids.add(x); }); }); return ids; };
+/* الأسماء اللي تنخفي في نسخة العرض: بس طالبات الحالات السرية (انفصال الوالدين، اليتم، الظروف الاقتصادية، الملاحظات النفسية) */
+const CONF_K = ['separation', 'orphan', 'economic', 'psych'], CONF_RX = /انفصال|يتيم|يتم|اقتصاد|مادي|نفسي|أسري|اسري|طلاق|وفاة/;
+const confCat = c => CONF_K.includes(c) || CONF_RX.test(String(c || ''));
+function confNames() { const raw = new Set(); const addN = n => { n = String(n || '').replace(/^مثال:\s*/, '').replace(/\s+/g, ' ').trim(); if (n.split(' ').length >= 2) raw.add(n); };
+  (S.mcases || []).forEach(c => { if ((c.cats || []).some(confCat)) addN(c.name); });
+  ['ind', 'grp'].forEach(k => (myFile(k).sessions || []).forEach(x => { if ((x.cats || []).some(confCat) || CONF_RX.test(x.topic || '')) (x.names || []).forEach(m => addN(typeof m === 'string' ? m : m && m.name)); }));
+  list('daily').forEach(d => { if (CONF_RX.test((d.type || '') + ' ' + (d.cat || ''))) addN(d.studentName); });
+  const roster = students().map(x => String(x.name || '').replace(/\s+/g, ' ').trim()).filter(Boolean);
+  [...raw].forEach(n => roster.forEach(r => { if (r.startsWith(n) || n.startsWith(r)) raw.add(r); }));
+  return raw; }
 function anonHTML(html, keep) {
   const staff = new Set(SIGS.map(x => x[1].replace(/^أ\.\s*/, '')));
-  const raw = new Set(); const addN = n => { n = String(n || '').replace(/^مثال:\s*/, '').replace(/\s+/g, ' ').trim(); if (n.split(' ').length >= 2) raw.add(n); };
-  Object.values(DB.docs || {}).forEach(v => { const d = v && v.data; if (!d) return; if (v.kind === 'student') addN(d.name); addN(d.studentName); if (v.kind === 'honor') addN(d.name);
-    (d.members || []).forEach(m => addN(typeof m === 'string' ? m : m && (m.name || m.studentName))); (d.students || []).forEach(m => addN(typeof m === 'string' ? m : m && (m.name || m.studentName))); });
-  (S.mcases || []).forEach(c => addN(c.name));
+  const raw = confNames();
   const ini = n => n.split(' ').filter(w => !['بن', 'بنت', 'ال'].includes(w)).slice(0, 2).map(w => w.charAt(0) + '.').join(' ');
   const forms = new Map(); raw.forEach(n => { if (staff.has(n)) return; const t = n.split(' '); for (let k = t.length; k >= 2; k--) { const f = t.slice(0, k).join(' '); if (!staff.has(f) && !forms.has(f)) forms.set(f, ini(n)); } });
   const list0 = [...forms.keys()].sort((a, b) => b.length - a.length);
@@ -4747,7 +4756,7 @@ async function publishViews() {
     const isig = Object.keys(imgs).sort().map(k => k + imgs[k].length).join(',');
     if (pubSig._img !== isig) { await q(DB.sb.from('public_views').upsert({ id: '_img', html: JSON.stringify(imgs), updated_at: new Date().toISOString() })); pubSig._img = isig; }
     for (const sec of Object.keys(VIEW_T)) { await new Promise(r => setTimeout(r, 30));
-      S.binOpt = { year: acadYear(), term: 'العام كاملاً', anon: true };
+      S.binOpt = { year: acadYear(), term: 'العام كاملاً', anon: false };
       let html; try { html = anonHTML(buildBinder(sec, S.binOpt), keepIds); } catch (e) { continue; }
       let h = 0; for (let i = 0; i < html.length; i += 7) h = (h * 31 + html.charCodeAt(i)) | 0; const sig = html.length + ':' + h;
       if (pubSig[sec] === sig) continue;

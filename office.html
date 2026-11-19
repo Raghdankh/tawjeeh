@@ -839,14 +839,22 @@ function absFillForm(one) {
   const ids = one ? [one] : list('absence').filter(a => !a.closed).map(a => a.id);
   const cnt = o => ids.reduce((s, id) => { const d = DB.docs[id].data; return s + dueSteps(d).filter(k => !(d.done || {})[k] && !(LEGAL_STEPS.has(k) && !o.legal) && !(roleOf(d, k) === 'a' && !o.admin)).length; }, 0);
   openSheet(one ? 'تعبئة الإجراءات المستحقة' : 'تعبئة إجراءات كل الملفات', `<p class="small muted">تتأشّر الإجراءات اللي وصلت لها كل طالبة حسب أيامها: مسار <b>بدون عذر</b> (المادة ٣٤) على أيام الغياب بدون عذر، ومسار <b>بعذر</b> (المادة ٣٣) على أيام الغياب بعذر. الإجراءات المشروطة («في حال…») ما تتأشّر، والمؤشّر قبل ما يتغير.</p>
-    <div class="form"><label class="chk full" style="--sc:var(--abs)"><input type="checkbox" id="af_a" checked><span>إجراءات الإدارة بعد (استدعاء ولي الأمر، التعهد…)</span></label>
+    <div class="form">${(() => { const nr = ids.filter(id => !DB.docs[id].data.ref && !(DB.docs[id].data.refs && Object.keys(DB.docs[id].data.refs).length)).length; return nr ? `<div class="f full" style="border:1.5px solid var(--abs);border-radius:12px;padding:10px"><label class="chk" style="--sc:var(--abs)"><input type="checkbox" id="af_rs" checked><span><b>سجّلي تاريخ الإحالة ${one ? 'لها' : `للي ما لهن تاريخ إحالة (${ar(nr)} ${nr > 2 && nr < 11 ? 'ملفات' : 'ملف'})`}</b></span></label>${hdInput('af_rd', todayH())}<span class="tiny muted">والجلسة الفردية تنحسب لحالها أول يوم دراسي بعده.</span></div>` : ''; })()}
+    ${(() => { const np = ids.filter(id => { const d = DB.docs[id].data; return !d.plan && (unex(d) >= 3 || exc(d) >= 3); }).length; return np ? `<label class="chk full" style="--sc:var(--abs)"><input type="checkbox" id="af_pl" checked><span><b>خطة علاجية جاهزة ${one ? 'لها' : `للي ما لهن خطة (${ar(np)} ${np > 2 && np < 11 ? 'ملفات' : 'ملف'})`}</b> — أهدافها وإجراءاتها حسب غياب كل طالبة وأسبابه، وتقدرين تعدلين أي خطة بعدين من ملفها</span></label>` : ''; })()}
+    <label class="chk full" style="--sc:var(--abs)"><input type="checkbox" id="af_a" checked><span>إجراءات الإدارة بعد (استدعاء ولي الأمر، التعهد…)</span></label>
     <label class="chk full" style="--sc:var(--abs)"><input type="checkbox" id="af_h" checked><span>ولي الأمر اعتذر عن الحضور ووقّع على الإجراءات المتخذة والتعهد من المنزل (يتسجل للي وصلن الاستدعاء)</span></label>
     <label class="chk full" style="--sc:var(--bad)"><input type="checkbox" id="af_l"><span>مخاطبة الجهات المختصة (١٠ أيام بدون عذر أو غياب متصل) — أشّريها بس إذا تمت فعلاً</span></label>
     <div class="f full"><span>تاريخ الإجراءات</span><p class="small" style="margin:0;font-weight:700;color:var(--good)">${one ? (DB.docs[one].data.ref ? '✓ بتاريخ الإحالة: ' + esc(hij(DB.docs[one].data.ref)) : 'ما لها تاريخ إحالة في ملفها، بيتسجل تاريخ اليوم') : (() => { const noRef = ids.filter(id => !DB.docs[id].data.ref).length; return '✓ كل طالبة بتاريخ إحالتها' + (noRef ? ` (${ar(noRef)} بدون تاريخ إحالة، يتسجل لهن تاريخ اليوم)` : ''); })()}</p>
       <label class="chk" style="--sc:var(--abs)"><input type="checkbox" id="af_ref"><span>أبغى تاريخ مختلف</span></label><div id="af_dw" hidden>${hdInput('af_d', todayH())}</div></div>
     <p class="small" id="af_n" style="font-weight:700"></p></div>
     <div class="toolbar"><button class="btn primary" type="submit">تعبئة</button></div>`,
-    async f => { if (f.querySelector('#af_h').checked) { const W = []; ids.forEach(id => { const d = DB.docs[id].data; if (!homeDue(d) || d.home) return; const c = homeContact(id, d); if (c) W.push(c); W.push({ id, kind: 'absence', data: { ...JSON.parse(JSON.stringify(d)), home: true } }); }); if (W.length) await saveMany(W); }
+    async f => { const rs = f.querySelector('#af_rs'), pl = f.querySelector('#af_pl'); const rd = rs && rs.checked ? readHD(f, 'af_rd') : ''; const R = [];
+      ids.forEach(id => { const d0 = DB.docs[id].data; const d = JSON.parse(JSON.stringify(d0)); let ch = false;
+        if (rd && !d.ref && !(d.refs && Object.keys(d.refs).length)) { d.ref = rd; ch = true; }
+        if (pl && pl.checked && !d.plan && (unex(d) >= 3 || exc(d) >= 3)) { d.plan = apSuggest(id, d); ch = true; }
+        if (ch) R.push({ id, kind: 'absence', data: d }); });
+      if (R.length) await saveMany(R);
+      if (f.querySelector('#af_h').checked) { const W = []; ids.forEach(id => { const d = DB.docs[id].data; if (!homeDue(d) || d.home) return; const c = homeContact(id, d); if (c) W.push(c); W.push({ id, kind: 'absence', data: { ...JSON.parse(JSON.stringify(d)), home: true } }); }); if (W.length) await saveMany(W); }
       const o = { admin: f.querySelector('#af_a').checked, legal: f.querySelector('#af_l').checked, date: f.querySelector('#af_ref').checked ? readHD(f, 'af_d') : '' };
       const r = await absFill(ids, o); toast(r.steps ? `تعبّى ${ar(r.steps)} إجراء في ${ar(r.files)} ${r.files > 2 && r.files < 11 ? 'ملفات' : 'ملف'}` : 'كل الإجراءات المستحقة متعبّية'); }, `--c:var(--abs);--cs:var(--abs-soft)`);
   const upd = () => { const o = { admin: $('#af_a').checked, legal: $('#af_l').checked }; $('#af_n').textContent = `سيتعبّى ${ar(cnt(o))} إجراء${one ? '' : ' في ' + ar(ids.length) + ' ملف'}`; };
@@ -2014,7 +2022,8 @@ function progGroups(id) { return list('group').filter(g => g.progId === id).sort
 
 /* ═════════ absence: individual treatment plan ═════════ */
 const AP_CAUSES = ['ظرف صحي', 'السفر', 'ظرف أسري', 'صعوبات دراسية', 'مشكلات مع الزميلات', 'رفض المدرسة أو عدم الرغبة', 'السهر واضطراب النوم', 'بُعد المسكن أو المواصلات', 'تهاون الأسرة في المتابعة'];
-const AP_STEPS = ['مقابلة الطالبة لدراسة أسباب الغياب', 'التواصل مع ولي الأمر وإطلاعه على الإجراءات المترتبة', 'أخذ التعهد على الطالبة وولي الأمر', 'خطة تعويضية لما فات من دروس بالتعاون مع المعلمات', 'تكليف الطالبة بمهمة تحبّبها في المدرسة', 'لوحة متابعة الحضور ومكافأة عند الانتظام', 'متابعة يومية لحضور الطالبة لمدة أسبوعين', 'إشراك الطالبة في نشاط أو نادٍ تحبه', 'إحالة الطالبة للجنة التوجيه الطلابي', 'التنسيق مع المرشدة الصحية إذا كان السبب صحياً'];
+const AP_STEPS = ['مقابلة الطالبة لدراسة أسباب الغياب', 'التواصل مع ولي الأمر وإطلاعه على الإجراءات المترتبة', 'أخذ التعهد على الطالبة وولي الأمر', 'خطة تعويضية لما فات من دروس بالتعاون مع المعلمات', 'تكليف الطالبة بمهمة تحبّبها في المدرسة', 'لوحة متابعة الحضور ومكافأة عند الانتظام', 'متابعة يومية لحضور الطالبة لمدة أسبوعين', 'إشراك الطالبة في نشاط أو نادٍ تحبه', 'إحالة الطالبة للجنة التوجيه الطلابي'];
+const apNoHealth = st => (st || []).filter(x => !/المرشدة الصحية/.test(x.t || x));
 /* المسؤولة عن كل إجراء علاجي (الموجهة الطلابية لما يكون الإجراء من عملها) */
 function apWho(t) { t = String(t || '');
   if (/تعهد/.test(t)) return 'مديرة المدرسة';
@@ -2083,12 +2092,12 @@ function apSuggest(id, a) {
   const G = []; if (u >= 3 || !x) G.push(AP_GOAL_OPTS[0]); if (u >= 3) G.push(AP_GOAL_OPTS[1]); if (x >= 3 || u >= 3) G.push(AP_GOAL_OPTS[2]); if (u >= 3 || K.has('family') || K.has('neglect')) G.push(AP_GOAL_OPTS[3]);
   if (u && K.has('health')) G.push(AP_GOAL_OPTS[4]); if (K.has('sleep')) G.push(AP_GOAL_OPTS[5]); if (K.has('refuse') || K.has('peers')) G.push(AP_GOAL_OPTS[6]);
   const S2 = [AP_STEPS[0], AP_STEPS[1]]; if (u >= 3) S2.push(AP_STEPS[2]); if (x >= 3 || u >= 3) S2.push(AP_STEPS[3]); if (K.has('refuse') || K.has('peers')) S2.push(AP_STEPS[4], AP_STEPS[7]);
-  S2.push(AP_STEPS[5]); if (u >= 3) S2.push(AP_STEPS[6]); if (u >= 5) S2.push(AP_STEPS[8]); if (K.has('health')) S2.push(AP_STEPS[9]);
+  S2.push(AP_STEPS[5]); if (u >= 3) S2.push(AP_STEPS[6]); if (u >= 5) S2.push(AP_STEPS[8]);
   return { causes, causeNote: '', goals: [...new Set(G)].join('\n'), who: 'الموجهة الطلابية', follow: AP_FOLLOW[0], steps: [...new Set(S2)].map(t => ({ t, date: '', who: apWho(t), done: false })) };
 }
 const apCur = (id, a) => a.plan ? JSON.parse(JSON.stringify(a.plan)) : apSuggest(id, a);
 function absPlanHTML(a) {
-  const id = S.param; const p = apCur(id, a); const sugg = !a.plan; const st = p.steps || []; const dn = st.filter(s => s.done).length; const G = lines(p.goals);
+  const id = S.param; const p = apCur(id, a); const sugg = !a.plan; const st = apNoHealth(p.steps); const dn = st.filter(s => s.done).length; const G = lines(p.goals);
   const chip = (kind, v, on) => `<button type="button" class="apchip${on ? ' on' : ''}" data-apt="${kind}" data-v="${esc(v)}" aria-pressed="${on}">${on ? '✓ ' : ''}${esc(v)}</button>`;
   const allSteps = [...new Set(AP_STEPS.concat(st.map(s => s.t)))]; const allGoals = [...new Set(AP_GOAL_OPTS.concat(G))];
   return `<section class="panel apbox" style="border-color:var(--abs)"><div class="head"><h3>الخطة العلاجية</h3>${sugg ? '<span class="pill" style="--pc:var(--good);--ps:var(--good-soft)">مقترحة حسب غيابها وأسبابه</span>' : ''}<span class="sp"></span>${sugg ? '<button class="btn sm primary" data-apsave="1">اعتماد الخطة</button>' : '<button class="btn sm" data-act="apRep">طباعة الخطة</button><button class="btn sm ghost" data-apdel2="1">حذف</button>'}</div>
@@ -2163,7 +2172,7 @@ function apForm() {
     }, `--c:var(--abs);--cs:var(--abs-soft)`);
 }
 function apReport(a) {
-  const p = a.plan || {}; const st = p.steps || [];
+  const p = a.plan || {}; const st = apNoHealth(p.steps);
   return `<div class="a4 prep-a4">${repHead('خطة علاجية لطالبة متكررة الغياب')}<div class="pband" style="border-color:#C9532A;background:#FCE9E1"><small style="color:#C9532A">${esc((a.grade || '') + ' ' + (a.section || ''))}</small><b>${esc(a.studentName)}</b></div>
     <table class="pinfo-t"><tbody><tr><th>الغياب بدون عذر</th><td>${ar(unex(a))} ${unex(a) > 2 && unex(a) < 11 ? 'أيام' : 'يوم'}</td><th>الغياب بعذر</th><td>${ar(exc(a))} ${exc(a) > 2 && exc(a) < 11 ? 'أيام' : 'يوم'}</td></tr></tbody></table>
     <div class="boxes"><div class="box full"><h4>أسباب الغياب</h4><p>${esc((p.causes || []).join('، ') || '—')}${p.causeNote ? '\n' + esc(p.causeNote) : ''}</p></div>

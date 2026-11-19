@@ -1316,7 +1316,7 @@ function vAbsence() {
   const f = S.filter.abs || 'all';
   const shown = rows.filter(a => f === 'low' ? !a.closed && a.n < 3 && a.x < 3 : f === 'all' ? !a.closed : f === 'closed' ? a.closed : f === 'pending' ? !a.closed && a.p > 0 : f === 'consec' ? !a.closed && a.st >= 3 : ABS_MISS.some(z => z[0] === f) ? a.miss.includes(f) : f[0] === 'e' ? !a.closed && a.x >= +f.slice(1) : !a.closed && a.n >= +f);
   const cnt = fn => rows.filter(a => !a.closed && fn(a)).length;
-  return `<div class="head"><h1><span class="dot"></span>التعامل مع حالات الغياب</h1><span class="sp"></span><button class="btn" data-act="refPaste">تواريخ الإحالة</button><button class="btn" data-binder="absence">📁 الملف الشامل</button><button class="btn wa" data-act="absWA">📲 مراسلة أولياء الأمور</button><button class="btn" data-act="absFill">✓ تعبئة الإجراءات</button><button class="btn" data-act="absSesAll">＋ جلسات فردية</button><button class="btn" data-sesfix="1">ضبط تواريخ الجلسات</button><button class="btn" data-planall="1">اعتماد الخطط المقترحة</button><button class="btn" data-act="absRefs">تواريخ الإجراءات</button><button class="btn primary" data-act="absAdd">＋ ملف غياب</button></div>
+  return `<div class="head"><h1><span class="dot"></span>التعامل مع حالات الغياب</h1><span class="sp"></span>${absDupGroups().length ? `<button class="btn" data-act="absDedup" style="border-color:var(--bad);color:var(--bad)">دمج الملفات المكررة (${ar(absDupGroups().reduce((s, g) => s + g.length - 1, 0))})</button>` : ''}<button class="btn" data-act="refPaste">تواريخ الإحالة</button><button class="btn" data-binder="absence">📁 الملف الشامل</button><button class="btn wa" data-act="absWA">📲 مراسلة أولياء الأمور</button><button class="btn" data-act="absFill">✓ تعبئة الإجراءات</button><button class="btn" data-act="absSesAll">＋ جلسات فردية</button><button class="btn" data-sesfix="1">ضبط تواريخ الجلسات</button><button class="btn" data-planall="1">اعتماد الخطط المقترحة</button><button class="btn" data-act="absRefs">تواريخ الإجراءات</button><button class="btn primary" data-act="absAdd">＋ ملف غياب</button></div>
     ${absSubtabs('files')}
     <p class="lede">حسب قواعد السلوك والمواظبة: المادة (٣٣) للغياب بعذر، والمادة (٣٤) للغياب بدون عذر. اكتبي عدد الأيام فقط، وتظهر إجراءات اليوم ٣ و٥ و١٠ تلقائياً.</p>
     <div class="tiles">
@@ -2747,7 +2747,25 @@ function bestStu(pool, r) {
   const sub = g.filter(s => nameMatch(r.name, s.name || s.studentName)); if (sub.length === 1) return sub[0];
   const t = nTok(r.name); const two = g.filter(s => { const u = nTok(s.name || s.studentName); return u[0] === t[0] && u[1] === t[1]; }); return two.length === 1 ? two[0] : null;
 }
-function findFile(r) { const L = list('absence'); return bestStu(L.filter(a => !a.closed), r) || bestStu(L.filter(a => a.closed), r) || undefined; }
+function findFile(r) { const L = list('absence'); const b = bestStu(L.filter(a => !a.closed), r) || bestStu(L.filter(a => a.closed), r); if (b) return b;
+  const g = L.filter(a => (!r.grade || !a.grade || a.grade === r.grade) && (nameMatch(r.name, a.studentName) || norm(a.studentName) === norm(r.name)));
+  return g.sort((p, q) => String(p.id).localeCompare(String(q.id)))[0] || undefined; }
+/* ملفات الغياب المكررة لنفس الطالبة: تندمج في ملف واحد */
+const absKey = a => (a.studentId && DB.docs[a.studentId] ? 'S' + a.studentId : 'N' + nTok(a.studentName).slice(0, 3).join(' ')) + '|' + (a.grade || '');
+function absDupGroups() { const G = {}; list('absence').forEach(a => { const k = absKey(a); (G[k] = G[k] || []).push(a); }); return Object.values(G).filter(g => g.length > 1); }
+async function absMergeDups() { const W = [], D = [];
+  for (const g of absDupGroups()) { g.sort((p, q) => (Object.keys(q.done || {}).length + (q.plan ? 5 : 0) + (q.ref ? 3 : 0)) - (Object.keys(p.done || {}).length + (p.plan ? 5 : 0) + (p.ref ? 3 : 0)) || String(p.id).localeCompare(String(q.id)));
+    const keep = g[0]; const d = JSON.parse(JSON.stringify(DB.docs[keep.id].data));
+    g.slice(1).forEach(o => { const x = DB.docs[o.id].data; d.u = Math.max(unex(d), unex(x)); d.x = Math.max(exc(d), exc(x));
+      d.done = d.done || {}; Object.entries(x.done || {}).forEach(([k, v]) => { if (!d.done[k] || (v && v < d.done[k])) d.done[k] = v; });
+      d.refs = d.refs || {}; Object.entries(x.refs || {}).forEach(([k, v]) => { if (!d.refs[k] || v < d.refs[k]) d.refs[k] = v; });
+      if (x.ref && (!d.ref || x.ref < d.ref)) d.ref = x.ref; if (!d.plan && x.plan) d.plan = x.plan; if (x.home) d.home = true; if (!d.section && x.section) d.section = x.section;
+      d.log = (d.log || []).concat(x.log || []); if (!x.closed) d.closed = false;
+      list('contact').filter(c => c.absId === o.id).forEach(c => W.push({ id: c.id, kind: 'contact', data: { ...JSON.parse(JSON.stringify(DB.docs[c.id].data)), absId: keep.id } }));
+      D.push(o.id); });
+    const seen = new Set(); d.log = d.log.filter(l => { const k = (l.type || '') + '|' + (l.date || '') + '|' + (l.text || '') + '|' + (l.ms || ''); if (seen.has(k)) return false; seen.add(k); return true; });
+    d.upd = todayH(); W.push({ id: keep.id, kind: 'absence', data: d }); }
+  if (W.length) await saveMany(W); for (const id of D) await delDoc(id); return D.length; }
 function findStu(r) { return bestStu(students(), r) || undefined; }
 function cumOther(r, mid) { let x = 0, u = 0; list('absmonth').forEach(m => { if (m.id === mid) return; (m.list || []).forEach(o => { if (o.grade === r.grade && (norm(o.name) === norm(r.name) || nameMatch(o.name, r.name) || looseMatch(o.name, r.name) || looseMatch(r.name, o.name))) { x += o.x; u += o.u; } }); }); return { x, u }; }
 function impForm() {
@@ -2811,7 +2829,7 @@ async function amAutoSync(m) { if (S.amSyncing) return 0; S.amSyncing = true; le
   try { const { behind } = reconcile(m); const rows = []; behind.forEach(x => { const f = x.f; const dd = JSON.parse(JSON.stringify(DB.docs[f.id].data)); dd.u = Math.max(unex(f), x.cu); dd.x = Math.max(exc(f), x.cx); dd.upd = todayH(); if (dd.closed) { dd.closed = false; re++; } rows.push({ id: f.id, kind: 'absence', data: dd }); });
     if (rows.length) { await saveMany(rows); n = rows.length; } } catch (e) { toast(errT(e)); } finally { S.amSyncing = false; }
   return { n, re }; }
-async function amOpenAll(m) { const { miss } = reconcile(m); const rows = miss.map(x => { const st = findStu(x.r); return { id: uid('abs'), kind: 'absence', data: { studentId: st ? st.id : '', studentName: st ? st.name : x.r.name, grade: x.r.grade, section: st ? st.section || x.r.section : x.r.section, u: x.cu, x: x.cx, consec: false, done: {}, log: [], closed: false, upd: todayH() } }; });
+async function amOpenAll(m) { const { miss } = reconcile(m); const made = new Set(); const rows = miss.filter(x => { if (findFile(x.r)) return false; const k = norm(x.r.name) + '|' + x.r.grade; if (made.has(k)) return false; made.add(k); return true; }).map(x => { const st = findStu(x.r); return { id: uid('abs'), kind: 'absence', data: { studentId: st ? st.id : '', studentName: st ? st.name : x.r.name, grade: x.r.grade, section: st ? st.section || x.r.section : x.r.section, u: x.cu, x: x.cx, consec: false, done: {}, log: [], closed: false, upd: todayH() } }; });
   if (rows.length) await saveMany(rows); return rows.length; }
 function reconHTML(m) {
   const { miss, behind } = reconcile(m); if (!(m.list || []).length) return '';
@@ -4575,7 +4593,7 @@ document.addEventListener('click', async e => {
   if (d.asub) { S.sub.abs = d.asub; rerender(); return; }
   if (d.amopenall) { const ms = amMonths(); const sel = DB.docs[S.filter.absm] ? S.filter.absm : ms[0] && ms[0].id; try { const n = await amOpenAll({ id: sel, ...DB.docs[sel].data }); toast('فُتح ' + ar(n) + ' ملف'); } catch (er) { toast(errT(er)); } rerender(); return; }
   if (d.amopen != null || d.amsync != null) { const ms = amMonths(); const sel = DB.docs[S.filter.absm] ? S.filter.absm : ms[0] && ms[0].id; const m = { id: sel, ...DB.docs[sel].data }; const r = m.list[+(d.amopen != null ? d.amopen : d.amsync)]; const o = cumOther(r, sel); const cx = o.x + r.x, cu = o.u + r.u;
-    try { if (d.amopen != null) { const st = findStu(r); await saveDoc(uid('abs'), 'absence', { studentId: st ? st.id : '', studentName: st ? st.name : r.name, grade: r.grade, section: r.section, u: cu, x: cx, consec: false, done: {}, log: [], closed: false, upd: todayH() }); toast('فُتح ملف ' + r.name); }
+    try { if (d.amopen != null && findFile(r)) { toast('لها ملف من قبل'); rerender(); return; } if (d.amopen != null) { const st = findStu(r); await saveDoc(uid('abs'), 'absence', { studentId: st ? st.id : '', studentName: st ? st.name : r.name, grade: r.grade, section: r.section, u: cu, x: cx, consec: false, done: {}, log: [], closed: false, upd: todayH() }); toast('فُتح ملف ' + r.name); }
       else { const f = findFile(r); const dd = JSON.parse(JSON.stringify(DB.docs[f.id].data)); const grew = cu > unex(f) || cx > exc(f); dd.u = Math.max(unex(f), cu); dd.x = Math.max(exc(f), cx); dd.upd = todayH(); const reop = dd.closed && grew; if (reop) dd.closed = false; await saveDoc(f.id, 'absence', dd); toast((reop ? 'انفتح ملف ' : 'حُدّث ملف ') + r.name + (reop ? ' من جديد لأن غيابها زاد' : '')); } } catch (er) { toast(errT(er)); }
     rerender(); return; }
   if (d.wagrp) { const all = students(); const items = all.filter(s => ((s.grade || 'بدون صف') + (s.section ? ' ' + s.section : '')) === d.wagrp).map(s => ({ studentId: s.id, name: s.name, grade: s.grade, section: s.section, phone: s.phone })); waQueue(items, 'free', 'مراسلة أولياء أمور ' + d.wagrp); return; }
@@ -4707,6 +4725,7 @@ document.addEventListener('click', async e => {
   else if (act === 'absRep') { const nm = DB.docs[S.param].data.studentName; openSheet('تقرير الغياب', `<div class="reps"><button type="button" class="rep-btn" data-absrep="all" style="--c:var(--abs)"><b>التقرير الكامل</b><small>إجراءات الموجهة وإجراءات الإدارة، وتوقيع الموجهة والمديرة</small></button><button type="button" class="rep-btn" data-absrep="m" style="--c:var(--abs)"><b>إجراءات الموجهة فقط</b><small>لملف أعمالك: إجراءاتك أنتِ وتوقيعك</small></button></div>`, async () => false, `--c:var(--abs);--cs:var(--abs-soft)`); }
   else if (act === 'absFill') absFillForm(null);
   else if (act === 'refPaste') refPasteForm();
+  else if (act === 'absDedup') { try { const n = await absMergeDups(); toast(n ? 'اندمج ' + ar(n) + ' ملف مكرر، وكل طالبة صار لها ملف واحد' : 'ما فيه ملفات مكررة'); } catch (er) { toast(errT(er)); } rerender(); }
   else if (act === 'absSesAll') absSesBulk();
   else if (act === 'absRefs') absRefsBulk();
   else if (act === 'absFillOne') absFillForm(S.param);

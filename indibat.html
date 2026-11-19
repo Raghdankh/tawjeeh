@@ -627,7 +627,7 @@ function addNames(txt){
   var clsAll=document.getElementById('fCls').value.trim();var key=document.getElementById('fKey').value;
   var rows=String(txt||'').split(/[\r\n\u2028\u2029\u0085\v\f]+/).map(function(s){return s.trim();}).filter(Boolean).map(function(l){var m=CR.exec(l);
     if(m&&m[1].trim().split(/\s+/).length>=2){var c=m[2].replace(/^الصف\s+/,'').replace(/^(?!ال)/,'ال').replace(/\sا$/,' أ');return {name:m[1].trim(),cls:c};}return {name:l,cls:clsAll};});
-  var long=rows.filter(function(r){return r.name.split(/\s+/).length>9;});
+  var long=rows.filter(function(r){return r.name.split(/\s+/).length>11||/[-–|]\s*(?:الصف\s+)?(?:ال)?(?:أول|اول|ثاني|ثالث|رابع|خامس|سادس)/.test(r.name);});
   if(long.length){ui.status='يبدو أن عدة أسماء لُصقت في سطر واحد. اجعلي كل اسم في سطر مستقل ثم أعيدي الإضافة.';render();return;}
   if(!rows.length)return;var mo=S.months[ui.month];
   var have={};(mo[key]||[]).forEach(function(r){have[(r.name||'').replace(/\s+/g,'')]=1;});

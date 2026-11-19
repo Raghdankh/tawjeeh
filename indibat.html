@@ -464,7 +464,8 @@ var ICO={
 function card(key,p,i){
   var medal=key==='regular'?ICO.medal:ICO.star;
   var times=timesHonored(key,p.name);
-  var badge=times>1?'<span class="streak">'+(key==='regular'?'مواظبة ':'متميزة ')+ar(times)+' أشهر</span>':'';
+  var MW=['','شهر','شهرين','ثلاثة أشهر','أربعة أشهر','خمسة أشهر','ستة أشهر','سبعة أشهر','ثمانية أشهر','تسعة أشهر','عشرة أشهر'];
+  var badge=times>1?'<span class="streak">'+(key==='regular'?'مواظبة ':'متميزة ')+(MW[times]||ar(times)+' شهراً')+'</span>':'';
   var inner='<span class="medal" aria-hidden="true">'+medal+'</span><span class="nmw"><span class="nm">'+esc(p.name)+'</span>'+(p.cls?'<span class="ncls">'+esc(p.cls)+'</span>':'')+badge+'</span>'+
     (!ui.editing?'<span class="ctag">عرض الشهادة</span>':'');
   if(ui.editing){

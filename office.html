@@ -1316,7 +1316,7 @@ function vAbsence() {
   const f = S.filter.abs || 'all';
   const shown = rows.filter(a => f === 'low' ? !a.closed && a.n < 3 && a.x < 3 : f === 'all' ? !a.closed : f === 'closed' ? a.closed : f === 'pending' ? !a.closed && a.p > 0 : f === 'consec' ? !a.closed && a.st >= 3 : ABS_MISS.some(z => z[0] === f) ? a.miss.includes(f) : f[0] === 'e' ? !a.closed && a.x >= +f.slice(1) : !a.closed && a.n >= +f);
   const cnt = fn => rows.filter(a => !a.closed && fn(a)).length;
-  return `<div class="head"><h1><span class="dot"></span>التعامل مع حالات الغياب</h1><span class="sp"></span><button class="btn" data-binder="absence">📁 الملف الشامل</button><button class="btn wa" data-act="absWA">📲 مراسلة أولياء الأمور</button><button class="btn" data-act="absFill">✓ تعبئة الإجراءات</button><button class="btn" data-act="absSesAll">＋ جلسات فردية</button><button class="btn" data-sesfix="1">ضبط تواريخ الجلسات</button><button class="btn" data-planall="1">اعتماد الخطط المقترحة</button><button class="btn" data-act="absRefs">تواريخ الإجراءات</button><button class="btn primary" data-act="absAdd">＋ ملف غياب</button></div>
+  return `<div class="head"><h1><span class="dot"></span>التعامل مع حالات الغياب</h1><span class="sp"></span><button class="btn" data-act="refPaste">تواريخ الإحالة</button><button class="btn" data-binder="absence">📁 الملف الشامل</button><button class="btn wa" data-act="absWA">📲 مراسلة أولياء الأمور</button><button class="btn" data-act="absFill">✓ تعبئة الإجراءات</button><button class="btn" data-act="absSesAll">＋ جلسات فردية</button><button class="btn" data-sesfix="1">ضبط تواريخ الجلسات</button><button class="btn" data-planall="1">اعتماد الخطط المقترحة</button><button class="btn" data-act="absRefs">تواريخ الإجراءات</button><button class="btn primary" data-act="absAdd">＋ ملف غياب</button></div>
     ${absSubtabs('files')}
     <p class="lede">حسب قواعد السلوك والمواظبة: المادة (٣٣) للغياب بعذر، والمادة (٣٤) للغياب بدون عذر. اكتبي عدد الأيام فقط، وتظهر إجراءات اليوم ٣ و٥ و١٠ تلقائياً.</p>
     <div class="tiles">
@@ -1403,12 +1403,31 @@ function stepDate_(k) {
 function stRefForm(st) {
   const a = DB.docs[S.param].data; const [k, dd] = st.split('-'); const old = refFor(a, st);
   openSheet('تاريخ التحويل عند ' + ar(+dd) + ' أيام ' + (k === 'u' ? 'بدون عذر' : 'بعذر'), `<p class="small muted">إذا تحولت الطالبة أكثر من مرة، حطي تاريخ هذا التحويل. إجراءات هذي المحطة وجلستها تتعدل على هذا التاريخ.</p><div class="f"><span>التاريخ</span>${hdInput('st_d', old || todayH())}</div><div class="toolbar"><button class="btn primary" type="submit">حفظ</button></div>`,
-    async f => { const id = S.param; const d = JSON.parse(JSON.stringify(DB.docs[id].data)); const v = readHD(f, 'st_d'); d.refs = d.refs || {}; d.refs[st] = v; if (!d.ref) d.ref = v;
-      const oldS = old ? nextSchoolH(old) : ''; const newS = nextSchoolH(v);
-      Object.keys(d.done || {}).forEach(key => { if (key.startsWith(st + '-') && (!old || d.done[key] === old)) d.done[key] = v; });
-      (d.log || []).forEach(l => { if (l.type === 'session' && l.ms === st && (!oldS || l.date === oldS)) l.date = newS || l.date; });
-      absSesFix(d); if (S.sd) Object.keys(S.sd).forEach(x => { if (x === id + '|' + st) delete S.sd[x]; });
+    async f => { const id = S.param; const d = absApplyRef(id, DB.docs[id].data, st, readHD(f, 'st_d'));
       await saveDoc(id, 'absence', d); toast('تم حفظ تاريخ التحويل'); }, `--c:var(--abs);--cs:var(--abs-soft)`);
+}
+function absApplyRef(id, a, st, v) { const old = refFor(a, st); const d = JSON.parse(JSON.stringify(a)); d.refs = d.refs || {}; d.refs[st] = v; if (!d.ref || v < d.ref) d.ref = v;
+  const oldS = old ? nextSchoolH(old) : ''; const newS = nextSchoolH(v);
+  Object.keys(d.done || {}).forEach(key => { if (key.startsWith(st + '-') && (!old || d.done[key] === old)) d.done[key] = v; });
+  (d.log || []).forEach(l => { if (l.type === 'session' && l.ms === st && (!oldS || l.date === oldS)) l.date = newS || l.date; });
+  absSesFix(d); if (S.sd) Object.keys(S.sd).forEach(x => { if (x === id + '|' + st) delete S.sd[x]; }); return d; }
+/* لصق تواريخ الإحالة لعدة طالبات مرة وحدة: كل سطر «الاسم | بدون عذر أو بعذر | الأيام | التاريخ» */
+function refPasteParse(txt) { const cy = todayH().split('-')[0]; const toAD = c => String(c).replace(/[٠-٩]/g, x => '٠١٢٣٤٥٦٧٨٩'.indexOf(x));
+  return String(txt || '').split(/\n+/).map(l => l.trim()).filter(Boolean).map(l => { const p = l.split(/\s*[|｜]\s*/); if (p.length < 4) return { line: l, err: 'السطر ناقص' };
+    const name = p[0].trim(), k = /بدون/.test(p[1]) ? 'u' : 'e', dd = +toAD(p[2]).replace(/\D/g, ''); const ds = toAD(p[3]).trim(); let date = '', m;
+    if ((m = ds.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/))) date = `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
+    else if ((m = ds.match(/^(\d{1,2})[-/](\d{1,2})(?:[-/](\d{4}))?$/))) date = `${m[3] || cy}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
+    if (!date || !(dd > 0)) return { line: l, err: 'التاريخ أو الأيام مو واضحة' };
+    const f = findFile({ name }); return { line: l, name, st: k + '-' + dd, k, dd, date, f, err: f ? '' : 'ما لقيت لها ملف غياب' }; }); }
+function refPasteForm() {
+  openSheet('تواريخ الإحالة', `<p class="small muted">الصقي التواريخ، كل طالبة في سطر: <b>الاسم | بدون عذر أو بعذر | عدد الأيام | التاريخ</b>. وتتسجل كل وحدة عند محطتها (٣ أو ٥ أيام…)، وتتعدل إجراءاتها وجلستها على تاريخها.</p>
+    <label class="f full"><span>التواريخ</span><textarea id="rp_t" style="min-height:160px" dir="rtl"></textarea></label><div id="rp_v" class="small"></div>
+    <div class="toolbar"><button class="btn primary" type="submit">حفظ التواريخ</button></div>`,
+    async f => { const R = refPasteParse(f.querySelector('#rp_t').value).filter(r => !r.err); if (!R.length) throw new Error('ما فيه ولا سطر جاهز');
+      const by = {}; R.forEach(r => { const cur = by[r.f.id] || DB.docs[r.f.id].data; by[r.f.id] = absApplyRef(r.f.id, cur, r.st, r.date); });
+      await saveMany(Object.entries(by).map(([id, data]) => ({ id, kind: 'absence', data }))); toast('انحفظ ' + ar(R.length) + ' تاريخ إحالة في ' + ar(Object.keys(by).length) + ' ملف'); }, `--c:var(--abs);--cs:var(--abs-soft)`);
+  const show = () => { const R = refPasteParse($('#rp_t').value); $('#rp_v').innerHTML = R.map(r => `<div style="padding:3px 0;color:${r.err ? 'var(--bad)' : 'var(--good)'}">${r.err ? '✕ ' + esc(r.line) + ' — ' + r.err : '✓ ' + esc(r.f.studentName) + ' · ' + ar(r.dd) + ' أيام ' + (r.k === 'u' ? 'بدون عذر' : 'بعذر') + ' · ' + esc(hij(r.date))}</div>`).join(''); };
+  $('#rp_t').addEventListener('input', show);
 }
 document.addEventListener('click', async e => { const b = e.target.closest('[data-planall]'); if (!b || b.closest('#sheetbg')) return; e.preventDefault(); e.stopPropagation();
   const writes = list('absence').filter(a => !a.closed && !a.plan && (unex(a) >= 3 || exc(a) >= 3)).map(a => { const d = JSON.parse(JSON.stringify(DB.docs[a.id].data)); d.plan = apSuggest(a.id, d); return { id: a.id, kind: 'absence', data: d }; });
@@ -4686,6 +4705,7 @@ document.addEventListener('click', async e => {
   else if (act === 'dayLog') { const f = S.filter.day || 'today'; const td = todayH(); const rows = list('daily').filter(r => f === 'today' ? r.date === td : f === 'month' ? String(r.date || '').startsWith(td.slice(0, 7)) : f === 'open' ? r.status !== 'مغلقة' : true).filter(r => (S.filter.dayt || 'all') === 'all' || r.type === S.filter.dayt).sort((a, b) => String(a.date).localeCompare(String(b.date)) || String(a.time || '').localeCompare(String(b.time || ''))); openReport(dayLogReport(rows, 'سجل الحالات اليومية الطارئة' + (f === 'today' ? ' — ' + hij(td) : f === 'month' ? ' — شهر ' + hij(td).replace(/^\S+ /, '') : '')), 'الحالات-الطارئة'); }
   else if (act === 'absRep') { const nm = DB.docs[S.param].data.studentName; openSheet('تقرير الغياب', `<div class="reps"><button type="button" class="rep-btn" data-absrep="all" style="--c:var(--abs)"><b>التقرير الكامل</b><small>إجراءات الموجهة وإجراءات الإدارة، وتوقيع الموجهة والمديرة</small></button><button type="button" class="rep-btn" data-absrep="m" style="--c:var(--abs)"><b>إجراءات الموجهة فقط</b><small>لملف أعمالك: إجراءاتك أنتِ وتوقيعك</small></button></div>`, async () => false, `--c:var(--abs);--cs:var(--abs-soft)`); }
   else if (act === 'absFill') absFillForm(null);
+  else if (act === 'refPaste') refPasteForm();
   else if (act === 'absSesAll') absSesBulk();
   else if (act === 'absRefs') absRefsBulk();
   else if (act === 'absFillOne') absFillForm(S.param);

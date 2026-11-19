@@ -1418,15 +1418,16 @@ function refPasteParse(txt) { const cy = todayH().split('-')[0]; const toAD = c 
     if ((m = ds.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/))) date = `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
     else if ((m = ds.match(/^(\d{1,2})[-/](\d{1,2})(?:[-/](\d{4}))?$/))) date = `${m[3] || cy}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
     if (!date || !(dd > 0)) return { line: l, err: 'التاريخ أو الأيام مو واضحة' };
-    const f = findFile({ name }); return { line: l, name, st: k + '-' + dd, k, dd, date, f, err: f ? '' : 'ما لقيت لها ملف غياب' }; }); }
+    const f = findFile({ name }); const stu = f ? null : findStu({ name }); return { line: l, name, st: k + '-' + dd, k, dd, date, f, stu, err: f || stu ? '' : 'ما لقيتها لا في ملفات الغياب ولا في قائمة الطالبات' }; }); }
 function refPasteForm() {
   openSheet('تواريخ الإحالة', `<p class="small muted">الصقي التواريخ، كل طالبة في سطر: <b>الاسم | بدون عذر أو بعذر | عدد الأيام | التاريخ</b>. وتتسجل كل وحدة عند محطتها (٣ أو ٥ أيام…)، وتتعدل إجراءاتها وجلستها على تاريخها.</p>
     <label class="f full"><span>التواريخ</span><textarea id="rp_t" style="min-height:160px" dir="rtl"></textarea></label><div id="rp_v" class="small"></div>
     <div class="toolbar"><button class="btn primary" type="submit">حفظ التواريخ</button></div>`,
     async f => { const R = refPasteParse(f.querySelector('#rp_t').value).filter(r => !r.err); if (!R.length) throw new Error('ما فيه ولا سطر جاهز');
-      const by = {}; R.forEach(r => { const cur = by[r.f.id] || DB.docs[r.f.id].data; by[r.f.id] = absApplyRef(r.f.id, cur, r.st, r.date); });
+      const by = {}, made = {}; R.forEach(r => { if (!r.f) { const sid = r.stu.id; if (!made[sid]) { const nid = uid('abs'); made[sid] = nid; by[nid] = { studentId: sid, studentName: r.stu.name, grade: r.stu.grade || '', section: r.stu.section || '', u: 0, x: 0, consec: false, done: {}, log: [], closed: false, upd: todayH() }; } r.f = { id: made[sid] }; }
+        const cur = by[r.f.id] || DB.docs[r.f.id].data; const d = absApplyRef(r.f.id, cur, r.st, r.date); if (made[r.stu && r.stu.id] === r.f.id) { if (r.k === 'u') d.u = Math.max(d.u || 0, r.dd); else d.x = Math.max(d.x || 0, r.dd); } by[r.f.id] = d; });
       await saveMany(Object.entries(by).map(([id, data]) => ({ id, kind: 'absence', data }))); toast('انحفظ ' + ar(R.length) + ' تاريخ إحالة في ' + ar(Object.keys(by).length) + ' ملف'); }, `--c:var(--abs);--cs:var(--abs-soft)`);
-  const show = () => { const R = refPasteParse($('#rp_t').value); $('#rp_v').innerHTML = R.map(r => `<div style="padding:3px 0;color:${r.err ? 'var(--bad)' : 'var(--good)'}">${r.err ? '✕ ' + esc(r.line) + ' — ' + r.err : '✓ ' + esc(r.f.studentName) + ' · ' + ar(r.dd) + ' أيام ' + (r.k === 'u' ? 'بدون عذر' : 'بعذر') + ' · ' + esc(hij(r.date))}</div>`).join(''); };
+  const show = () => { const R = refPasteParse($('#rp_t').value); $('#rp_v').innerHTML = R.map(r => `<div style="padding:3px 0;color:${r.err ? 'var(--bad)' : 'var(--good)'}">${r.err ? '✕ ' + esc(r.line) + ' — ' + r.err : '✓ ' + esc(r.f ? r.f.studentName : r.stu.name) + (r.f ? '' : ' <b style="color:var(--abs)">(بينفتح لها ملف)</b>') + ' · ' + ar(r.dd) + ' أيام ' + (r.k === 'u' ? 'بدون عذر' : 'بعذر') + ' · ' + esc(hij(r.date))}</div>`).join(''); };
   $('#rp_t').addEventListener('input', show);
 }
 document.addEventListener('click', async e => { const b = e.target.closest('[data-planall]'); if (!b || b.closest('#sheetbg')) return; e.preventDefault(); e.stopPropagation();
